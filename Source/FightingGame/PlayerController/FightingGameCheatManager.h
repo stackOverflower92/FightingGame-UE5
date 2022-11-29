@@ -11,8 +11,4 @@ UCLASS()
 class FIGHTINGGAME_API UFightingGameCheatManager : public UCheatManager
 {
 	GENERATED_BODY()
-
-public:
-	UFUNCTION( exec, Category="Custom Cheats" )
-	void ShowHitTraces( int32 Show );
 };

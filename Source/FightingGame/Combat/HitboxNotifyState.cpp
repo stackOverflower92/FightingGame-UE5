@@ -4,6 +4,7 @@
 
 #include "HitboxHandlerComponent.h"
 #include "FightingGame/Character/FightingCharacter.h"
+#include "FightingGame/Common/CombatStatics.h"
 
 void UHitboxNotifyState::NotifyBegin( USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration )
 {
@@ -11,20 +12,20 @@ void UHitboxNotifyState::NotifyBegin( USkeletalMeshComponent* MeshComp, UAnimSeq
 
 	if( auto* Character = Cast<AFightingCharacter>( MeshComp->GetOwner() ) )
 	{
-		m_CurrentHitData = new FHitData( m_ForceOpponentFacing,
-		                                 m_DamagePercent,
-		                                 m_Radius,
-		                                 m_KnockbackOrientation,
-		                                 m_IgnoreKnockbackMultiplier,
-		                                 m_HitStunDuration,
-		                                 m_Shake,
-		                                 MeshComp->GetWorld(),
-		                                 Character,
-		                                 MeshComp,
-		                                 m_SocketName,
-		                                 GetUniqueID() );
+		const HitData& Data = HitData( m_ForceOpponentFacing,
+		                               m_DamagePercent,
+		                               m_Radius,
+		                               UCombatStatics::GetKnockbackFromOrientation( Character, m_KnockbackOrientation ) * m_KnockbackForce,
+		                               m_IgnoreKnockbackMultiplier,
+		                               m_HitStunDuration,
+		                               m_Shake,
+		                               MeshComp->GetWorld(),
+		                               Character,
+		                               MeshComp,
+		                               m_SocketName,
+		                               GetUniqueID() );
 
-		Character->GetHitboxHandler()->AddHitbox( *m_CurrentHitData );
+		Character->GetHitboxHandler()->AddHitbox( Data );
 	}
 }
 

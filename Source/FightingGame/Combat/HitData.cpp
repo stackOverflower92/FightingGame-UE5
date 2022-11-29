@@ -1,13 +1,13 @@
 ﻿#include "HitData.h"
 
-FHitData::FHitData( bool InForceOpponentFacing, float InDamagePercent, float InRadius, float InKnockbackOrientation, bool InIgnoreKnockbackMultiplier,
-                    float InHitStunDuration, bool InShake, const UWorld* InWorld, AActor* InOwner, USkeletalMeshComponent* InSkeletalMesh, const
-                    FName& InSocketToFollow,
-                    uint32 InId )
+HitData::HitData( bool InForceOpponentFacing, float InDamagePercent, float InRadius, const FVector& InProcessedKnockback, bool InIgnoreKnockbackMultiplier,
+                  float InHitStunDuration, bool InShake, const UWorld* InWorld, AActor* InOwner, USkeletalMeshComponent* InSkeletalMesh, const
+                  FName& InSocketToFollow,
+                  uint32 InId )
 	: m_ForceOpponentFacing( InForceOpponentFacing ),
 	  m_DamagePercent( InDamagePercent ),
 	  m_Radius( InRadius ),
-	  m_KnockbackOrientation( InKnockbackOrientation ),
+	  m_ProcessedKnockback( InProcessedKnockback ),
 	  m_IgnoreKnockbackMultiplier( InIgnoreKnockbackMultiplier ),
 	  m_HitStunDuration( InHitStunDuration ),
 	  m_Shake( InShake ),
@@ -19,12 +19,12 @@ FHitData::FHitData( bool InForceOpponentFacing, float InDamagePercent, float InR
 {
 }
 
-FHitData::FHitData( bool InForceOpponentFacing, float InDamagePercent, float InRadius, float InKnockbackOrientation, bool InIgnoreKnockbackMultiplier,
-                    float InHitStunDuration, bool InShake, const UWorld* InWorld, AActor* InOwner, FVector InLocation, uint32 InId )
+HitData::HitData( bool InForceOpponentFacing, float InDamagePercent, float InRadius, const FVector& InProcessedKnockback, bool InIgnoreKnockbackMultiplier,
+                  float InHitStunDuration, bool InShake, const UWorld* InWorld, AActor* InOwner, FVector InLocation, uint32 InId )
 	: m_ForceOpponentFacing( InForceOpponentFacing ),
 	  m_DamagePercent( InDamagePercent ),
 	  m_Radius( InRadius ),
-	  m_KnockbackOrientation( InKnockbackOrientation ),
+	  m_ProcessedKnockback( InProcessedKnockback ),
 	  m_IgnoreKnockbackMultiplier( InIgnoreKnockbackMultiplier ),
 	  m_HitStunDuration( InHitStunDuration ),
 	  m_Shake( InShake ),
@@ -35,12 +35,12 @@ FHitData::FHitData( bool InForceOpponentFacing, float InDamagePercent, float InR
 {
 }
 
-bool operator==( const FHitData& Lhs, const FHitData& RHS )
+bool operator==( const HitData& Lhs, const HitData& RHS )
 {
 	return Lhs.m_Id == RHS.m_Id;
 }
 
-bool operator!=( const FHitData& Lhs, const FHitData& RHS )
+bool operator!=( const HitData& Lhs, const HitData& RHS )
 {
 	return !(Lhs == RHS);
 }

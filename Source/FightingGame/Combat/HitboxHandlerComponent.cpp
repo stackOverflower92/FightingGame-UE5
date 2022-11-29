@@ -9,7 +9,7 @@
 namespace
 {
 	int32 loc_ShowHitboxTraces = 0;
-	FG_CVAR( CVarShowHitboxTraces, TEXT( "game.ShowHitboxTraces" ), loc_ShowHitboxTraces );
+	FG_CVAR_DESC( CVarShowHitboxTraces, TEXT( "HitboxHandlerComponent.ShowHitboxTraces" ), TEXT("1: Enable, 0: Disable"), loc_ShowHitboxTraces );
 }
 
 UHitboxHandlerComponent::UHitboxHandlerComponent()
@@ -22,14 +22,14 @@ void UHitboxHandlerComponent::BeginPlay()
 	Super::BeginPlay();
 }
 
-void UHitboxHandlerComponent::AddHitbox( FHitData HitData )
+void UHitboxHandlerComponent::AddHitbox( HitData HitData )
 {
 	m_ActiveHitboxes.AddUnique( HitData );
 }
 
 void UHitboxHandlerComponent::RemoveHitbox( uint32 HitUniqueId )
 {
-	auto* It = m_ActiveHitboxes.FindByPredicate( [&HitUniqueId]( const FHitData& HitData )
+	auto* It = m_ActiveHitboxes.FindByPredicate( [&HitUniqueId]( const HitData& HitData )
 	{
 		return HitData.m_Id == HitUniqueId;
 	} );
@@ -60,7 +60,7 @@ void UHitboxHandlerComponent::TickComponent( float DeltaTime, ELevelTick TickTyp
 	RemovePendingHitboxes();
 }
 
-bool UHitboxHandlerComponent::TraceHitbox( const FHitData& HitData, FHitResult& OutHit )
+bool UHitboxHandlerComponent::TraceHitbox( const HitData& HitData, FHitResult& OutHit )
 {
 	TArray<TEnumAsByte<EObjectTypeQuery>> TargetTraceTypes;
 
@@ -109,7 +109,7 @@ void UHitboxHandlerComponent::RegisterHitActor( AActor* Actor, uint32 HitboxId )
 	}
 }
 
-void UHitboxHandlerComponent::UpdateHitbox( const FHitData& HitData )
+void UHitboxHandlerComponent::UpdateHitbox( const HitData& HitData )
 {
 	FHitResult OutHit;
 	const bool Success = TraceHitbox( HitData, OutHit );

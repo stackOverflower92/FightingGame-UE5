@@ -63,14 +63,6 @@ float AFightingCharacter::GetKnockbackMultiplier() const
 	return 1.f;
 }
 
-void AFightingCharacter::ShowHitTraces( bool Show )
-{
-	if( m_HitboxHandler )
-	{
-		m_HitboxHandler->ShowDebugTraces( Show );
-	}
-}
-
 void AFightingCharacter::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
@@ -91,12 +83,14 @@ void AFightingCharacter::SetupPlayerInputComponent( UInputComponent* PlayerInput
 	m_MovesBuffer->OnSetupPlayerInputComponent( PlayerInputComponent );
 }
 
-void AFightingCharacter::OnHit( const FHitData& HitData )
+void AFightingCharacter::OnHit( const HitData& HitData )
 {
 	if( HitData.m_ForceOpponentFacing )
 	{
 		UCombatStatics::FaceOther( this, HitData.m_Owner, true );
 	}
+
+	UCombatStatics::ApplyKnockbackTo( HitData.m_ProcessedKnockback, HitData.m_ProcessedKnockback.Length(), this );
 
 	UFSMStatics::SetState( m_FSM, TEXT( "REACTION_LIGHT_GROUNDED" ) );
 }

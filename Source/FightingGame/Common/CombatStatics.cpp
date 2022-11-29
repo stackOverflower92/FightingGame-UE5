@@ -80,7 +80,7 @@ FVector UCombatStatics::GetKnockbackFromOrientation( AFightingCharacter* Charact
 	ensureMsgf( Character, TEXT("Character is null") );
 
 	bool FacingRight = Character->IsFacingRight();
-	FVector Forward = FacingRight ? FVector( 0.f, 1.f, 0.f ) : FVector( 0.f, -1.f, 0.f );
+	FVector Forward = FacingRight ? -FVector::RightVector : FVector::RightVector;
 
 	float FinalKnockbackOrientation = FacingRight ? Orientation : -Orientation;
 

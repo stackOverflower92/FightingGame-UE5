@@ -42,12 +42,10 @@ public:
 	UFUNCTION( BlueprintCallable )
 	float GetKnockbackMultiplier() const;
 
-	void ShowHitTraces( bool Show );
-
 	virtual void Tick( float DeltaTime ) override;
 	virtual void SetupPlayerInputComponent( class UInputComponent* PlayerInputComponent ) override;
 
-	virtual void OnHit( const FHitData& HitData ) override;
+	virtual void OnHit( const HitData& HitData ) override;
 
 protected:
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "FSM" )

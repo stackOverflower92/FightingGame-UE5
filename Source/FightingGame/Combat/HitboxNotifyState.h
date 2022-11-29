@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "HitData.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
 #include "HitboxNotifyState.generated.h"
 
@@ -31,6 +30,9 @@ public:
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Knockback Orientation" )
 	float m_KnockbackOrientation = 0.f;
 
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Knockback Force" )
+	float m_KnockbackForce = 600.f;
+
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Ignore Knockback Multiplier" )
 	bool m_IgnoreKnockbackMultiplier = false;
 
@@ -42,7 +44,4 @@ public:
 
 	virtual void NotifyBegin( USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration ) override;
 	virtual void NotifyEnd( USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation ) override;
-
-protected:
-	FHitData* m_CurrentHitData = nullptr;
 };
