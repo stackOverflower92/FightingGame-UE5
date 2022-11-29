@@ -2,6 +2,6 @@
 
 #include "Hittable.h"
 
-void IHittable::OnHit( const HitData& HitData )
+void IHittable::OnHitReceived( const HitData& HitData )
 {
 }

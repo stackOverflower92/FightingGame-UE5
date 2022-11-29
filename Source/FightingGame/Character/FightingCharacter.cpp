@@ -27,9 +27,12 @@ void AFightingCharacter::UpdateHorizontalMovement( float value )
 	m_CurrentHorizontalMovement = value;
 	AddMovementInput( FVector( 0.f, -1.f, 0.f ), m_CurrentHorizontalMovement );
 
-	if( !FMath::IsNearlyZero( m_CurrentHorizontalMovement ) )
+	if( !IsAirborne() || m_UpdateFacingWhenAirborne )
 	{
-		m_TargetRotatorYaw = -FMath::Sign( m_CurrentHorizontalMovement ) * 90.f;
+		if( !FMath::IsNearlyZero( m_CurrentHorizontalMovement ) )
+		{
+			m_TargetRotatorYaw = -FMath::Sign( m_CurrentHorizontalMovement ) * 90.f;
+		}
 	}
 }
 
@@ -38,6 +41,15 @@ void AFightingCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	UFSMStatics::Init( m_FSM, m_FirstState );
+
+	m_HitDelegateHandle = m_HitboxHandler->m_HitDelegate.AddUObject( this, &AFightingCharacter::OnHitLanded );
+}
+
+void AFightingCharacter::EndPlay( const EEndPlayReason::Type EndPlayReason )
+{
+	Super::EndPlay( EndPlayReason );
+
+	m_HitboxHandler->m_HitDelegate.Remove( m_HitDelegateHandle );
 }
 
 bool AFightingCharacter::IsFacingRight() const
@@ -69,10 +81,7 @@ void AFightingCharacter::Tick( float DeltaTime )
 
 	m_FacingRight = m_TargetRotatorYaw < 0.f && m_TargetRotatorYaw > -180.f;
 
-	if( !IsAirborne() || m_UpdateFacingWhenAirborne )
-	{
-		UpdateYaw( DeltaTime );
-	}
+	UpdateYaw( DeltaTime );
 }
 
 void AFightingCharacter::SetupPlayerInputComponent( UInputComponent* PlayerInputComponent )
@@ -83,7 +92,7 @@ void AFightingCharacter::SetupPlayerInputComponent( UInputComponent* PlayerInput
 	m_MovesBuffer->OnSetupPlayerInputComponent( PlayerInputComponent );
 }
 
-void AFightingCharacter::OnHit( const HitData& HitData )
+void AFightingCharacter::OnHitReceived( const HitData& HitData )
 {
 	if( HitData.m_ForceOpponentFacing )
 	{
@@ -103,4 +112,9 @@ void AFightingCharacter::UpdateYaw( float DeltaTime )
 	FRotator LerpRotator = UKismetMathLibrary::RLerp( GetActorRotation(), TargetRotator, m_FacingRotationLerpMultiplier * DeltaTime, true );
 
 	SetActorRotation( LerpRotator );
+}
+
+void AFightingCharacter::OnHitLanded( AActor* Target )
+{
+	m_HitLandedDelegate.Broadcast( Target );
 }

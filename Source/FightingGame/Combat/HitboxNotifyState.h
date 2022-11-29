@@ -6,6 +6,7 @@
 #include "Animation/AnimNotifies/AnimNotifyState.h"
 #include "HitboxNotifyState.generated.h"
 
+
 UCLASS()
 class FIGHTINGGAME_API UHitboxNotifyState : public UAnimNotifyState
 {

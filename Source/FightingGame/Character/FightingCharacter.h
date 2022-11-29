@@ -10,6 +10,7 @@ class UMovesBufferComponent;
 class UHitboxHandlerComponent;
 
 DECLARE_MULTICAST_DELEGATE( FFacingChanged )
+DECLARE_MULTICAST_DELEGATE_OneParam( FHitLanded, AActor* );
 
 UCLASS()
 class FIGHTINGGAME_API AFightingCharacter : public ACharacter, public IHittable
@@ -20,6 +21,7 @@ public:
 	AFightingCharacter();
 
 	FFacingChanged m_FacingChangedDelegate;
+	FHitLanded m_HitLandedDelegate;
 
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Current Horizontal Movement" )
 	float m_CurrentHorizontalMovement = 0.f;
@@ -45,7 +47,7 @@ public:
 	virtual void Tick( float DeltaTime ) override;
 	virtual void SetupPlayerInputComponent( class UInputComponent* PlayerInputComponent ) override;
 
-	virtual void OnHit( const HitData& HitData ) override;
+	virtual void OnHitReceived( const HitData& HitData ) override;
 
 protected:
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "FSM" )
@@ -67,10 +69,13 @@ protected:
 	float m_FacingRotationLerpMultiplier = 1.f;
 
 	virtual void BeginPlay() override;
+	virtual void EndPlay( const EEndPlayReason::Type EndPlayReason ) override;
 
 private:
 	bool m_FacingRight = true;
 	float m_TargetRotatorYaw = 90.f;
+	FDelegateHandle m_HitDelegateHandle;
 
 	void UpdateYaw( float DeltaTime );
+	void OnHitLanded( AActor* Target );
 };

@@ -15,6 +15,8 @@ void UFightingCharacterState::Enter_Implementation()
 	ensure( m_AnimInstance );
 
 	m_AnimInstance->m_MontageEvent.AddDynamic( this, &UFightingCharacterState::OnMontageEvent );
+
+	m_CharacterHitLandedHandle = m_OwnerCharacter->m_HitLandedDelegate.AddUObject( this, &UFightingCharacterState::OnCharacterHitLanded );
 }
 
 void UFightingCharacterState::Exit_Implementation()
@@ -25,6 +27,8 @@ void UFightingCharacterState::Exit_Implementation()
 	{
 		m_AnimInstance->m_MontageEvent.RemoveDynamic( this, &UFightingCharacterState::OnMontageEvent );
 	}
+
+	m_OwnerCharacter->m_HitLandedDelegate.Remove( m_CharacterHitLandedHandle );
 }
 
 void UFightingCharacterState::OnMontageEvent( UAnimMontage* Montage, EMontageEventType EventType )
@@ -33,14 +37,17 @@ void UFightingCharacterState::OnMontageEvent( UAnimMontage* Montage, EMontageEve
 	switch( EventType )
 	{
 	case EMontageEventType::Ended:
-	{
-		OnMontageEnded( Montage );
-		break;
+		{
+			OnMontageEnded( Montage );
+			break;
+		}
 	}
-	}
+}
+
+void UFightingCharacterState::OnCharacterHitLanded_Implementation( AActor* Target )
+{
 }
 
 void UFightingCharacterState::OnMontageEnded_Implementation( UAnimMontage* Montage )
 {
-
 }

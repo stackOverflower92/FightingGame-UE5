@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "StateBase.h"
+#include "FightingGame/Character/FightingCharacter.h"
 #include "FightingCharacterState.generated.h"
 
 class AFightingCharacter;
@@ -21,14 +22,20 @@ public:
 
 protected:
 	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Owner Character" )
-		TObjectPtr<AFightingCharacter> m_OwnerCharacter = nullptr;
+	TObjectPtr<AFightingCharacter> m_OwnerCharacter = nullptr;
 
 	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Anim Instance" )
-		TObjectPtr<UFightingCharacterAnimInstance> m_AnimInstance = nullptr;
+	TObjectPtr<UFightingCharacterAnimInstance> m_AnimInstance = nullptr;
 
 	UFUNCTION()
-		void OnMontageEvent( UAnimMontage* Montage, EMontageEventType EventType );
+	void OnMontageEvent( UAnimMontage* Montage, EMontageEventType EventType );
 
 	UFUNCTION( BlueprintNativeEvent )
-		void OnMontageEnded( UAnimMontage* Montage );
+	void OnMontageEnded( UAnimMontage* Montage );
+
+	UFUNCTION( BlueprintNativeEvent )
+	void OnCharacterHitLanded(AActor* Target);
+
+private:
+	FDelegateHandle m_CharacterHitLandedHandle;
 };

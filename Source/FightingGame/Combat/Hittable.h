@@ -20,5 +20,5 @@ class FIGHTINGGAME_API IHittable
 	GENERATED_BODY()
 
 public:
-	virtual void OnHit( const HitData& HitData );
+	virtual void OnHitReceived( const HitData& HitData );
 };

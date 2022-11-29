@@ -7,6 +7,8 @@
 #include "FightingGame/Combat/HitData.h"
 #include "HitboxHandlerComponent.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam( FHit, AActor* )
+
 UCLASS( ClassGroup = ( Custom ), meta = ( BlueprintSpawnableComponent ) )
 class FIGHTINGGAME_API UHitboxHandlerComponent : public UActorComponent
 {
@@ -19,10 +21,12 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	FHit m_HitDelegate;
+
 	void AddHitbox( HitData HitData );
 	void RemoveHitbox( uint32 HitUniqueId );
 
-	void ShowDebugTraces(bool Show);
+	void ShowDebugTraces( bool Show );
 
 	virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
 
