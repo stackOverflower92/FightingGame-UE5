@@ -38,10 +38,12 @@ public:
 
 	UFUNCTION( BlueprintCallable )
 	UHitboxHandlerComponent* GetHitboxHandler() const { return m_HitboxHandler; }
-	
+
 	UFUNCTION( BlueprintCallable )
 	float GetKnockbackMultiplier() const;
-	
+
+	void ShowHitTraces( bool Show );
+
 	virtual void Tick( float DeltaTime ) override;
 	virtual void SetupPlayerInputComponent( class UInputComponent* PlayerInputComponent ) override;
 

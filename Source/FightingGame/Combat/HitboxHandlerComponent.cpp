@@ -3,8 +3,17 @@
 #include "HitboxHandlerComponent.h"
 #include "Hittable.h"
 #include "FightingGame/Collision/CustomCollisionChannels.h"
-#include "FightingGame/Common/CombatStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+
+namespace
+{
+	int32 loc_ShowHitboxTraces = 0;
+
+	FAutoConsoleVariableRef CVarShowHitboxTraces(
+		TEXT( "game.ShowHitboxTraces" ),
+		loc_ShowHitboxTraces,
+		TEXT( "1 = Show hitbox traces. 0 = Hide hitbox traces" ) );
+}
 
 UHitboxHandlerComponent::UHitboxHandlerComponent()
 {
@@ -32,6 +41,11 @@ void UHitboxHandlerComponent::RemoveHitbox( uint32 HitUniqueId )
 	{
 		(*It).m_PendingRemoval = true;
 	}
+}
+
+void UHitboxHandlerComponent::ShowDebugTraces( bool Show )
+{
+	m_DebugTraces = Show;
 }
 
 void UHitboxHandlerComponent::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
@@ -62,9 +76,11 @@ bool UHitboxHandlerComponent::TraceHitbox( const FHitData& HitData, FHitResult& 
 	const bool HasSocketToFollow = !HitData.m_SocketToFollow.ToString().IsEmpty();
 	const FVector Location = HasSocketToFollow ? HitData.m_SkeletalMesh->GetSocketLocation( HitData.m_SocketToFollow ) : HitData.m_Location;
 
+	EDrawDebugTrace::Type DebugDrawType = loc_ShowHitboxTraces == 0 ? EDrawDebugTrace::None : EDrawDebugTrace::ForOneFrame;
+
 	const bool SuccessfulHit = UKismetSystemLibrary::SphereTraceSingleForObjects( HitData.m_World, Location, Location,
 	                                                                              HitData.m_Radius, TargetTraceTypes,
-	                                                                              false, ActorsToIgnore, EDrawDebugTrace::ForOneFrame, OutHit, true );
+	                                                                              false, ActorsToIgnore, DebugDrawType, OutHit, true );
 
 	return SuccessfulHit;
 }

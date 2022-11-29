@@ -63,6 +63,14 @@ float AFightingCharacter::GetKnockbackMultiplier() const
 	return 1.f;
 }
 
+void AFightingCharacter::ShowHitTraces( bool Show )
+{
+	if( m_HitboxHandler )
+	{
+		m_HitboxHandler->ShowDebugTraces( Show );
+	}
+}
+
 void AFightingCharacter::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
