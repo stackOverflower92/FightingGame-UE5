@@ -3,16 +3,13 @@
 #include "HitboxHandlerComponent.h"
 #include "Hittable.h"
 #include "FightingGame/Collision/CustomCollisionChannels.h"
+#include "FightingGame/Debug/Debug.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 namespace
 {
 	int32 loc_ShowHitboxTraces = 0;
-
-	FAutoConsoleVariableRef CVarShowHitboxTraces(
-		TEXT( "game.ShowHitboxTraces" ),
-		loc_ShowHitboxTraces,
-		TEXT( "1 = Show hitbox traces. 0 = Hide hitbox traces" ) );
+	FG_CVAR( CVarShowHitboxTraces, TEXT( "game.ShowHitboxTraces" ), loc_ShowHitboxTraces );
 }
 
 UHitboxHandlerComponent::UHitboxHandlerComponent()
