@@ -92,6 +92,16 @@ void AFightingCharacter::SetDamagePercent( float Percent )
 	m_DamagePercent = FMath::Max( 0.f, Percent );
 }
 
+bool AFightingCharacter::IsAirKnockbackHappening() const
+{
+	return m_IsAirKnockbackHappening;
+}
+
+void AFightingCharacter::SetAirKnockbackHappening( bool Value )
+{
+	m_IsAirKnockbackHappening = Value;
+}
+
 void AFightingCharacter::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
@@ -125,7 +135,15 @@ void AFightingCharacter::OnHitReceived( const HitData& HitData )
 	m_DamagePercent += HitData.m_DamagePercent;
 	UCombatStatics::ApplyKnockbackTo( HitData.m_ProcessedKnockback, HitData.m_ProcessedKnockback.Length(), this );
 
-	UFSMStatics::SetState( m_FSM, TEXT( "REACTION_LIGHT_GROUNDED" ) );
+	float DotAbs = FMath::Abs( FVector::DotProduct( GetActorForwardVector(), HitData.m_ProcessedKnockback.GetSafeNormal() ) );
+	if( DotAbs < .9f && HitData.m_ProcessedKnockback.Length() >= 500.f )
+	{
+		UFSMStatics::SetState( m_FSM, TEXT( "REACTION_LIGHT_AIRBORNE" ) );
+	}
+	else
+	{
+		UFSMStatics::SetState( m_FSM, TEXT( "REACTION_LIGHT_GROUNDED" ) );
+	}
 }
 
 void AFightingCharacter::UpdateYaw( float DeltaTime )

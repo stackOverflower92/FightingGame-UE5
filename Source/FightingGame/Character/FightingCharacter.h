@@ -50,6 +50,12 @@ public:
 	UFUNCTION( BlueprintCallable )
 	void SetDamagePercent( float Percent );
 
+	UFUNCTION( BlueprintCallable )
+	bool IsAirKnockbackHappening() const;
+
+	UFUNCTION( BlueprintCallable )
+	void SetAirKnockbackHappening( bool Value );
+
 	virtual void Tick( float DeltaTime ) override;
 	virtual void SetupPlayerInputComponent( class UInputComponent* PlayerInputComponent ) override;
 
@@ -84,6 +90,8 @@ private:
 	bool m_FacingRight = true;
 	float m_TargetRotatorYaw = 90.f;
 	float m_DamagePercent = 0.f;
+	bool m_IsAirKnockbackHappening = false;
+
 	FDelegateHandle m_HitDelegateHandle;
 
 	void UpdateYaw( float DeltaTime );

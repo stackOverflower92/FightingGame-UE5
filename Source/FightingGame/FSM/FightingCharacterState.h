@@ -27,6 +27,9 @@ protected:
 	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Anim Instance" )
 	TObjectPtr<UFightingCharacterAnimInstance> m_AnimInstance = nullptr;
 
+	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Is Reaction" )
+	bool m_IsReaction = false;
+
 	UFUNCTION()
 	void OnMontageEvent( UAnimMontage* Montage, EMontageEventType EventType );
 
@@ -34,7 +37,7 @@ protected:
 	void OnMontageEnded( UAnimMontage* Montage );
 
 	UFUNCTION( BlueprintNativeEvent )
-	void OnCharacterHitLanded(AActor* Target);
+	void OnCharacterHitLanded( AActor* Target );
 
 private:
 	FDelegateHandle m_CharacterHitLandedHandle;

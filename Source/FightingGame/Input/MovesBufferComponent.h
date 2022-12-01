@@ -24,35 +24,35 @@ public:
 	UMovesBufferComponent();
 
 	UFUNCTION( BlueprintCallable )
-		void UseBufferedInput( FString Input );
+	void UseBufferedInput( FString Input );
 
 	UFUNCTION( BlueprintCallable )
-		bool IsInputBuffered( FString Input, bool ConsumeEntry = true );
+	bool IsInputBuffered( FString Input, bool ConsumeEntry = true );
 
 	UFUNCTION( BlueprintCallable )
-		TArray<FString> GetBufferedInputs() const;
+	TArray<FString> GetBufferedInputs() const;
 
 	UFUNCTION( BlueprintCallable )
-		void ClearBuffer();
+	void ClearBuffer();
 
 	UFUNCTION( BlueprintCallable )
-		void InitBuffer();
+	void InitBuffer();
 
 	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Input Movement" )
-		float m_InputMovement = 0.f;
+	float m_InputMovement = 0.f;
 
 	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Moving Right" )
-		bool m_MovingRight = false;
+	bool m_MovingRight = false;
 
 	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Moving Left" )
-		bool m_MovingLeft = false;
+	bool m_MovingLeft = false;
 
 protected:
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Buffer Size Frames" )
-		int m_BufferSizeFrames = 6;
+	int m_BufferSizeFrames = 6;
 
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Buffer Frame Length" )
-		float m_BufferFrameLength = 0.032;
+	float m_BufferFrameLength = 0.032;
 
 public:
 	virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
@@ -60,11 +60,11 @@ public:
 	void OnSetupPlayerInputComponent( UInputComponent* PlayerInputComponent );
 
 	UFUNCTION( BlueprintCallable )
-		float GetMovementDirection() const;
+	float GetMovementDirection() const;
 
 private:
 	UPROPERTY()
-		UInputComponent* m_PlayerInput = nullptr;
+	UInputComponent* m_PlayerInput = nullptr;
 
 	std::deque<FInputBufferEntry> m_Buffer;
 	float m_ElapsedFrameTime = 0.f;
