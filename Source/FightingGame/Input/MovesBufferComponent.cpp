@@ -5,15 +5,15 @@
 
 namespace
 {
-	const FString NoInput{ "" };
+	const FString NoInput{""};
 
-	const FString EntryStartJump{ "StartJump" };
-	const FString EntryStopJump{ "StopJump" };
-	const FString EntryStartMove{ "StartMove" };
-	const FString EntryStartMoveRight{ "StartMoveRight" };
-	const FString EntryStartMoveLeft{ "StartMoveLeft" };
-	const FString EntryStopMove{ "StopMove" };
-	const FString EntryAttack{ "Attack" };
+	const FString EntryStartJump{"StartJump"};
+	const FString EntryStopJump{"StopJump"};
+	const FString EntryStartMove{"StartMove"};
+	const FString EntryStartMoveRight{"StartMoveRight"};
+	const FString EntryStartMoveLeft{"StartMoveLeft"};
+	const FString EntryStopMove{"StopMove"};
+	const FString EntryAttack{"Attack"};
 }
 
 UMovesBufferComponent::UMovesBufferComponent()
@@ -109,7 +109,7 @@ float UMovesBufferComponent::GetMovementDirection() const
 
 void UMovesBufferComponent::AddMoveToBuffer( const FString& MoveName )
 {
-	m_Buffer.emplace_back( FInputBufferEntry{ FString( MoveName ), false } );
+	m_Buffer.emplace_back( FInputBufferEntry{FString( MoveName ), false} );
 	m_Buffer.pop_front();
 
 	m_BufferChanged = true;
@@ -139,13 +139,16 @@ void UMovesBufferComponent::InitBuffer()
 
 	for( int i = 0; i < m_BufferSizeFrames; ++i )
 	{
-		m_Buffer.emplace_back( FInputBufferEntry{ NoInput, false } );
+		m_Buffer.emplace_back( FInputBufferEntry{NoInput, false} );
 	}
 }
 
 void UMovesBufferComponent::OnMoveHorizontal( float Value )
 {
 	m_InputMovement = Value;
+
+	m_MovingRight = Value > 0.f;
+	m_MovingLeft = Value < 0.f;
 }
 
 // TODO: these are all the same, make it generic maybe?
@@ -194,7 +197,7 @@ void UMovesBufferComponent::OnAttack()
 
 void UMovesBufferComponent::UpdateMovement()
 {
-	if( ( m_MovingRight && m_MovingLeft ) || ( !m_MovingRight && !m_MovingLeft ) )
+	if( (m_MovingRight && m_MovingLeft) || (!m_MovingRight && !m_MovingLeft) )
 	{
 		m_MovementDirection = 0.f;
 	}

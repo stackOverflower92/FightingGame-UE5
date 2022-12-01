@@ -44,6 +44,12 @@ public:
 	UFUNCTION( BlueprintCallable )
 	float GetKnockbackMultiplier() const;
 
+	UFUNCTION( BlueprintCallable )
+	float GetDamagePercent() const;
+
+	UFUNCTION( BlueprintCallable )
+	void SetDamagePercent( float Percent );
+
 	virtual void Tick( float DeltaTime ) override;
 	virtual void SetupPlayerInputComponent( class UInputComponent* PlayerInputComponent ) override;
 
@@ -58,6 +64,9 @@ protected:
 
 	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Hitbox Handler" )
 	TObjectPtr<UHitboxHandlerComponent> m_HitboxHandler = nullptr;
+
+	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Knockback Multiplier Curve" )
+	TObjectPtr<UCurveFloat> m_KnockbackMultiplierCurve;
 
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "FSM First State" )
 	FName m_FirstState = "IDLE";
@@ -74,6 +83,7 @@ protected:
 private:
 	bool m_FacingRight = true;
 	float m_TargetRotatorYaw = 90.f;
+	float m_DamagePercent = 0.f;
 	FDelegateHandle m_HitDelegateHandle;
 
 	void UpdateYaw( float DeltaTime );

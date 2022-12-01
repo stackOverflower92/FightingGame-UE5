@@ -7,6 +7,14 @@
 #include <Runtime/Engine/Classes/Kismet/KismetMathLibrary.h>
 
 #include "FightingGame/Common/CombatStatics.h"
+#include "FightingGame/Debug/Debug.h"
+#include "Kismet/KismetSystemLibrary.h"
+
+namespace
+{
+	int32 loc_DebugDamageStats = 0;
+	FG_CVAR_DESC( CVarDebugDamageStats, TEXT("FightingCharacter.DebugDamageStats"), TEXT("1: enable, 0: disable"), loc_DebugDamageStats );
+}
 
 AFightingCharacter::AFightingCharacter()
 {
@@ -71,13 +79,28 @@ void AFightingCharacter::SetFacingRight( bool Right, bool Instant /*= false*/ )
 
 float AFightingCharacter::GetKnockbackMultiplier() const
 {
-	// #TODO implement
-	return 1.f;
+	return m_KnockbackMultiplierCurve->GetFloatValue( m_DamagePercent );
+}
+
+float AFightingCharacter::GetDamagePercent() const
+{
+	return m_DamagePercent;
+}
+
+void AFightingCharacter::SetDamagePercent( float Percent )
+{
+	m_DamagePercent = FMath::Max( 0.f, Percent );
 }
 
 void AFightingCharacter::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
+
+	if( loc_DebugDamageStats == 1 )
+	{
+		UKismetSystemLibrary::DrawDebugString( GetWorld(), GetActorLocation(),
+		                                       FString::Printf( TEXT( "[DP: %.1f][KM: %.1f]" ), m_DamagePercent, GetKnockbackMultiplier() ) );
+	}
 
 	m_FacingRight = m_TargetRotatorYaw < 0.f && m_TargetRotatorYaw > -180.f;
 
@@ -99,6 +122,7 @@ void AFightingCharacter::OnHitReceived( const HitData& HitData )
 		UCombatStatics::FaceOther( this, HitData.m_Owner, true );
 	}
 
+	m_DamagePercent += HitData.m_DamagePercent;
 	UCombatStatics::ApplyKnockbackTo( HitData.m_ProcessedKnockback, HitData.m_ProcessedKnockback.Length(), this );
 
 	UFSMStatics::SetState( m_FSM, TEXT( "REACTION_LIGHT_GROUNDED" ) );
