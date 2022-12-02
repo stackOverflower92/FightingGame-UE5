@@ -114,6 +114,19 @@ void AFightingCharacter::Tick( float DeltaTime )
 
 	m_FacingRight = m_TargetRotatorYaw < 0.f && m_TargetRotatorYaw > -180.f;
 	UpdateYaw( DeltaTime );
+
+	if( IsAirborne() )
+	{
+		m_GroundedDelegateBroadcast = false;
+	}
+	else
+	{
+		if( !m_GroundedDelegateBroadcast )
+		{
+			m_GroundedDelegateBroadcast = true;
+			m_GroundedDelegate.Broadcast();
+		}
+	}
 }
 
 void AFightingCharacter::SetupPlayerInputComponent( UInputComponent* PlayerInputComponent )

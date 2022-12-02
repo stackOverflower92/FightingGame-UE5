@@ -99,7 +99,7 @@ private:
 	float m_TargetRotatorYaw = 90.f;
 	float m_DamagePercent = 0.f;
 	bool m_IsAirKnockbackHappening = false;
-	bool m_WasAirborneLastFrame = false;
+	bool m_GroundedDelegateBroadcast = false;
 
 	FDelegateHandle m_HitDelegateHandle;
 
