@@ -113,7 +113,6 @@ void AFightingCharacter::Tick( float DeltaTime )
 	}
 
 	m_FacingRight = m_TargetRotatorYaw < 0.f && m_TargetRotatorYaw > -180.f;
-
 	UpdateYaw( DeltaTime );
 }
 
@@ -138,11 +137,11 @@ void AFightingCharacter::OnHitReceived( const HitData& HitData )
 	float DotAbs = FMath::Abs( FVector::DotProduct( GetActorForwardVector(), HitData.m_ProcessedKnockback.GetSafeNormal() ) );
 	if( DotAbs < .9f && HitData.m_ProcessedKnockback.Length() >= 500.f )
 	{
-		UFSMStatics::SetState( m_FSM, TEXT( "REACTION_LIGHT_AIRBORNE" ) );
+		UFSMStatics::SetState( m_FSM, m_GroundToAirReactionStateName );
 	}
 	else
 	{
-		UFSMStatics::SetState( m_FSM, TEXT( "REACTION_LIGHT_GROUNDED" ) );
+		UFSMStatics::SetState( m_FSM, m_GroundedReactionStateName );
 	}
 }
 

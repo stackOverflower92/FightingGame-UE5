@@ -39,6 +39,10 @@ protected:
 	UFUNCTION( BlueprintNativeEvent )
 	void OnCharacterHitLanded( AActor* Target );
 
+	UFUNCTION( BlueprintNativeEvent )
+	void OnCharacterGrounded();
+
 private:
 	FDelegateHandle m_CharacterHitLandedHandle;
+	FDelegateHandle m_CharacterGroundedHandle;
 };

@@ -10,7 +10,8 @@ class UMovesBufferComponent;
 class UHitboxHandlerComponent;
 
 DECLARE_MULTICAST_DELEGATE( FFacingChanged )
-DECLARE_MULTICAST_DELEGATE_OneParam( FHitLanded, AActor* );
+DECLARE_MULTICAST_DELEGATE_OneParam( FHitLanded, AActor* )
+DECLARE_MULTICAST_DELEGATE( FGrounded )
 
 UCLASS()
 class FIGHTINGGAME_API AFightingCharacter : public ACharacter, public IHittable
@@ -22,6 +23,7 @@ public:
 
 	FFacingChanged m_FacingChangedDelegate;
 	FHitLanded m_HitLandedDelegate;
+	FGrounded m_GroundedDelegate;
 
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Current Horizontal Movement" )
 	float m_CurrentHorizontalMovement = 0.f;
@@ -83,6 +85,12 @@ protected:
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Facing Rotation Lerp Multiplier" )
 	float m_FacingRotationLerpMultiplier = 1.f;
 
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Grounded Reaction State Name" )
+	FName m_GroundedReactionStateName = "REACTION_LIGHT_GROUNDED";
+
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Ground To Air Reaction State Name" )
+	FName m_GroundToAirReactionStateName = "REACTION_LIGHT_AIRBORNE";
+
 	virtual void BeginPlay() override;
 	virtual void EndPlay( const EEndPlayReason::Type EndPlayReason ) override;
 
@@ -91,6 +99,7 @@ private:
 	float m_TargetRotatorYaw = 90.f;
 	float m_DamagePercent = 0.f;
 	bool m_IsAirKnockbackHappening = false;
+	bool m_WasAirborneLastFrame = false;
 
 	FDelegateHandle m_HitDelegateHandle;
 

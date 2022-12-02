@@ -17,6 +17,7 @@ void UFightingCharacterState::Enter_Implementation()
 	m_AnimInstance->m_MontageEvent.AddDynamic( this, &UFightingCharacterState::OnMontageEvent );
 
 	m_CharacterHitLandedHandle = m_OwnerCharacter->m_HitLandedDelegate.AddUObject( this, &UFightingCharacterState::OnCharacterHitLanded );
+	m_CharacterGroundedHandle = m_OwnerCharacter->m_GroundedDelegate.AddUObject( this, &UFightingCharacterState::OnCharacterGrounded );
 
 	// #TODO what happens with AI?
 	if( m_IsReaction && m_OwnerCharacter->IsPlayerControlled() )
@@ -35,6 +36,7 @@ void UFightingCharacterState::Exit_Implementation()
 	}
 
 	m_OwnerCharacter->m_HitLandedDelegate.Remove( m_CharacterHitLandedHandle );
+	m_OwnerCharacter->m_GroundedDelegate.Remove( m_CharacterGroundedHandle );
 
 	// #TODO what happens with AI?
 	if( m_IsReaction && m_OwnerCharacter->IsPlayerControlled() )
@@ -54,6 +56,10 @@ void UFightingCharacterState::OnMontageEvent( UAnimMontage* Montage, EMontageEve
 			break;
 		}
 	}
+}
+
+void UFightingCharacterState::OnCharacterGrounded_Implementation()
+{
 }
 
 void UFightingCharacterState::OnCharacterHitLanded_Implementation( AActor* Target )
