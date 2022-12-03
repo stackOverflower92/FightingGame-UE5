@@ -6,12 +6,16 @@
 #include "GameFramework/GameModeBase.h"
 #include "FightingGameGameModeBase.generated.h"
 
-/**
- * 
- */
+class ACameraManager;
+
 UCLASS()
 class FIGHTINGGAME_API AFightingGameGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+
+public:
+	virtual void BeginPlay() override;
+
+protected:
+	TObjectPtr<ACameraManager> m_CameraManager = nullptr;
 };

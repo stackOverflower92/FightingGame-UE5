@@ -25,6 +25,10 @@
 		{
 			"Name": "StackBasedFSM",
 			"Enabled": true
+		},
+		{
+			"Name": "AssetSearch",
+			"Enabled": true
 		}
 	]
 }

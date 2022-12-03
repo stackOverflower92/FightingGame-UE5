@@ -1,6 +1,7 @@
 #include "FreeForAllGameMode.h"
 
 #include "EngineUtils.h"
+#include "FightingGame/Camera/CameraManager.h"
 #include "FightingGame/Character/FightingCharacter.h"
 #include "FightingGame/Common/CombatStatics.h"
 #include "GameFramework/PlayerStart.h"
@@ -59,6 +60,11 @@ void AFreeForAllGameMode::SpawnCharacters()
 	}
 
 	EnablePlayersInput( true );
+
+	if( m_CameraManager )
+	{
+		m_CameraManager->Init();
+	}
 }
 
 void AFreeForAllGameMode::EnablePlayersInput( bool Enable )

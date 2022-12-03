@@ -4,6 +4,7 @@
 #include "FightingGame/FightingGameGameModeBase.h"
 #include "FreeForAllGameMode.generated.h"
 
+class ACameraManager;
 class AFightingCharacter;
 class APlayerStart;
 
