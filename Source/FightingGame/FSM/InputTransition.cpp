@@ -8,5 +8,17 @@
 
 bool UInputTransition::CanPerformTransition()
 {
-	return m_Character->GetMovesBufferComponent()->IsInputBuffered( m_InputEntry );
+	if( m_RequireHitLanded )
+	{
+		if( m_Character->HasJustLandedHit() )
+		{
+			return m_Character->GetMovesBufferComponent()->IsInputBuffered( m_InputEntry );
+		}
+	}
+	else
+	{
+		return m_Character->GetMovesBufferComponent()->IsInputBuffered( m_InputEntry );
+	}
+
+	return false;
 }

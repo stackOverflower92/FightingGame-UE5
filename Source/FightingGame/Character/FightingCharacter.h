@@ -65,6 +65,7 @@ public:
 
 	FORCEINLINE TObjectPtr<UMovesBufferComponent> GetMovesBufferComponent() const { return m_MovesBuffer; }
 	FORCEINLINE TObjectPtr<UFSM> GetFSM() const { return m_FSM; }
+	FORCEINLINE bool HasJustLandedHit() const { return m_HasLandedHit; }
 
 protected:
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "FSM" )
@@ -94,6 +95,9 @@ protected:
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Ground To Air Reaction State Name" )
 	FName m_GroundToAirReactionStateName = "REACTION_LIGHT_AIRBORNE";
 
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Hit Landed State Duration" )
+	float m_HitLandedStateDuration = .2f;
+
 	virtual void BeginPlay() override;
 	virtual void EndPlay( const EEndPlayReason::Type EndPlayReason ) override;
 
@@ -103,9 +107,12 @@ private:
 	float m_DamagePercent = 0.f;
 	bool m_IsAirKnockbackHappening = false;
 	bool m_GroundedDelegateBroadcast = false;
+	bool m_HasLandedHit = false;
+	FTimerHandle m_HitLandedStateTimerHandle;
 
 	FDelegateHandle m_HitDelegateHandle;
 
 	void UpdateYaw( float DeltaTime );
 	void OnHitLanded( AActor* Target );
+	void OnHitLandedTimerEnded();
 };

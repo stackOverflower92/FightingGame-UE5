@@ -16,5 +16,8 @@ public:
 	UPROPERTY( EditAnywhere, DisplayName = "Input Entry" )
 	FString m_InputEntry;
 
+	UPROPERTY( EditAnywhere, DisplayName = "Require Hit Landed" )
+	bool m_RequireHitLanded = false;
+
 	virtual bool CanPerformTransition() override;
 };

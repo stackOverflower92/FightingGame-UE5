@@ -171,4 +171,18 @@ void AFightingCharacter::UpdateYaw( float DeltaTime )
 void AFightingCharacter::OnHitLanded( AActor* Target )
 {
 	m_HitLandedDelegate.Broadcast( Target );
+
+	m_HasLandedHit = true;
+
+	if( GetWorldTimerManager().IsTimerActive( m_HitLandedStateTimerHandle ) )
+	{
+		GetWorldTimerManager().ClearTimer( m_HitLandedStateTimerHandle );
+	}
+
+	GetWorldTimerManager().SetTimer( m_HitLandedStateTimerHandle, this, &AFightingCharacter::OnHitLandedTimerEnded, m_HitLandedStateDuration );
+}
+
+void AFightingCharacter::OnHitLandedTimerEnded()
+{
+	m_HasLandedHit = false;
 }
