@@ -37,6 +37,7 @@ protected:
 	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Move To Execute" )
 	TObjectPtr<UMoveDataAsset> m_MoveToExecute = nullptr;
 
+	// #TODO add AND/OR conditions for transitions? So that they can be combined to create more complex behaviours
 	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Transitions" )
 	TMap<TObjectPtr<UFightingCharacterStateTransition>, FName> m_Transitions;
 

@@ -20,6 +20,10 @@ void UFightingCharacterStateTransition::OnMontageEvent( UAnimMontage* Montage, E
 {
 }
 
+void UFightingCharacterStateTransition::OnGrounded()
+{
+}
+
 bool UFightingCharacterStateTransition::CanPerformTransition()
 {
 	return false;

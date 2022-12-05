@@ -113,6 +113,10 @@ void UFightingCharacterState::OnMontageEvent( UAnimMontage* Montage, EMontageEve
 
 void UFightingCharacterState::OnCharacterGrounded_Implementation()
 {
+	for( auto Pair : m_Transitions )
+	{
+		Pair.Key->OnGrounded();
+	}
 }
 
 void UFightingCharacterState::OnCharacterHitLanded_Implementation( AActor* Target )

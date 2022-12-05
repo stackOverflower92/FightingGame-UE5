@@ -18,6 +18,7 @@ public:
 	virtual void OnStateEnter();
 	virtual void OnStateExit();
 	virtual void OnMontageEvent( UAnimMontage* Montage, EMontageEventType MontageEvent );
+	virtual void OnGrounded();
 
 	virtual bool CanPerformTransition();
 
