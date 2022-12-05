@@ -33,13 +33,13 @@ bool AFightingCharacter::IsAirborne() const
 void AFightingCharacter::UpdateHorizontalMovement( float value )
 {
 	m_CurrentHorizontalMovement = value;
-	AddMovementInput( FVector( 0.f, -1.f, 0.f ), m_CurrentHorizontalMovement );
+	AddMovementInput( FVector( 0.f, 1.f, 0.f ), m_CurrentHorizontalMovement );
 
 	if( !IsAirborne() || m_UpdateFacingWhenAirborne )
 	{
 		if( !FMath::IsNearlyZero( m_CurrentHorizontalMovement ) )
 		{
-			m_TargetRotatorYaw = -FMath::Sign( m_CurrentHorizontalMovement ) * 90.f;
+			m_TargetRotatorYaw = FMath::Sign( m_CurrentHorizontalMovement ) * 90.f;
 		}
 	}
 }
