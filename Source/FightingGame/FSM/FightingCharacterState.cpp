@@ -21,7 +21,7 @@ void UFightingCharacterState::Init_Implementation()
 
 	for( auto Pair : m_Transitions )
 	{
-		Pair.Key->Init( m_OwnerCharacter );
+		Pair.Value->Init( m_OwnerCharacter );
 	}
 }
 
@@ -47,7 +47,7 @@ void UFightingCharacterState::Enter_Implementation()
 
 	for( auto Pair : m_Transitions )
 	{
-		Pair.Key->OnStateEnter();
+		Pair.Value->OnStateEnter();
 	}
 }
 
@@ -71,7 +71,7 @@ void UFightingCharacterState::Exit_Implementation()
 
 	for( auto Pair : m_Transitions )
 	{
-		Pair.Key->OnStateExit();
+		Pair.Value->OnStateExit();
 	}
 }
 
@@ -81,9 +81,9 @@ void UFightingCharacterState::Update_Implementation( float DeltaTime )
 
 	for( auto Pair : m_Transitions )
 	{
-		if( Pair.Key->CanPerformTransition() )
+		if( Pair.Value->CanPerformTransition() )
 		{
-			UFSMStatics::SetState( FSMOwner, Pair.Value );
+			UFSMStatics::SetState( FSMOwner, Pair.Key );
 		}
 	}
 
@@ -97,7 +97,7 @@ void UFightingCharacterState::OnMontageEvent( UAnimMontage* Montage, EMontageEve
 {
 	for( auto Pair : m_Transitions )
 	{
-		Pair.Key->OnMontageEvent( Montage, EventType );
+		Pair.Value->OnMontageEvent( Montage, EventType );
 	}
 
 	// #TODO handle other cases
@@ -115,7 +115,7 @@ void UFightingCharacterState::OnCharacterGrounded_Implementation()
 {
 	for( auto Pair : m_Transitions )
 	{
-		Pair.Key->OnGrounded();
+		Pair.Value->OnGrounded();
 	}
 }
 

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "StateBase.h"
 #include "FightingGame/Character/FightingCharacter.h"
+#include <algorithm>
 #include "FightingCharacterState.generated.h"
 
 class UFightingCharacterStateTransition;
@@ -37,9 +38,8 @@ protected:
 	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Move To Execute" )
 	TObjectPtr<UMoveDataAsset> m_MoveToExecute = nullptr;
 
-	// #TODO add AND/OR conditions for transitions? So that they can be combined to create more complex behaviours
 	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Transitions" )
-	TMap<TObjectPtr<UFightingCharacterStateTransition>, FName> m_Transitions;
+	TMap<FName, TObjectPtr<UFightingCharacterStateTransition>> m_Transitions;
 
 	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Update Movement" )
 	bool m_UpdateMovement = false;
