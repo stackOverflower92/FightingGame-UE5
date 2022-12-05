@@ -63,6 +63,9 @@ public:
 
 	virtual void OnHitReceived( const HitData& HitData ) override;
 
+	FORCEINLINE TObjectPtr<UMovesBufferComponent> GetMovesBufferComponent() const { return m_MovesBuffer; }
+	FORCEINLINE TObjectPtr<UFSM> GetFSM() const { return m_FSM; }
+
 protected:
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "FSM" )
 	TObjectPtr<UFSM> m_FSM = nullptr;

@@ -8,11 +8,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetStringLibrary.h"
 
-namespace
-{
-	constexpr auto loc_PlayersCount = 2;
-}
-
 void AFreeForAllGameMode::BeginPlay()
 {
 	Super::BeginPlay();
@@ -37,7 +32,7 @@ void AFreeForAllGameMode::SpawnCharacters()
 		return AStartTag < BStartTag;
 	} );
 
-	for( int i = 0; i < loc_PlayersCount; ++i )
+	for( int i = 0; i < m_AdditionalPlayers + 1; ++i )
 	{
 		APlayerController* player = i == 0 ? UGameplayStatics::GetPlayerController( world, 0 ) : UGameplayStatics::CreatePlayer( GetWorld() );
 		//ABasePlayerState* playerState = Cast<ABasePlayerState>( player->PlayerState );

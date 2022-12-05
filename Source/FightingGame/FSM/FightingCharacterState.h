@@ -7,6 +7,8 @@
 #include "FightingGame/Character/FightingCharacter.h"
 #include "FightingCharacterState.generated.h"
 
+class UFightingCharacterStateTransition;
+class UMoveDataAsset;
 class AFightingCharacter;
 class UFightingCharacterAnimInstance;
 enum class EMontageEventType : uint8;
@@ -17,8 +19,10 @@ class FIGHTINGGAME_API UFightingCharacterState : public UStateBase
 	GENERATED_BODY()
 
 public:
+	virtual void Init_Implementation() override;
 	virtual void Enter_Implementation() override;
 	virtual void Exit_Implementation() override;
+	virtual void Update_Implementation( float DeltaTime ) override;
 
 protected:
 	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Owner Character" )
@@ -29,6 +33,15 @@ protected:
 
 	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Is Reaction" )
 	bool m_IsReaction = false;
+
+	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Move To Execute" )
+	TObjectPtr<UMoveDataAsset> m_MoveToExecute = nullptr;
+
+	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Transitions" )
+	TMap<TObjectPtr<UFightingCharacterStateTransition>, FName> m_Transitions;
+
+	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Update Movement" )
+	bool m_UpdateMovement = false;
 
 	UFUNCTION()
 	void OnMontageEvent( UAnimMontage* Montage, EMontageEventType EventType );

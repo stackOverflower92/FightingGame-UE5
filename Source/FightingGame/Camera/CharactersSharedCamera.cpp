@@ -4,7 +4,6 @@
 
 #include "FightingGame/Character/FightingCharacter.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetMathLibrary.h"
 
 ACharactersSharedCamera::ACharactersSharedCamera()
 {
@@ -90,10 +89,18 @@ FVector ACharactersSharedCamera::GetCenterPosition() const
 	}
 
 	Sum /= AllLocations.Num();
+
 	return FVector( GetActorLocation().X, Sum.Y, Sum.Z );
 }
 
 void ACharactersSharedCamera::UpdateCameraPosition( float DeltaTime )
 {
-	SetActorLocation( UKismetMathLibrary::VLerp( GetActorLocation(), GetCenterPosition() + m_PositionOffset, MovementDamping * DeltaTime ) );
+	FVector TargetPosition = GetCenterPosition() + m_PositionOffset;
+	FVector LerpedLocation = GetActorLocation();
+
+	LerpedLocation.X = FMath::Lerp( LerpedLocation.X, TargetPosition.X, m_MovementDamping.X * DeltaTime );
+	LerpedLocation.Y = FMath::Lerp( LerpedLocation.Y, TargetPosition.Y, m_MovementDamping.Y * DeltaTime );
+	LerpedLocation.Z = FMath::Lerp( LerpedLocation.Z, TargetPosition.Z, m_MovementDamping.Z * DeltaTime );
+
+	SetActorLocation( LerpedLocation );
 }

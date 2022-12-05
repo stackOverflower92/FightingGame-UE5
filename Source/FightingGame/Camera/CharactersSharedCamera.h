@@ -21,7 +21,7 @@ protected:
 	bool m_AutoAddTargetsOnBeginPlay = true;
 
 	UPROPERTY( EditAnywhere, DisplayName = "Movement Damping" )
-	float MovementDamping = 2.f;
+	FVector m_MovementDamping = FVector( 1.f, 1.f, 1.f );
 
 	UPROPERTY( EditAnywhere, DisplayName = "Position Offset" )
 	FVector m_PositionOffset;
