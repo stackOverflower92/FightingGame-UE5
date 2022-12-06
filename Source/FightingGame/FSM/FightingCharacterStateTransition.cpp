@@ -3,9 +3,13 @@
 
 #include "FightingCharacterStateTransition.h"
 
-void UFightingCharacterStateTransition::OnStateEnter( TObjectPtr<AFightingCharacter> Character )
+void UFightingCharacterStateTransition::OnInit( TObjectPtr<AFightingCharacter> Character )
 {
 	m_Character = Character;
+}
+
+void UFightingCharacterStateTransition::OnStateEnter()
+{
 }
 
 void UFightingCharacterStateTransition::OnStateExit()

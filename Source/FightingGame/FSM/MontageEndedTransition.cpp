@@ -5,16 +5,16 @@
 
 #include "FightingGame/Animation/FightingCharacterAnimInstance.h"
 
+void UMontageEndedTransition::OnStateEnter()
+{
+	Super::OnStateEnter();
+
+	m_CanTransition = false;
+}
+
 bool UMontageEndedTransition::CanPerformTransition()
 {
 	return m_CanTransition;
-}
-
-void UMontageEndedTransition::OnStateEnter( TObjectPtr<AFightingCharacter> Character )
-{
-	Super::OnStateEnter( Character );
-
-	m_CanTransition = false;
 }
 
 void UMontageEndedTransition::OnMontageEvent( UAnimMontage* Montage, EMontageEventType EventType )

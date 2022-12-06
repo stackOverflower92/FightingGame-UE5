@@ -18,6 +18,15 @@ void UFightingCharacterState::Init_Implementation()
 
 	m_AnimInstance = Cast<UFightingCharacterAnimInstance>( m_OwnerCharacter->GetMesh()->GetAnimInstance() );
 	ensure( m_AnimInstance );
+
+	for( auto Pair : m_Transitions )
+	{
+		TObjectPtr<UFightingCharacterStateTransition> Instance = NewObject<UFightingCharacterStateTransition>(
+			m_OwnerCharacter, Pair.Value, Pair.Value->GetFName(), RF_NoFlags, Pair.Value.GetDefaultObject(), true );
+
+		Instance->OnInit( m_OwnerCharacter );
+		m_InstancedTransitions.Emplace( Pair.Key, Instance );
+	}
 }
 
 void UFightingCharacterState::Enter_Implementation()
@@ -41,9 +50,9 @@ void UFightingCharacterState::Enter_Implementation()
 		m_OwnerCharacter->DisableInput( Cast<APlayerController>( m_OwnerCharacter->GetController() ) );
 	}
 
-	for( auto Pair : m_Transitions )
+	for( auto Pair : m_InstancedTransitions )
 	{
-		Pair.Value->OnStateEnter( m_OwnerCharacter );
+		Pair.Value->OnStateEnter();
 	}
 }
 
@@ -66,7 +75,7 @@ void UFightingCharacterState::Exit_Implementation()
 		m_OwnerCharacter->EnableInput( Cast<APlayerController>( m_OwnerCharacter->GetController() ) );
 	}
 
-	for( auto Pair : m_Transitions )
+	for( auto Pair : m_InstancedTransitions )
 	{
 		Pair.Value->OnStateExit();
 	}
@@ -76,7 +85,7 @@ void UFightingCharacterState::Update_Implementation( float DeltaTime )
 {
 	Super::Update_Implementation( DeltaTime );
 
-	for( auto Pair : m_Transitions )
+	for( auto Pair : m_InstancedTransitions )
 	{
 		if( Pair.Value->CanPerformTransition() )
 		{
@@ -92,7 +101,7 @@ void UFightingCharacterState::Update_Implementation( float DeltaTime )
 
 void UFightingCharacterState::OnMontageEvent( UAnimMontage* Montage, EMontageEventType EventType )
 {
-	for( auto Pair : m_Transitions )
+	for( auto Pair : m_InstancedTransitions )
 	{
 		Pair.Value->OnMontageEvent( Montage, EventType );
 	}
@@ -110,7 +119,7 @@ void UFightingCharacterState::OnMontageEvent( UAnimMontage* Montage, EMontageEve
 
 void UFightingCharacterState::OnCharacterAirborne_Implementation()
 {
-	for( auto Pair : m_Transitions )
+	for( auto Pair : m_InstancedTransitions )
 	{
 		Pair.Value->OnAirborne();
 	}
@@ -118,7 +127,7 @@ void UFightingCharacterState::OnCharacterAirborne_Implementation()
 
 void UFightingCharacterState::OnCharacterGrounded_Implementation()
 {
-	for( auto Pair : m_Transitions )
+	for( auto Pair : m_InstancedTransitions )
 	{
 		Pair.Value->OnGrounded();
 	}

@@ -3,16 +3,16 @@
 
 #include "GroundedTransition.h"
 
+void UGroundedTransition::OnStateEnter()
+{
+	Super::OnStateEnter();
+
+	m_CanTransition = false;
+}
+
 bool UGroundedTransition::CanPerformTransition()
 {
 	return m_CanTransition;
-}
-
-void UGroundedTransition::OnStateEnter( TObjectPtr<AFightingCharacter> Character )
-{
-	Super::OnStateEnter( Character );
-
-	m_CanTransition = false;
 }
 
 void UGroundedTransition::OnGrounded()

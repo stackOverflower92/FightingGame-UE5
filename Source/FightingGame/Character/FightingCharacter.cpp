@@ -14,6 +14,9 @@ namespace
 {
 	int32 loc_DebugDamageStats = 0;
 	FG_CVAR_DESC( CVarDebugDamageStats, TEXT("FightingCharacter.DebugDamageStats"), TEXT("1: enable, 0: disable"), loc_DebugDamageStats );
+
+	int32 loc_DebugFacing = 0;
+	FG_CVAR_DESC( CVarDebugFacing, TEXT("FightingCharacter.DebugFacing"), TEXT("1: enable, 0: disable"), loc_DebugFacing );
 }
 
 AFightingCharacter::AFightingCharacter()
@@ -114,7 +117,13 @@ void AFightingCharacter::Tick( float DeltaTime )
 		                                       FString::Printf( TEXT( "[DP: %.1f][KM: %.1f]" ), m_DamagePercent, GetKnockbackMultiplier() ) );
 	}
 
-	m_FacingRight = m_TargetRotatorYaw < 0.f && m_TargetRotatorYaw > -180.f;
+	m_FacingRight = m_TargetRotatorYaw > 0.f && m_TargetRotatorYaw < 180.f;
+	if( loc_DebugFacing == 1 )
+	{
+		UKismetSystemLibrary::DrawDebugString( GetWorld(), GetActorLocation(),
+		                                       FString::Printf( TEXT( "[Facing Right: %s]" ), m_FacingRight ? TEXT( "TRUE" ) : TEXT( "FALSE" ) ) );
+	}
+
 	UpdateYaw( DeltaTime );
 
 	CheckGroundedEvent();

@@ -13,8 +13,8 @@ class FIGHTINGGAME_API UGroundedTransition : public UFightingCharacterStateTrans
 	GENERATED_BODY()
 
 public:
+	virtual void OnStateEnter() override;
 	virtual bool CanPerformTransition() override;
-	virtual void OnStateEnter( TObjectPtr<AFightingCharacter> Character ) override;
 	virtual void OnGrounded() override;
 	virtual void OnAirborne() override;
 

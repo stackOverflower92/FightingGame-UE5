@@ -39,7 +39,7 @@ protected:
 	TObjectPtr<UMoveDataAsset> m_MoveToExecute = nullptr;
 
 	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Transitions" )
-	TMap<FName, TObjectPtr<UFightingCharacterStateTransition>> m_Transitions;
+	TMap<FName, TSubclassOf<UFightingCharacterStateTransition>> m_Transitions;
 
 	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Update Movement" )
 	bool m_UpdateMovement = false;
@@ -60,6 +60,9 @@ protected:
 	void OnCharacterAirborne();
 
 private:
+	UPROPERTY()
+	TMap<FName, TObjectPtr<UFightingCharacterStateTransition>> m_InstancedTransitions;
+
 	FDelegateHandle m_CharacterHitLandedHandle;
 	FDelegateHandle m_CharacterGroundedHandle;
 	FDelegateHandle m_CharacterAirborneHandle;
