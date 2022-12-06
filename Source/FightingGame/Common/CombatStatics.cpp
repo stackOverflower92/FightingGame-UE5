@@ -8,7 +8,7 @@
 namespace
 {
 	constexpr float loc_MinCustomTimeDilation = 0.001f;
-	constexpr float loc_HitStunInitialDelay = 0.1f;
+	constexpr float loc_HitStunInitialDelay = 0.06f;
 }
 
 bool UCombatStatics::ExecuteMove( AFightingCharacter* Character, UMoveDataAsset* Move )
