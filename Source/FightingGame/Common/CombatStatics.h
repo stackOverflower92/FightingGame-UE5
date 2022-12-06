@@ -29,4 +29,10 @@ public:
 
 	UFUNCTION( BlueprintCallable, Category = "Combat" )
 	static bool ApplyKnockbackTo( const FVector& Direction, float Force, AFightingCharacter* Character, bool IgnoreMultiplier = false );
+
+	UFUNCTION( BlueprintCallable, Category = "Combat" )
+	static float GetMinCustomTimeDilation();
+
+	UFUNCTION( BlueprintCallable, Category = "Combat" )
+	static float GetHitStunInitialDelay();
 };

@@ -56,6 +56,8 @@ void AFightingCharacter::BeginPlay()
 	UFSMStatics::Init( m_FSM, m_FirstState );
 
 	m_HitDelegateHandle = m_HitboxHandler->m_HitDelegate.AddUObject( this, &AFightingCharacter::OnHitLanded );
+
+	InitTimeDilations();
 }
 
 void AFightingCharacter::EndPlay( const EEndPlayReason::Type EndPlayReason )
@@ -105,6 +107,21 @@ bool AFightingCharacter::IsAirKnockbackHappening() const
 void AFightingCharacter::SetAirKnockbackHappening( bool Value )
 {
 	m_IsAirKnockbackHappening = Value;
+}
+
+void AFightingCharacter::EnableHitStun( bool Shake )
+{
+	m_TimeDilations.Push( UCombatStatics::GetMinCustomTimeDilation() );
+
+	CustomTimeDilation = m_TimeDilations.Last();
+}
+
+void AFightingCharacter::DisableHitStun()
+{
+	m_TimeDilations.Pop();
+	ensureMsgf( m_TimeDilations.Num() > 0, TEXT("Time dilations stack cannot be empty") );
+
+	CustomTimeDilation = m_TimeDilations.Last();
 }
 
 void AFightingCharacter::Tick( float DeltaTime )
@@ -162,6 +179,11 @@ void AFightingCharacter::OnHitReceived( const HitData& HitData )
 	{
 		UFSMStatics::SetState( m_FSM, m_GroundedReactionStateName );
 	}
+
+	if( HitData.m_HitStunDuration > 0.f )
+	{
+		StartBeginHitStunTimer( HitData );
+	}
 }
 
 void AFightingCharacter::UpdateYaw( float DeltaTime )
@@ -174,12 +196,22 @@ void AFightingCharacter::UpdateYaw( float DeltaTime )
 	SetActorRotation( LerpRotator );
 }
 
-void AFightingCharacter::OnHitLanded( AActor* Target )
+void AFightingCharacter::OnHitLanded( AActor* Target, const HitData& HitData )
 {
 	m_HitLandedDelegate.Broadcast( Target );
 
 	m_HasLandedHit = true;
 
+	StartHitLandedTimer();
+
+	if( HitData.m_HitStunDuration > 0.f )
+	{
+		StartBeginHitStunTimer( HitData );
+	}
+}
+
+void AFightingCharacter::StartHitLandedTimer()
+{
 	if( GetWorldTimerManager().IsTimerActive( m_HitLandedStateTimerHandle ) )
 	{
 		GetWorldTimerManager().ClearTimer( m_HitLandedStateTimerHandle );
@@ -223,4 +255,44 @@ void AFightingCharacter::CheckAirborneEvent()
 			m_AirborneDelegate.Broadcast();
 		}
 	}
+}
+
+void AFightingCharacter::InitTimeDilations()
+{
+	m_TimeDilations.Empty();
+	m_TimeDilations.Push( CustomTimeDilation );
+}
+
+void AFightingCharacter::StartBeginHitStunTimer( const HitData& HitData )
+{
+	if( GetWorldTimerManager().IsTimerActive( m_HitStunBeginTimerHandle ) )
+	{
+		GetWorldTimerManager().ClearTimer( m_HitStunBeginTimerHandle );
+	}
+
+	m_CachedHitStunDuration = HitData.m_HitStunDuration;
+	GetWorldTimerManager().SetTimer( m_HitStunBeginTimerHandle, this, &AFightingCharacter::OnHitStunBeginTimerEnded, UCombatStatics::GetHitStunInitialDelay() );
+}
+
+void AFightingCharacter::OnHitStunBeginTimerEnded()
+{
+	StartStopHitStunTimer();
+}
+
+void AFightingCharacter::OnHitStunStopTimerEnded()
+{
+	DisableHitStun();
+}
+
+void AFightingCharacter::StartStopHitStunTimer()
+{
+	if( GetWorldTimerManager().IsTimerActive( m_HitStunStopTimerHandle ) )
+	{
+		GetWorldTimerManager().ClearTimer( m_HitStunStopTimerHandle );
+		DisableHitStun();
+	}
+
+	// #TODO pass shake from hitdata
+	EnableHitStun( false );
+	GetWorldTimerManager().SetTimer( m_HitStunStopTimerHandle, this, &AFightingCharacter::OnHitStunStopTimerEnded, m_CachedHitStunDuration );
 }

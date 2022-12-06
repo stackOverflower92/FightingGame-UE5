@@ -5,6 +5,12 @@
 #include "FightingGame/Combat/MoveDataAsset.h"
 #include "FightingGame/Animation/FightingCharacterAnimInstance.h"
 
+namespace
+{
+	constexpr float loc_MinCustomTimeDilation = 0.001f;
+	constexpr float loc_HitStunInitialDelay = 0.1f;
+}
+
 bool UCombatStatics::ExecuteMove( AFightingCharacter* Character, UMoveDataAsset* Move )
 {
 	if( !Character )
@@ -100,4 +106,14 @@ bool UCombatStatics::ApplyKnockbackTo( const FVector& Direction, float Force, AF
 	Character->LaunchCharacter( Direction.GetSafeNormal() * MultipliedForce, true, true );
 
 	return true;
+}
+
+float UCombatStatics::GetMinCustomTimeDilation()
+{
+	return loc_MinCustomTimeDilation;
+}
+
+float UCombatStatics::GetHitStunInitialDelay()
+{
+	return loc_HitStunInitialDelay;
 }

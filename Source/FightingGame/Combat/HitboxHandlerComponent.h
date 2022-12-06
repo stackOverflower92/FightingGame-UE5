@@ -7,7 +7,7 @@
 #include "FightingGame/Combat/HitData.h"
 #include "HitboxHandlerComponent.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_OneParam( FHit, AActor* )
+DECLARE_MULTICAST_DELEGATE_TwoParams( FHit, AActor*, const HitData& )
 
 UCLASS( ClassGroup = ( Custom ), meta = ( BlueprintSpawnableComponent ) )
 class FIGHTINGGAME_API UHitboxHandlerComponent : public UActorComponent

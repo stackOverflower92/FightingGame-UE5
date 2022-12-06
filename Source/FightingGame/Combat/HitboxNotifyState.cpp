@@ -6,9 +6,10 @@
 #include "FightingGame/Character/FightingCharacter.h"
 #include "FightingGame/Common/CombatStatics.h"
 
-void UHitboxNotifyState::NotifyBegin( USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration )
+void UHitboxNotifyState::NotifyBegin( USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration,
+                                      const FAnimNotifyEventReference& EventReference )
 {
-	Super::NotifyBegin( MeshComp, Animation, TotalDuration );
+	Super::NotifyBegin( MeshComp, Animation, TotalDuration, EventReference );
 
 	if( auto* Character = Cast<AFightingCharacter>( MeshComp->GetOwner() ) )
 	{
@@ -29,9 +30,9 @@ void UHitboxNotifyState::NotifyBegin( USkeletalMeshComponent* MeshComp, UAnimSeq
 	}
 }
 
-void UHitboxNotifyState::NotifyEnd( USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation )
+void UHitboxNotifyState::NotifyEnd( USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference )
 {
-	Super::NotifyEnd( MeshComp, Animation );
+	Super::NotifyEnd( MeshComp, Animation, EventReference );
 
 	if( auto* Character = Cast<AFightingCharacter>( MeshComp->GetOwner() ) )
 	{

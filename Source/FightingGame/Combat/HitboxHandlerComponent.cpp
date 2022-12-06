@@ -122,7 +122,7 @@ void UHitboxHandlerComponent::UpdateHitbox( const HitData& HitData )
 		if( auto* Hittable = Cast<IHittable>( HitActor ) )
 		{
 			Hittable->OnHitReceived( HitData );
-			m_HitDelegate.Broadcast( HitActor );
+			m_HitDelegate.Broadcast( HitActor, HitData );
 		}
 	}
 }

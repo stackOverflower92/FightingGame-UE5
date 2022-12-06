@@ -61,6 +61,12 @@ public:
 	UFUNCTION( BlueprintCallable )
 	void SetAirKnockbackHappening( bool Value );
 
+	UFUNCTION( BlueprintCallable )
+	void EnableHitStun( bool Shake );
+
+	UFUNCTION( BlueprintCallable )
+	void DisableHitStun();
+
 	virtual void Tick( float DeltaTime ) override;
 	virtual void SetupPlayerInputComponent( class UInputComponent* PlayerInputComponent ) override;
 
@@ -104,6 +110,9 @@ protected:
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Hit Landed State Duration" )
 	float m_HitLandedStateDuration = .2f;
 
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Hit Stun Time Dilation" )
+	float m_HitStunTimeDilation = .001f;
+
 	virtual void BeginPlay() override;
 	virtual void EndPlay( const EEndPlayReason::Type EndPlayReason ) override;
 
@@ -117,12 +126,26 @@ private:
 	bool m_HasLandedHit = false;
 	FTimerHandle m_HitLandedStateTimerHandle;
 	bool m_Hittable = true;
+	FTimerHandle m_HitStunStopTimerHandle;
+	FTimerHandle m_HitStunBeginTimerHandle;
+	float m_CachedHitStunDuration = 0.f;
+	TArray<float> m_TimeDilations;
 
 	FDelegateHandle m_HitDelegateHandle;
 
 	void UpdateYaw( float DeltaTime );
-	void OnHitLanded( AActor* Target );
+
+	void OnHitLanded( AActor* Target, const HitData& HitData );
+	void StartHitLandedTimer();
 	void OnHitLandedTimerEnded();
+
 	void CheckGroundedEvent();
 	void CheckAirborneEvent();
+
+	void InitTimeDilations();
+	void StartBeginHitStunTimer( const HitData& HitData );
+	void OnHitStunBeginTimerEnded();
+
+	void StartStopHitStunTimer();
+	void OnHitStunStopTimerEnded();
 };
