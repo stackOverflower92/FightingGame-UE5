@@ -7,6 +7,7 @@
 #include <deque>
 #include "MovesBufferComponent.generated.h"
 
+class AFightingCharacter;
 class UInputComponent;
 
 struct FInputBufferEntry
@@ -22,6 +23,8 @@ class FIGHTINGGAME_API UMovesBufferComponent : public UActorComponent
 
 public:
 	UMovesBufferComponent();
+
+	TObjectPtr<AFightingCharacter> m_OwnerCharacter = nullptr;
 
 	UFUNCTION( BlueprintCallable )
 	void UseBufferedInput( FString Input );

@@ -42,10 +42,7 @@ void AFreeForAllGameMode::SpawnCharacters()
 
 		APlayerStart* start = m_PlayerStarts[i];
 		AFightingCharacter* character = GetWorld()->SpawnActor<AFightingCharacter>( m_CharacterClass, start->GetTransform() );
-		/*character->SetPlayerNumber( i );
-
-		character->m_PauseGameRequestedDelegate.AddUObject( this, &ABasketballGameMode::OnCharacterPauseGameRequested );
-		character->m_ThrowDelegate.AddUObject( this, &ABasketballGameMode::OnCharacterThrow );*/
+		character->m_PlayerIndex = i;
 
 		m_Characters.Emplace( character );
 

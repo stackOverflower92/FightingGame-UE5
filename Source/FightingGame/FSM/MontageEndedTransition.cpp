@@ -10,9 +10,9 @@ bool UMontageEndedTransition::CanPerformTransition()
 	return m_CanTransition;
 }
 
-void UMontageEndedTransition::OnStateEnter()
+void UMontageEndedTransition::OnStateEnter( TObjectPtr<AFightingCharacter> Character )
 {
-	Super::OnStateEnter();
+	Super::OnStateEnter( Character );
 
 	m_CanTransition = false;
 }

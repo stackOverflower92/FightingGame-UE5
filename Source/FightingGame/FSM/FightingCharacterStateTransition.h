@@ -8,17 +8,18 @@
 
 enum class EMontageEventType : uint8;
 class AFightingCharacter;
+
 UCLASS()
 class FIGHTINGGAME_API UFightingCharacterStateTransition : public UDataAsset
 {
 	GENERATED_BODY()
 
 public:
-	virtual void Init( TObjectPtr<AFightingCharacter> Character );
-	virtual void OnStateEnter();
+	virtual void OnStateEnter( TObjectPtr<AFightingCharacter> Character );
 	virtual void OnStateExit();
 	virtual void OnMontageEvent( UAnimMontage* Montage, EMontageEventType MontageEvent );
 	virtual void OnGrounded();
+	virtual void OnAirborne();
 
 	virtual bool CanPerformTransition();
 

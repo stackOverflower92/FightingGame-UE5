@@ -48,6 +48,8 @@ void AFightingCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	m_MovesBuffer->m_OwnerCharacter = this;
+
 	UFSMStatics::Init( m_FSM, m_FirstState );
 
 	m_HitDelegateHandle = m_HitboxHandler->m_HitDelegate.AddUObject( this, &AFightingCharacter::OnHitLanded );
@@ -115,18 +117,8 @@ void AFightingCharacter::Tick( float DeltaTime )
 	m_FacingRight = m_TargetRotatorYaw < 0.f && m_TargetRotatorYaw > -180.f;
 	UpdateYaw( DeltaTime );
 
-	if( IsAirborne() )
-	{
-		m_GroundedDelegateBroadcast = false;
-	}
-	else
-	{
-		if( !m_GroundedDelegateBroadcast )
-		{
-			m_GroundedDelegateBroadcast = true;
-			m_GroundedDelegate.Broadcast();
-		}
-	}
+	CheckGroundedEvent();
+	CheckAirborneEvent();
 }
 
 void AFightingCharacter::SetupPlayerInputComponent( UInputComponent* PlayerInputComponent )
@@ -185,4 +177,36 @@ void AFightingCharacter::OnHitLanded( AActor* Target )
 void AFightingCharacter::OnHitLandedTimerEnded()
 {
 	m_HasLandedHit = false;
+}
+
+void AFightingCharacter::CheckGroundedEvent()
+{
+	if( IsAirborne() )
+	{
+		m_GroundedDelegateBroadcast = false;
+	}
+	else
+	{
+		if( !m_GroundedDelegateBroadcast )
+		{
+			m_GroundedDelegateBroadcast = true;
+			m_GroundedDelegate.Broadcast();
+		}
+	}
+}
+
+void AFightingCharacter::CheckAirborneEvent()
+{
+	if( !IsAirborne() )
+	{
+		m_AirborneDelegateBroadcast = false;
+	}
+	else
+	{
+		if( !m_AirborneDelegateBroadcast )
+		{
+			m_AirborneDelegateBroadcast = true;
+			m_AirborneDelegate.Broadcast();
+		}
+	}
 }

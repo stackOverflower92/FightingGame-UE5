@@ -14,8 +14,13 @@ class FIGHTINGGAME_API UGroundedTransition : public UFightingCharacterStateTrans
 
 public:
 	virtual bool CanPerformTransition() override;
-	virtual void OnStateEnter() override;
+	virtual void OnStateEnter( TObjectPtr<AFightingCharacter> Character ) override;
 	virtual void OnGrounded() override;
+	virtual void OnAirborne() override;
+
+protected:
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Must Be Grounded" )
+	bool m_MustBeGrounded = true;
 
 private:
 	bool m_CanTransition = false;

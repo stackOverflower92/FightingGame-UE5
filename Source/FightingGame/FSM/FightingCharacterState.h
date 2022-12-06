@@ -56,7 +56,11 @@ protected:
 	UFUNCTION( BlueprintNativeEvent )
 	void OnCharacterGrounded();
 
+	UFUNCTION( BlueprintNativeEvent )
+	void OnCharacterAirborne();
+
 private:
 	FDelegateHandle m_CharacterHitLandedHandle;
 	FDelegateHandle m_CharacterGroundedHandle;
+	FDelegateHandle m_CharacterAirborneHandle;
 };

@@ -18,11 +18,6 @@ void UFightingCharacterState::Init_Implementation()
 
 	m_AnimInstance = Cast<UFightingCharacterAnimInstance>( m_OwnerCharacter->GetMesh()->GetAnimInstance() );
 	ensure( m_AnimInstance );
-
-	for( auto Pair : m_Transitions )
-	{
-		Pair.Value->Init( m_OwnerCharacter );
-	}
 }
 
 void UFightingCharacterState::Enter_Implementation()
@@ -33,6 +28,7 @@ void UFightingCharacterState::Enter_Implementation()
 
 	m_CharacterHitLandedHandle = m_OwnerCharacter->m_HitLandedDelegate.AddUObject( this, &UFightingCharacterState::OnCharacterHitLanded );
 	m_CharacterGroundedHandle = m_OwnerCharacter->m_GroundedDelegate.AddUObject( this, &UFightingCharacterState::OnCharacterGrounded );
+	m_CharacterAirborneHandle = m_OwnerCharacter->m_AirborneDelegate.AddUObject( this, &UFightingCharacterState::OnCharacterAirborne );
 
 	if( m_MoveToExecute )
 	{
@@ -47,7 +43,7 @@ void UFightingCharacterState::Enter_Implementation()
 
 	for( auto Pair : m_Transitions )
 	{
-		Pair.Value->OnStateEnter();
+		Pair.Value->OnStateEnter( m_OwnerCharacter );
 	}
 }
 
@@ -62,6 +58,7 @@ void UFightingCharacterState::Exit_Implementation()
 
 	m_OwnerCharacter->m_HitLandedDelegate.Remove( m_CharacterHitLandedHandle );
 	m_OwnerCharacter->m_GroundedDelegate.Remove( m_CharacterGroundedHandle );
+	m_OwnerCharacter->m_AirborneDelegate.Remove( m_CharacterAirborneHandle );
 
 	// #TODO what happens with AI?
 	if( m_IsReaction && m_OwnerCharacter->IsPlayerControlled() )
@@ -108,6 +105,14 @@ void UFightingCharacterState::OnMontageEvent( UAnimMontage* Montage, EMontageEve
 			OnMontageEnded( Montage );
 			break;
 		}
+	}
+}
+
+void UFightingCharacterState::OnCharacterAirborne_Implementation()
+{
+	for( auto Pair : m_Transitions )
+	{
+		Pair.Value->OnAirborne();
 	}
 }
 

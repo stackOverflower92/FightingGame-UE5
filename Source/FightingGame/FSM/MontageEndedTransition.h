@@ -16,7 +16,7 @@ class FIGHTINGGAME_API UMontageEndedTransition : public UFightingCharacterStateT
 	GENERATED_BODY()
 
 public:
-	virtual void OnStateEnter() override;
+	virtual void OnStateEnter(TObjectPtr<AFightingCharacter> Character) override;
 	virtual void OnMontageEvent( UAnimMontage* Montage, EMontageEventType MontageEvent ) override;
 	
 	virtual bool CanPerformTransition() override;

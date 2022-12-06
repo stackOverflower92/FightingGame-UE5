@@ -12,6 +12,7 @@ class UHitboxHandlerComponent;
 DECLARE_MULTICAST_DELEGATE( FFacingChanged )
 DECLARE_MULTICAST_DELEGATE_OneParam( FHitLanded, AActor* )
 DECLARE_MULTICAST_DELEGATE( FGrounded )
+DECLARE_MULTICAST_DELEGATE( FAirborne )
 
 UCLASS()
 class FIGHTINGGAME_API AFightingCharacter : public ACharacter, public IHittable
@@ -24,6 +25,8 @@ public:
 	FFacingChanged m_FacingChangedDelegate;
 	FHitLanded m_HitLandedDelegate;
 	FGrounded m_GroundedDelegate;
+	FAirborne m_AirborneDelegate;
+	int m_PlayerIndex = 0;
 
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Current Horizontal Movement" )
 	float m_CurrentHorizontalMovement = 0.f;
@@ -107,6 +110,7 @@ private:
 	float m_DamagePercent = 0.f;
 	bool m_IsAirKnockbackHappening = false;
 	bool m_GroundedDelegateBroadcast = false;
+	bool m_AirborneDelegateBroadcast = false;
 	bool m_HasLandedHit = false;
 	FTimerHandle m_HitLandedStateTimerHandle;
 
@@ -115,4 +119,6 @@ private:
 	void UpdateYaw( float DeltaTime );
 	void OnHitLanded( AActor* Target );
 	void OnHitLandedTimerEnded();
+	void CheckGroundedEvent();
+	void CheckAirborneEvent();
 };

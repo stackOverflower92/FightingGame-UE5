@@ -2,6 +2,7 @@
 
 #include "MovesBufferComponent.h"
 #include "Components/InputComponent.h"
+#include "FightingGame/Character/FightingCharacter.h"
 
 namespace
 {
@@ -37,13 +38,17 @@ void UMovesBufferComponent::TickComponent( float DeltaTime, ELevelTick TickType,
 		}
 	}
 
-	for( int i = 0; i < m_Buffer.size(); ++i )
+	if( m_OwnerCharacter && m_OwnerCharacter->m_PlayerIndex == 0 )
 	{
-		FInputBufferEntry& Entry = m_Buffer.at( i );
-		const bool IsEmpty = Entry.Name == NoInput;
-		auto Message = IsEmpty ? "Empty" : Entry.Name;
+		for( int i = 0; i < m_Buffer.size(); ++i )
+		{
+			FInputBufferEntry& Entry = m_Buffer.at( i );
+			const bool IsEmpty = Entry.Name == NoInput;
+			auto Message = IsEmpty ? "Empty" : Entry.Name;
 
-		GEngine->AddOnScreenDebugMessage( i, 1.f, FColor::White, FString::Printf( TEXT( "%s" ), *Message ) );
+			FColor Color = Entry.Used ? FColor::Red : FColor::Green;
+			GEngine->AddOnScreenDebugMessage( i, 1.f, Color, FString::Printf( TEXT( "%s" ), *Message ) );
+		}
 	}
 
 	m_BufferChanged = false;

@@ -3,13 +3,9 @@
 
 #include "FightingCharacterStateTransition.h"
 
-void UFightingCharacterStateTransition::Init( TObjectPtr<AFightingCharacter> Character )
+void UFightingCharacterStateTransition::OnStateEnter( TObjectPtr<AFightingCharacter> Character )
 {
 	m_Character = Character;
-}
-
-void UFightingCharacterStateTransition::OnStateEnter()
-{
 }
 
 void UFightingCharacterStateTransition::OnStateExit()
@@ -21,6 +17,10 @@ void UFightingCharacterStateTransition::OnMontageEvent( UAnimMontage* Montage, E
 }
 
 void UFightingCharacterStateTransition::OnGrounded()
+{
+}
+
+void UFightingCharacterStateTransition::OnAirborne()
 {
 }
 
