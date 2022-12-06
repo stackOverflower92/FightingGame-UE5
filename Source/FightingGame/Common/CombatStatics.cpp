@@ -84,7 +84,7 @@ FVector UCombatStatics::GetKnockbackFromOrientation( AFightingCharacter* Charact
 
 	float FinalKnockbackOrientation = FacingRight ? Orientation : -Orientation;
 
-	FRotator Rotator = FRotator( 0, 0, FinalKnockbackOrientation );
+	FRotator Rotator = FRotator( 0, 0, -FinalKnockbackOrientation );
 	return Rotator.RotateVector( Forward );
 }
 
