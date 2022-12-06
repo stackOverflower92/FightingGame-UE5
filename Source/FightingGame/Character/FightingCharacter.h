@@ -70,6 +70,9 @@ public:
 	FORCEINLINE TObjectPtr<UFSM> GetFSM() const { return m_FSM; }
 	FORCEINLINE bool HasJustLandedHit() const { return m_HasLandedHit; }
 
+	FORCEINLINE void SetHittable( bool Hittable ) { m_Hittable = Hittable; }
+	FORCEINLINE bool IsHittable() const { return m_Hittable; }
+
 protected:
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "FSM" )
 	TObjectPtr<UFSM> m_FSM = nullptr;
@@ -113,6 +116,7 @@ private:
 	bool m_AirborneDelegateBroadcast = false;
 	bool m_HasLandedHit = false;
 	FTimerHandle m_HitLandedStateTimerHandle;
+	bool m_Hittable = true;
 
 	FDelegateHandle m_HitDelegateHandle;
 

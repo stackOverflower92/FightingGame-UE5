@@ -140,6 +140,11 @@ void AFightingCharacter::SetupPlayerInputComponent( UInputComponent* PlayerInput
 
 void AFightingCharacter::OnHitReceived( const HitData& HitData )
 {
+	if( !m_Hittable )
+	{
+		return;
+	}
+
 	if( HitData.m_ForceOpponentFacing )
 	{
 		UCombatStatics::FaceOther( this, HitData.m_Owner, true );
