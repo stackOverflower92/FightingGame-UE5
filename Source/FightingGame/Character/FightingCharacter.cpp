@@ -8,6 +8,7 @@
 
 #include "FightingGame/Common/CombatStatics.h"
 #include "FightingGame/Debug/Debug.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 namespace
@@ -17,6 +18,9 @@ namespace
 
 	int32 loc_DebugFacing = 0;
 	FG_CVAR_DESC( CVarDebugFacing, TEXT("FightingCharacter.DebugFacing"), TEXT("1: enable, 0: disable"), loc_DebugFacing );
+
+	int32 loc_DebugEnableShake = 0;
+	FG_CVAR_DESC( CVarDebugEnableShake, TEXT("FightingCharacter.DebugEnableShake"), TEXT("1: enable, 0: disable"), loc_DebugEnableShake );
 }
 
 AFightingCharacter::AFightingCharacter()
@@ -59,6 +63,8 @@ void AFightingCharacter::BeginPlay()
 	m_HitDelegateHandle = m_HitboxHandler->m_HitDelegate.AddUObject( this, &AFightingCharacter::OnHitLanded );
 
 	InitTimeDilations();
+
+	m_InitialMeshRelativeLocation = GetMesh()->GetRelativeLocation();
 }
 
 void AFightingCharacter::EndPlay( const EEndPlayReason::Type EndPlayReason )
@@ -146,6 +152,11 @@ void AFightingCharacter::Tick( float DeltaTime )
 
 	CheckGroundedEvent();
 	CheckAirborneEvent();
+
+	if( m_CanUpdateMeshShake || loc_DebugEnableShake )
+	{
+		UpdateMeshShake();
+	}
 }
 
 void AFightingCharacter::SetupPlayerInputComponent( UInputComponent* PlayerInputComponent )
@@ -183,7 +194,7 @@ void AFightingCharacter::OnHitReceived( const HitData& HitData )
 
 	if( HitData.m_HitStunDuration > 0.f )
 	{
-		StartBeginHitStunTimer( HitData );
+		StartBeginHitStunTimer( HitData, true );
 	}
 }
 
@@ -223,7 +234,7 @@ void AFightingCharacter::OnHitLanded( AActor* Target, const HitData& HitData )
 
 	if( HitData.m_HitStunDuration > 0.f )
 	{
-		StartBeginHitStunTimer( HitData );
+		StartBeginHitStunTimer( HitData, false );
 	}
 }
 
@@ -280,7 +291,7 @@ void AFightingCharacter::InitTimeDilations()
 	m_TimeDilations.Push( CustomTimeDilation );
 }
 
-void AFightingCharacter::StartBeginHitStunTimer( const HitData& HitData )
+void AFightingCharacter::StartBeginHitStunTimer( const HitData& HitData, bool ConsiderShake )
 {
 	if( GetWorldTimerManager().IsTimerActive( m_HitStunBeginTimerHandle ) )
 	{
@@ -288,17 +299,43 @@ void AFightingCharacter::StartBeginHitStunTimer( const HitData& HitData )
 	}
 
 	m_CachedHitStunDuration = HitData.m_HitStunDuration;
+	m_CachedDoMeshShake = HitData.m_Shake;
+	m_CachedConsiderShake = ConsiderShake;
 	GetWorldTimerManager().SetTimer( m_HitStunBeginTimerHandle, this, &AFightingCharacter::OnHitStunBeginTimerEnded, UCombatStatics::GetHitStunInitialDelay() );
 }
 
 void AFightingCharacter::OnHitStunBeginTimerEnded()
 {
 	StartStopHitStunTimer();
+
+	if( m_CachedConsiderShake && m_CachedDoMeshShake )
+	{
+		m_CanUpdateMeshShake = true;
+	}
 }
 
 void AFightingCharacter::OnHitStunStopTimerEnded()
 {
 	DisableHitStun();
+
+	m_CanUpdateMeshShake = false;
+	ResetMeshRelativeLocation();
+}
+
+void AFightingCharacter::UpdateMeshShake()
+{
+	float ElapsedTime = UGameplayStatics::GetRealTimeSeconds( GetWorld() );
+	float DeltaY = FMath::Sin( ElapsedTime * m_MeshShakeFrequency ) * m_MeshShakeAmplitude;
+
+	FVector CurrentPosition = GetMesh()->GetRelativeLocation();
+	CurrentPosition.X += DeltaY;
+
+	GetMesh()->SetRelativeLocation( CurrentPosition, false, nullptr, ETeleportType::TeleportPhysics );
+}
+
+void AFightingCharacter::ResetMeshRelativeLocation()
+{
+	GetMesh()->SetRelativeLocation( m_InitialMeshRelativeLocation );
 }
 
 void AFightingCharacter::StartStopHitStunTimer()

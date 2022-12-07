@@ -128,6 +128,12 @@ protected:
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Hit Stun Time Dilation" )
 	float m_HitStunTimeDilation = .001f;
 
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Mesh Shake Frequency" )
+	float m_MeshShakeFrequency = 2.5f;
+
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Mesh Shake Amplitude" )
+	float m_MeshShakeAmplitude = 60.f;
+
 	virtual void BeginPlay() override;
 	virtual void EndPlay( const EEndPlayReason::Type EndPlayReason ) override;
 
@@ -144,7 +150,11 @@ private:
 	FTimerHandle m_HitStunStopTimerHandle;
 	FTimerHandle m_HitStunBeginTimerHandle;
 	float m_CachedHitStunDuration = 0.f;
+	bool m_CachedDoMeshShake = false;
+	bool m_CachedConsiderShake = false;
 	TArray<float> m_TimeDilations;
+	bool m_CanUpdateMeshShake = false;
+	FVector m_InitialMeshRelativeLocation;
 
 	FDelegateHandle m_HitDelegateHandle;
 
@@ -159,9 +169,12 @@ private:
 	void CheckAirborneEvent();
 
 	void InitTimeDilations();
-	void StartBeginHitStunTimer( const HitData& HitData );
+	void StartBeginHitStunTimer( const HitData& HitData, bool ConsiderShake );
 	void OnHitStunBeginTimerEnded();
 
 	void StartStopHitStunTimer();
 	void OnHitStunStopTimerEnded();
+
+	void UpdateMeshShake();
+	void ResetMeshRelativeLocation();
 };
