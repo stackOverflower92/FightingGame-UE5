@@ -13,8 +13,11 @@ class FIGHTINGGAME_API UHitboxNotifyState : public UAnimNotifyState
 	GENERATED_BODY()
 
 public:
-	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Socket Name" )
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Socket Name (Regular)" )
 	FName m_SocketName;
+
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Socket Name (Mirrored)" )
+	FName m_SocketNameMirrored;
 
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Priority" )
 	int m_Priority = 0;

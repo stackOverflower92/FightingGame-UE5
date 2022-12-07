@@ -13,6 +13,8 @@ void UHitboxNotifyState::NotifyBegin( USkeletalMeshComponent* MeshComp, UAnimSeq
 
 	if( auto* Character = Cast<AFightingCharacter>( MeshComp->GetOwner() ) )
 	{
+		FName SocketName = Character->IsFacingRight() ? m_SocketName : m_SocketNameMirrored;
+
 		const HitData& Data = HitData( m_ForceOpponentFacing,
 		                               m_DamagePercent,
 		                               m_Radius,
@@ -23,7 +25,7 @@ void UHitboxNotifyState::NotifyBegin( USkeletalMeshComponent* MeshComp, UAnimSeq
 		                               MeshComp->GetWorld(),
 		                               Character,
 		                               MeshComp,
-		                               m_SocketName,
+		                               SocketName,
 		                               GetUniqueID() );
 
 		Character->GetHitboxHandler()->AddHitbox( Data );

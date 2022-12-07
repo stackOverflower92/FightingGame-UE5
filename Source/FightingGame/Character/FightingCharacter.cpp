@@ -42,7 +42,8 @@ void AFightingCharacter::UpdateHorizontalMovement( float value )
 	{
 		if( !FMath::IsNearlyZero( m_CurrentHorizontalMovement ) )
 		{
-			m_TargetRotatorYaw = FMath::Sign( m_CurrentHorizontalMovement ) * 90.f;
+			float HorizontalMovementSign = FMath::Sign( m_CurrentHorizontalMovement );
+			m_TargetRotatorYaw = HorizontalMovementSign * 90.f;
 		}
 	}
 }
@@ -135,13 +136,13 @@ void AFightingCharacter::Tick( float DeltaTime )
 	}
 
 	m_FacingRight = m_TargetRotatorYaw > 0.f && m_TargetRotatorYaw < 180.f;
+	UpdateYaw( DeltaTime );
+
 	if( loc_DebugFacing == 1 )
 	{
 		UKismetSystemLibrary::DrawDebugString( GetWorld(), GetActorLocation(),
 		                                       FString::Printf( TEXT( "[Facing Right: %s]" ), m_FacingRight ? TEXT( "TRUE" ) : TEXT( "FALSE" ) ) );
 	}
-
-	UpdateYaw( DeltaTime );
 
 	CheckGroundedEvent();
 	CheckAirborneEvent();
@@ -191,9 +192,25 @@ void AFightingCharacter::UpdateYaw( float DeltaTime )
 	FRotator TargetRotator = GetActorRotation();
 	TargetRotator.Yaw = m_TargetRotatorYaw;
 
-	FRotator LerpRotator = UKismetMathLibrary::RLerp( GetActorRotation(), TargetRotator, m_FacingRotationLerpMultiplier * DeltaTime, true );
+	FRotator UpdatedRotator;
+	if( m_FacingRotationLerpMultiplier > 0.f )
+	{
+		UpdatedRotator = UKismetMathLibrary::RLerp( GetActorRotation(), TargetRotator, m_FacingRotationLerpMultiplier * DeltaTime, true );
+	}
+	else
+	{
+		UpdatedRotator = TargetRotator;
+	}
 
-	SetActorRotation( LerpRotator );
+	SetActorRotation( UpdatedRotator );
+}
+
+void AFightingCharacter::UpdateVerticalScale()
+{
+	FVector Scale = GetMesh()->GetRelativeScale3D();
+	float YScale = m_FacingRight ? FMath::Abs( Scale.Y ) : -FMath::Abs( Scale.Y );
+	Scale.Y = YScale;
+	GetMesh()->SetRelativeScale3D( Scale );
 }
 
 void AFightingCharacter::OnHitLanded( AActor* Target, const HitData& HitData )
