@@ -12,7 +12,14 @@ bool UInputTransition::CanPerformTransition()
 	{
 		if( m_Character->HasJustLandedHit() )
 		{
-			return m_Character->GetMovesBufferComponent()->IsInputBuffered( m_InputEntry );
+			if( m_Character->GetMovesBufferComponent()->IsInputBuffered( m_InputEntry ) )
+			{
+				// #TODO is this correct? can this transition have the ownership of that value?
+				m_Character->ResetHasJustLandedHit();
+				return true;
+			}
+
+			return false;
 		}
 	}
 	else

@@ -85,7 +85,8 @@ public:
 
 	FORCEINLINE TObjectPtr<UMovesBufferComponent> GetMovesBufferComponent() const { return m_MovesBuffer; }
 	FORCEINLINE TObjectPtr<UFSM> GetFSM() const { return m_FSM; }
-	FORCEINLINE bool HasJustLandedHit() const { return m_HasLandedHit; }
+	FORCEINLINE bool HasJustLandedHit() const { return m_HasJustLandedHit; }
+	FORCEINLINE void ResetHasJustLandedHit() { m_HasJustLandedHit = false; }
 
 	FORCEINLINE void SetHittable( bool Hittable ) { m_Hittable = Hittable; }
 	FORCEINLINE bool IsHittable() const { return m_Hittable; }
@@ -137,7 +138,7 @@ private:
 	bool m_IsAirKnockbackHappening = false;
 	bool m_GroundedDelegateBroadcast = false;
 	bool m_AirborneDelegateBroadcast = false;
-	bool m_HasLandedHit = false;
+	bool m_HasJustLandedHit = false;
 	FTimerHandle m_HitLandedStateTimerHandle;
 	bool m_Hittable = true;
 	FTimerHandle m_HitStunStopTimerHandle;

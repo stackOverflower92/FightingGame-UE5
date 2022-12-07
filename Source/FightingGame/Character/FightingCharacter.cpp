@@ -217,7 +217,7 @@ void AFightingCharacter::OnHitLanded( AActor* Target, const HitData& HitData )
 {
 	m_HitLandedDelegate.Broadcast( Target );
 
-	m_HasLandedHit = true;
+	m_HasJustLandedHit = true;
 
 	StartHitLandedTimer();
 
@@ -239,7 +239,7 @@ void AFightingCharacter::StartHitLandedTimer()
 
 void AFightingCharacter::OnHitLandedTimerEnded()
 {
-	m_HasLandedHit = false;
+	m_HasJustLandedHit = false;
 }
 
 void AFightingCharacter::CheckGroundedEvent()
