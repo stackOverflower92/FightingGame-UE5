@@ -6,6 +6,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include <Runtime/Engine/Classes/Kismet/KismetMathLibrary.h>
 
+#include "FightingGame/Combat/HitStopComponent.h"
 #include "FightingGame/Common/CombatStatics.h"
 #include "FightingGame/Debug/Debug.h"
 #include "Kismet/GameplayStatics.h"
@@ -27,9 +28,10 @@ AFightingCharacter::AFightingCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	m_FSM = CreateDefaultSubobject<UFSM>( TEXT( "FSM" ) );
-	m_MovesBuffer = CreateDefaultSubobject<UMovesBufferComponent>( TEXT( "Moves Buffer" ) );
-	m_HitboxHandler = CreateDefaultSubobject<UHitboxHandlerComponent>( TEXT( "Hitbox Handler" ) );
+	m_FSM              = CreateDefaultSubobject<UFSM>( TEXT( "FSM" ) );
+	m_MovesBuffer      = CreateDefaultSubobject<UMovesBufferComponent>( TEXT( "Moves Buffer" ) );
+	m_HitboxHandler    = CreateDefaultSubobject<UHitboxHandlerComponent>( TEXT( "Hitbox Handler" ) );
+	m_HitStopComponent = CreateDefaultSubobject<UHitStopComponent>( TEXT( "Hit Stop" ) );
 }
 
 bool AFightingCharacter::IsAirborne() const
@@ -47,7 +49,7 @@ void AFightingCharacter::UpdateHorizontalMovement( float value )
 		if( !FMath::IsNearlyZero( m_CurrentHorizontalMovement ) )
 		{
 			float HorizontalMovementSign = FMath::Sign( m_CurrentHorizontalMovement );
-			m_TargetRotatorYaw = HorizontalMovementSign * 90.f;
+			m_TargetRotatorYaw           = HorizontalMovementSign * 90.f;
 		}
 	}
 }
@@ -86,7 +88,8 @@ void AFightingCharacter::SetFacingRight( bool Right, bool Instant /*= false*/ )
 	if( Instant )
 	{
 		FRotator TargetRotation = GetActorRotation();
-		TargetRotation.Yaw = m_TargetRotatorYaw;
+		TargetRotation.Yaw      = m_TargetRotatorYaw;
+
 		SetActorRotation( TargetRotation );
 	}
 }
@@ -116,14 +119,29 @@ void AFightingCharacter::SetAirKnockbackHappening( bool Value )
 	m_IsAirKnockbackHappening = Value;
 }
 
-void AFightingCharacter::EnableHitStun( bool Shake )
+void AFightingCharacter::EnableHitStop( bool Shake )
 {
 	m_TimeDilations.Push( UCombatStatics::GetMinCustomTimeDilation() );
 
 	CustomTimeDilation = m_TimeDilations.Last();
 }
 
-void AFightingCharacter::DisableHitStun()
+void AFightingCharacter::DisableHitStop()
+{
+	m_TimeDilations.Pop();
+	ensureMsgf( m_TimeDilations.Num() > 0, TEXT("Time dilations stack cannot be empty") );
+
+	CustomTimeDilation = m_TimeDilations.Last();
+}
+
+void AFightingCharacter::PushTimeDilation( float value )
+{
+	m_TimeDilations.Push( value );
+
+	CustomTimeDilation = m_TimeDilations.Last();
+}
+
+void AFightingCharacter::PopTimeDilation()
 {
 	m_TimeDilations.Pop();
 	ensureMsgf( m_TimeDilations.Num() > 0, TEXT("Time dilations stack cannot be empty") );
@@ -192,16 +210,16 @@ void AFightingCharacter::OnHitReceived( const HitData& HitData )
 		UFSMStatics::SetState( m_FSM, m_GroundedReactionStateName );
 	}
 
-	if( HitData.m_HitStunDuration > 0.f )
+	if( HitData.m_HitStopDuration > 0.f )
 	{
-		StartBeginHitStunTimer( HitData, true );
+		GetHitStopComponent()->EnableHitStop( HitData.m_HitStopDuration, HitData.m_Shake );
 	}
 }
 
 void AFightingCharacter::UpdateYaw( float DeltaTime )
 {
 	FRotator TargetRotator = GetActorRotation();
-	TargetRotator.Yaw = m_TargetRotatorYaw;
+	TargetRotator.Yaw      = m_TargetRotatorYaw;
 
 	FRotator UpdatedRotator;
 	if( m_FacingRotationLerpMultiplier > 0.f )
@@ -219,8 +237,9 @@ void AFightingCharacter::UpdateYaw( float DeltaTime )
 void AFightingCharacter::UpdateVerticalScale()
 {
 	FVector Scale = GetMesh()->GetRelativeScale3D();
-	float YScale = m_FacingRight ? FMath::Abs( Scale.Y ) : -FMath::Abs( Scale.Y );
-	Scale.Y = YScale;
+	float YScale  = m_FacingRight ? FMath::Abs( Scale.Y ) : -FMath::Abs( Scale.Y );
+	Scale.Y       = YScale;
+
 	GetMesh()->SetRelativeScale3D( Scale );
 }
 
@@ -232,9 +251,9 @@ void AFightingCharacter::OnHitLanded( AActor* Target, const HitData& HitData )
 
 	StartHitLandedTimer();
 
-	if( HitData.m_HitStunDuration > 0.f )
+	if( HitData.m_HitStopDuration > 0.f )
 	{
-		StartBeginHitStunTimer( HitData, false );
+		GetHitStopComponent()->EnableHitStop( HitData.m_HitStopDuration, false );
 	}
 }
 
@@ -291,44 +310,18 @@ void AFightingCharacter::InitTimeDilations()
 	m_TimeDilations.Push( CustomTimeDilation );
 }
 
-void AFightingCharacter::StartBeginHitStunTimer( const HitData& HitData, bool ConsiderShake )
-{
-	if( GetWorldTimerManager().IsTimerActive( m_HitStunBeginTimerHandle ) )
-	{
-		GetWorldTimerManager().ClearTimer( m_HitStunBeginTimerHandle );
-	}
-
-	m_CachedHitStunDuration = HitData.m_HitStunDuration;
-	m_CachedDoMeshShake = HitData.m_Shake;
-	m_CachedConsiderShake = ConsiderShake;
-	GetWorldTimerManager().SetTimer( m_HitStunBeginTimerHandle, this, &AFightingCharacter::OnHitStunBeginTimerEnded, UCombatStatics::GetHitStunInitialDelay() );
-}
-
-void AFightingCharacter::OnHitStunBeginTimerEnded()
-{
-	StartStopHitStunTimer();
-
-	if( m_CachedConsiderShake && m_CachedDoMeshShake )
-	{
-		m_CanUpdateMeshShake = true;
-	}
-}
-
-void AFightingCharacter::OnHitStunStopTimerEnded()
-{
-	DisableHitStun();
-
-	m_CanUpdateMeshShake = false;
-	ResetMeshRelativeLocation();
-}
-
 void AFightingCharacter::UpdateMeshShake()
 {
 	float ElapsedTime = UGameplayStatics::GetRealTimeSeconds( GetWorld() );
-	float DeltaY = FMath::Sin( ElapsedTime * m_MeshShakeFrequency ) * m_MeshShakeAmplitude;
+	float DeltaShake  = FMath::Sin( ElapsedTime * m_MeshShakeFrequency ) * m_MeshShakeAmplitude;
 
 	FVector CurrentPosition = GetMesh()->GetRelativeLocation();
-	CurrentPosition.X += DeltaY;
+	CurrentPosition.X += DeltaShake;
+
+	if( IsAirborne() )
+	{
+		CurrentPosition.Z += DeltaShake;
+	}
 
 	GetMesh()->SetRelativeLocation( CurrentPosition, false, nullptr, ETeleportType::TeleportPhysics );
 }
@@ -336,17 +329,4 @@ void AFightingCharacter::UpdateMeshShake()
 void AFightingCharacter::ResetMeshRelativeLocation()
 {
 	GetMesh()->SetRelativeLocation( m_InitialMeshRelativeLocation );
-}
-
-void AFightingCharacter::StartStopHitStunTimer()
-{
-	if( GetWorldTimerManager().IsTimerActive( m_HitStunStopTimerHandle ) )
-	{
-		GetWorldTimerManager().ClearTimer( m_HitStunStopTimerHandle );
-		DisableHitStun();
-	}
-
-	// #TODO pass shake from hitdata
-	EnableHitStun( false );
-	GetWorldTimerManager().SetTimer( m_HitStunStopTimerHandle, this, &AFightingCharacter::OnHitStunStopTimerEnded, m_CachedHitStunDuration );
 }

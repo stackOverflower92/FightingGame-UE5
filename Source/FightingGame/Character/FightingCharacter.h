@@ -5,6 +5,7 @@
 #include "GameFramework/Character.h"
 #include "FightingCharacter.generated.h"
 
+class UHitStopComponent;
 class UFSM;
 class UMovesBufferComponent;
 class UHitboxHandlerComponent;
@@ -73,10 +74,16 @@ public:
 	void SetAirKnockbackHappening( bool Value );
 
 	UFUNCTION( BlueprintCallable )
-	void EnableHitStun( bool Shake );
+	void EnableHitStop( bool Shake );
 
 	UFUNCTION( BlueprintCallable )
-	void DisableHitStun();
+	void DisableHitStop();
+
+	UFUNCTION( BlueprintCallable )
+	void PushTimeDilation( float value );
+
+	UFUNCTION( BlueprintCallable )
+	void PopTimeDilation();
 
 	virtual void Tick( float DeltaTime ) override;
 	virtual void SetupPlayerInputComponent( class UInputComponent* PlayerInputComponent ) override;
@@ -85,11 +92,16 @@ public:
 
 	FORCEINLINE TObjectPtr<UMovesBufferComponent> GetMovesBufferComponent() const { return m_MovesBuffer; }
 	FORCEINLINE TObjectPtr<UFSM> GetFSM() const { return m_FSM; }
+	FORCEINLINE TObjectPtr<UHitStopComponent> GetHitStopComponent() const { return m_HitStopComponent; }
+
 	FORCEINLINE bool HasJustLandedHit() const { return m_HasJustLandedHit; }
 	FORCEINLINE void ResetHasJustLandedHit() { m_HasJustLandedHit = false; }
 
 	FORCEINLINE void SetHittable( bool Hittable ) { m_Hittable = Hittable; }
 	FORCEINLINE bool IsHittable() const { return m_Hittable; }
+
+	void UpdateMeshShake();
+	void ResetMeshRelativeLocation();
 
 protected:
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "FSM" )
@@ -102,7 +114,10 @@ protected:
 	TObjectPtr<UHitboxHandlerComponent> m_HitboxHandler = nullptr;
 
 	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Knockback Multiplier Curve" )
-	TObjectPtr<UCurveFloat> m_KnockbackMultiplierCurve;
+	TObjectPtr<UCurveFloat> m_KnockbackMultiplierCurve = nullptr;
+
+	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Hit Stop" )
+	TObjectPtr<UHitStopComponent> m_HitStopComponent = nullptr;
 
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "FSM First State" )
 	FName m_FirstState = "IDLE";
@@ -138,20 +153,18 @@ protected:
 	virtual void EndPlay( const EEndPlayReason::Type EndPlayReason ) override;
 
 private:
-	bool m_FacingRight = true;
-	float m_TargetRotatorYaw = 90.f;
-	float m_DamagePercent = 0.f;
-	bool m_IsAirKnockbackHappening = false;
+	bool m_FacingRight               = true;
+	float m_TargetRotatorYaw         = 90.f;
+	float m_DamagePercent            = 0.f;
+	bool m_IsAirKnockbackHappening   = false;
 	bool m_GroundedDelegateBroadcast = false;
 	bool m_AirborneDelegateBroadcast = false;
-	bool m_HasJustLandedHit = false;
+	bool m_HasJustLandedHit          = false;
 	FTimerHandle m_HitLandedStateTimerHandle;
-	bool m_Hittable = true;
-	FTimerHandle m_HitStunStopTimerHandle;
-	FTimerHandle m_HitStunBeginTimerHandle;
-	float m_CachedHitStunDuration = 0.f;
-	bool m_CachedDoMeshShake = false;
-	bool m_CachedConsiderShake = false;
+	bool m_Hittable               = true;
+	float m_CachedHitStopDuration = 0.f;
+	bool m_CachedDoMeshShake      = false;
+	bool m_CachedConsiderShake    = false;
 	TArray<float> m_TimeDilations;
 	bool m_CanUpdateMeshShake = false;
 	FVector m_InitialMeshRelativeLocation;
@@ -169,12 +182,4 @@ private:
 	void CheckAirborneEvent();
 
 	void InitTimeDilations();
-	void StartBeginHitStunTimer( const HitData& HitData, bool ConsiderShake );
-	void OnHitStunBeginTimerEnded();
-
-	void StartStopHitStunTimer();
-	void OnHitStunStopTimerEnded();
-
-	void UpdateMeshShake();
-	void ResetMeshRelativeLocation();
 };

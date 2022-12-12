@@ -7,7 +7,7 @@ struct HitData
 	float m_Radius = 10.f;
 	FVector m_ProcessedKnockback;
 	bool m_IgnoreKnockbackMultiplier = false;
-	float m_HitStunDuration = 0.f;
+	float m_HitStopDuration = 0.f;
 	bool m_Shake = false;
 	const UWorld* m_World = nullptr;
 	AActor* m_Owner = nullptr;

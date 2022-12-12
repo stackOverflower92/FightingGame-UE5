@@ -6,7 +6,6 @@
 #include "Animation/AnimNotifies/AnimNotifyState.h"
 #include "HitboxNotifyState.generated.h"
 
-
 UCLASS()
 class FIGHTINGGAME_API UHitboxNotifyState : public UAnimNotifyState
 {
@@ -40,8 +39,8 @@ public:
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Ignore Knockback Multiplier" )
 	bool m_IgnoreKnockbackMultiplier = false;
 
-	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Hit Stun Duration" )
-	float m_HitStunDuration = 0.f;
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Hit Stop Duration" )
+	float m_HitStopDuration = 0.f;
 
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Shake" )
 	bool m_Shake = true;

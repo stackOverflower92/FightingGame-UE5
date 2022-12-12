@@ -20,7 +20,7 @@ void UHitboxNotifyState::NotifyBegin( USkeletalMeshComponent* MeshComp, UAnimSeq
 		                               m_Radius,
 		                               UCombatStatics::GetKnockbackFromOrientation( Character, m_KnockbackOrientation ) * m_KnockbackForce,
 		                               m_IgnoreKnockbackMultiplier,
-		                               m_HitStunDuration,
+		                               m_HitStopDuration,
 		                               m_Shake,
 		                               MeshComp->GetWorld(),
 		                               Character,
