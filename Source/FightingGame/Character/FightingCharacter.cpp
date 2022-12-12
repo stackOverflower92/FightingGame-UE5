@@ -122,21 +122,6 @@ void AFightingCharacter::SetAirKnockbackHappening( bool Value )
 	m_IsAirKnockbackHappening = Value;
 }
 
-void AFightingCharacter::EnableHitStop( bool Shake )
-{
-	m_TimeDilations.Push( UCombatStatics::GetMinCustomTimeDilation() );
-
-	CustomTimeDilation = m_TimeDilations.Last();
-}
-
-void AFightingCharacter::DisableHitStop()
-{
-	m_TimeDilations.Pop();
-	ensureMsgf( m_TimeDilations.Num() > 0, TEXT("Time dilations stack cannot be empty") );
-
-	CustomTimeDilation = m_TimeDilations.Last();
-}
-
 void AFightingCharacter::PushTimeDilation( float value )
 {
 	m_TimeDilations.Push( value );

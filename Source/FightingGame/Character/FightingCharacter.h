@@ -75,12 +75,6 @@ public:
 	void SetAirKnockbackHappening( bool Value );
 
 	UFUNCTION( BlueprintCallable )
-	void EnableHitStop( bool Shake );
-
-	UFUNCTION( BlueprintCallable )
-	void DisableHitStop();
-
-	UFUNCTION( BlueprintCallable )
 	void PushTimeDilation( float value );
 
 	UFUNCTION( BlueprintCallable )
