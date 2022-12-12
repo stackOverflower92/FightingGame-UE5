@@ -6,6 +6,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include <Runtime/Engine/Classes/Kismet/KismetMathLibrary.h>
 
+#include "Components/BoxComponent.h"
 #include "FightingGame/Combat/HitStopComponent.h"
 #include "FightingGame/Common/CombatStatics.h"
 #include "FightingGame/Debug/Debug.h"
@@ -67,6 +68,8 @@ void AFightingCharacter::BeginPlay()
 	InitTimeDilations();
 
 	m_InitialMeshRelativeLocation = GetMesh()->GetRelativeLocation();
+
+	InitPushbox();
 }
 
 void AFightingCharacter::EndPlay( const EEndPlayReason::Type EndPlayReason )
@@ -175,6 +178,8 @@ void AFightingCharacter::Tick( float DeltaTime )
 	{
 		UpdateMeshShake();
 	}
+
+	UpdatePushbox( DeltaTime );
 }
 
 void AFightingCharacter::SetupPlayerInputComponent( UInputComponent* PlayerInputComponent )
@@ -308,6 +313,44 @@ void AFightingCharacter::InitTimeDilations()
 {
 	m_TimeDilations.Empty();
 	m_TimeDilations.Push( CustomTimeDilation );
+}
+
+void AFightingCharacter::InitPushbox()
+{
+	TArray<UActorComponent*> PushBoxes = GetComponentsByTag( UBoxComponent::StaticClass(), TEXT( "Pushbox" ) );
+	ensure( PushBoxes.Num() <= 1 );
+
+	if( PushBoxes.Num() > 0 )
+	{
+		m_Pushbox = Cast<UBoxComponent>( PushBoxes[0] );
+		if( !m_Pushbox )
+		{
+			FG_SLOG_WARN( FString::Printf( TEXT( "Character [%s] has no Pushbox available; will overlap with other characters" ), *GetName() ) );
+		}
+	}
+}
+
+void AFightingCharacter::UpdatePushbox( float DeltaTime )
+{
+	if( m_Pushbox )
+	{
+		TArray<UPrimitiveComponent*> OverlappingComponents;
+		m_Pushbox->GetOverlappingComponents( OverlappingComponents );
+
+		// TODO: temp, let's start by handling a single other enemy
+		if( OverlappingComponents.Num() == 1 )
+		{
+			AActor* OtherActor         = OverlappingComponents[0]->GetOwner();
+			bool OtherOnTheRight       = OtherActor->GetActorLocation().Y > GetActorLocation().Y;
+			float MyShiftingMultiplier = OtherOnTheRight ? -1.f : 1.f;
+
+			const FVector CurrentLocation = GetActorLocation();
+			const float NextPosition      = CurrentLocation.Y + (m_PushboxShiftRatePerFrame * MyShiftingMultiplier * DeltaTime);
+			const FVector NextLocation    = FVector( CurrentLocation.X, NextPosition, CurrentLocation.Z );
+
+			SetActorLocation( NextLocation );
+		}
+	}
 }
 
 void AFightingCharacter::UpdateMeshShake()

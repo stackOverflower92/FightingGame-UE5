@@ -5,6 +5,7 @@
 #include "GameFramework/Character.h"
 #include "FightingCharacter.generated.h"
 
+class UBoxComponent;
 class UHitStopComponent;
 class UFSM;
 class UMovesBufferComponent;
@@ -149,6 +150,12 @@ protected:
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Mesh Shake Amplitude" )
 	float m_MeshShakeAmplitude = 60.f;
 
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Push Box" )
+	TObjectPtr<UBoxComponent> m_Pushbox = nullptr;
+
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Push Box Shift Rate (Per Frame)" )
+	float m_PushboxShiftRatePerFrame = 0.1f;
+
 	virtual void BeginPlay() override;
 	virtual void EndPlay( const EEndPlayReason::Type EndPlayReason ) override;
 
@@ -182,4 +189,6 @@ private:
 	void CheckAirborneEvent();
 
 	void InitTimeDilations();
+	void InitPushbox();
+	void UpdatePushbox( float DeltaTime );
 };
