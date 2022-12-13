@@ -75,7 +75,7 @@ public:
 	void SetAirKnockbackHappening( bool Value );
 
 	UFUNCTION( BlueprintCallable )
-	void PushTimeDilation( float value );
+	void PushTimeDilation( float Value );
 
 	UFUNCTION( BlueprintCallable )
 	void PopTimeDilation();

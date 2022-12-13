@@ -29,14 +29,14 @@ void UHitboxHandlerComponent::AddHitbox( HitData HitData )
 
 void UHitboxHandlerComponent::RemoveHitbox( uint32 HitUniqueId )
 {
-	auto* It = m_ActiveHitboxes.FindByPredicate( [&HitUniqueId]( const HitData& HitData )
+	auto* it = m_ActiveHitboxes.FindByPredicate( [&HitUniqueId]( const HitData& HitData )
 	{
 		return HitData.m_Id == HitUniqueId;
 	} );
 
-	if( It )
+	if( it )
 	{
-		(*It).m_PendingRemoval = true;
+		it->m_PendingRemoval = true;
 	}
 }
 
@@ -49,11 +49,11 @@ void UHitboxHandlerComponent::TickComponent( float DeltaTime, ELevelTick TickTyp
 {
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
 
-	for( const auto& HitData : m_ActiveHitboxes )
+	for( const auto& hitData : m_ActiveHitboxes )
 	{
-		if( !HitData.m_PendingRemoval )
+		if( !hitData.m_PendingRemoval )
 		{
-			UpdateHitbox( HitData );
+			UpdateHitbox( hitData );
 		}
 	}
 
@@ -62,67 +62,83 @@ void UHitboxHandlerComponent::TickComponent( float DeltaTime, ELevelTick TickTyp
 
 bool UHitboxHandlerComponent::TraceHitbox( const HitData& HitData, FHitResult& OutHit )
 {
-	TArray<TEnumAsByte<EObjectTypeQuery>> TargetTraceTypes;
+	TArray<TEnumAsByte<EObjectTypeQuery>> targetTraceTypes;
 
-	const EObjectTypeQuery TargetCollisionType = UEngineTypes::ConvertToObjectType( CUSTOM_TRACE_HURTBOX );
-	TargetTraceTypes.Add( TargetCollisionType );
+	const EObjectTypeQuery targetCollisionType = UEngineTypes::ConvertToObjectType( CUSTOM_TRACE_HURTBOX );
+	targetTraceTypes.Add( targetCollisionType );
 
-	TArray<AActor*> ActorsToIgnore;
-	ActorsToIgnore.Add( HitData.m_Owner );
+	TArray<AActor*> actorsToIgnore;
+	actorsToIgnore.Add( HitData.m_Owner );
 
-	const bool HasSocketToFollow = !HitData.m_SocketToFollow.ToString().IsEmpty();
-	const FVector Location = HasSocketToFollow ? HitData.m_SkeletalMesh->GetSocketLocation( HitData.m_SocketToFollow ) : HitData.m_Location;
+	const bool hasSocketToFollow = !HitData.m_SocketToFollow.ToString().IsEmpty();
+	const FVector location       = hasSocketToFollow ? HitData.m_SkeletalMesh->GetSocketLocation( HitData.m_SocketToFollow ) : HitData.m_Location;
 
-	EDrawDebugTrace::Type DebugDrawType = loc_ShowHitboxTraces == 0 ? EDrawDebugTrace::None : EDrawDebugTrace::ForOneFrame;
+	EDrawDebugTrace::Type debugDrawType = loc_ShowHitboxTraces == 0 ? EDrawDebugTrace::None : EDrawDebugTrace::ForOneFrame;
 
-	const bool SuccessfulHit = UKismetSystemLibrary::SphereTraceSingleForObjects( HitData.m_World, Location, Location,
-	                                                                              HitData.m_Radius, TargetTraceTypes,
-	                                                                              false, ActorsToIgnore, DebugDrawType, OutHit, true );
+	const bool isHitSuccessful = UKismetSystemLibrary::SphereTraceSingleForObjects( HitData.m_World, location, location,
+	                                                                                HitData.m_Radius, targetTraceTypes,
+	                                                                                false, actorsToIgnore, debugDrawType, OutHit, true );
 
-	return SuccessfulHit;
+	return isHitSuccessful;
 }
 
-bool UHitboxHandlerComponent::WasActorAlreadyHit( AActor* Actor, uint32 HitboxId ) const
+bool UHitboxHandlerComponent::WasActorAlreadyHit( AActor* Actor, uint32 HitboxId )
 {
 	ensureMsgf( Actor, TEXT("Actor is null") );
 
-	auto* It = m_HitActorsMap.Find( HitboxId );
-	if( !It ) return false;
+	if( !m_ActorGroupsMap.Find( Actor->GetUniqueID() ) ) return false;
 
-	return It->Contains( Actor->GetUniqueID() );
+	auto* activeHitboxesIt = m_ActiveHitboxes.FindByPredicate( [&]( const HitData& _hitData )
+	{
+		return _hitData.m_Id == HitboxId;
+	} );
+
+	ensureMsgf( activeHitboxesIt, TEXT("HitData should be available at this point") );
+
+	return m_ActorGroupsMap[Actor->GetUniqueID()].ContainsByPredicate( [&]( const FHitGroupPair& _hitPair )
+	{
+		return _hitPair.m_GroupId == activeHitboxesIt->m_GroupId;
+	} );
 }
 
 void UHitboxHandlerComponent::RegisterHitActor( AActor* Actor, uint32 HitboxId )
 {
 	ensureMsgf( Actor, TEXT("Actor is null") );
 
-	if( m_HitActorsMap.Contains( HitboxId ) )
+	// Update actor groups map
+	auto* it = m_ActiveHitboxes.FindByPredicate( [&]( const HitData& _hitData )
 	{
-		m_HitActorsMap[HitboxId].AddUnique( Actor->GetUniqueID() );
+		return _hitData.m_Id == HitboxId;
+	} );
+	ensureMsgf( it, TEXT("HitData should be available at this point") );
+
+	if( m_ActorGroupsMap.Contains( Actor->GetUniqueID() ) )
+	{
+		m_ActorGroupsMap[Actor->GetUniqueID()].AddUnique( FHitGroupPair{HitboxId, it->m_GroupId} );
 	}
 	else
 	{
-		TArray<uint32> HitActors;
-		HitActors.AddUnique( Actor->GetUniqueID() );
+		TArray<FHitGroupPair> pairs;
+		pairs.AddUnique( FHitGroupPair{HitboxId, it->m_GroupId} );
 
-		m_HitActorsMap.Emplace( HitboxId, HitActors );
+		m_ActorGroupsMap.Emplace( Actor->GetUniqueID(), pairs );
 	}
 }
 
 void UHitboxHandlerComponent::UpdateHitbox( const HitData& HitData )
 {
-	FHitResult OutHit;
-	const bool Success = TraceHitbox( HitData, OutHit );
+	FHitResult outHit;
+	const bool success = TraceHitbox( HitData, outHit );
 
-	AActor* HitActor = OutHit.GetActor();
-	if( Success && !WasActorAlreadyHit( HitActor, HitData.m_Id ) )
+	AActor* hitActor = outHit.GetActor();
+	if( success && !WasActorAlreadyHit( hitActor, HitData.m_Id ) )
 	{
-		RegisterHitActor( HitActor, HitData.m_Id );
+		RegisterHitActor( hitActor, HitData.m_Id );
 
-		if( auto* Hittable = Cast<IHittable>( HitActor ) )
+		if( auto* Hittable = Cast<IHittable>( hitActor ) )
 		{
 			Hittable->OnHitReceived( HitData );
-			m_HitDelegate.Broadcast( HitActor, HitData );
+			m_HitDelegate.Broadcast( hitActor, HitData );
 		}
 	}
 }
@@ -133,7 +149,34 @@ void UHitboxHandlerComponent::RemovePendingHitboxes()
 	{
 		if( m_ActiveHitboxes[i].m_PendingRemoval )
 		{
-			m_HitActorsMap.Remove( m_ActiveHitboxes[i].m_Id );
+			//m_HitActorsMap.Remove( m_ActiveHitboxes[i].m_Id );
+
+			TArray<uint32> targetKeys;
+			for( const auto& pair : m_ActorGroupsMap )
+			{
+				if( pair.Value.ContainsByPredicate( [&]( const FHitGroupPair& hitPair )
+				{
+					return hitPair.m_Id == m_ActiveHitboxes[i].m_Id;
+				} ) )
+				{
+					targetKeys.Emplace( pair.Key );
+					break;
+				}
+			}
+
+			for( int keyIdx = 0; keyIdx < targetKeys.Num(); ++keyIdx )
+			{
+				uint32 targetKey = targetKeys[keyIdx];
+
+				for( int j = m_ActorGroupsMap[targetKey].Num() - 1; j >= 0; --j )
+				{
+					if( m_ActorGroupsMap[targetKey][j].m_Id == m_ActiveHitboxes[i].m_Id )
+					{
+						m_ActorGroupsMap[targetKey].RemoveAt( j );
+					}
+				}
+			}
+
 			m_ActiveHitboxes.RemoveAt( i );
 		}
 	}

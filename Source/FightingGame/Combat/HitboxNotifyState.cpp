@@ -26,7 +26,8 @@ void UHitboxNotifyState::NotifyBegin( USkeletalMeshComponent* MeshComp, UAnimSeq
 		                               Character,
 		                               MeshComp,
 		                               SocketName,
-		                               GetUniqueID() );
+		                               GetUniqueID(),
+		                               m_GroupId );
 
 		Character->GetHitboxHandler()->AddHitbox( Data );
 	}

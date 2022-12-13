@@ -122,9 +122,9 @@ void AFightingCharacter::SetAirKnockbackHappening( bool Value )
 	m_IsAirKnockbackHappening = Value;
 }
 
-void AFightingCharacter::PushTimeDilation( float value )
+void AFightingCharacter::PushTimeDilation( float Value )
 {
-	m_TimeDilations.Push( value );
+	m_TimeDilations.Push( Value );
 
 	CustomTimeDilation = m_TimeDilations.Last();
 }

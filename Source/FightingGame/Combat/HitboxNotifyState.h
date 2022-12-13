@@ -21,6 +21,9 @@ public:
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Priority" )
 	int m_Priority = 0;
 
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Group Id" )
+	int m_GroupId = 0;
+
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Force Opponent Facing" )
 	bool m_ForceOpponentFacing = true;
 

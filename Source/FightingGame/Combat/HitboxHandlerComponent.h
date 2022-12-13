@@ -9,6 +9,22 @@
 
 DECLARE_MULTICAST_DELEGATE_TwoParams( FHit, AActor*, const HitData& )
 
+struct FHitGroupPair
+{
+	uint32 m_Id   = -1;
+	int m_GroupId = -1;
+
+	friend bool operator==( const FHitGroupPair& Lhs, const FHitGroupPair& Rhs )
+	{
+		return Lhs.m_Id == Rhs.m_Id && Lhs.m_GroupId == Rhs.m_GroupId;
+	}
+
+	friend bool operator!=( const FHitGroupPair& Lhs, const FHitGroupPair& Rhs )
+	{
+		return !(Lhs == Rhs);
+	}
+};
+
 UCLASS( ClassGroup = ( Custom ), meta = ( BlueprintSpawnableComponent ) )
 class FIGHTINGGAME_API UHitboxHandlerComponent : public UActorComponent
 {
@@ -31,12 +47,13 @@ public:
 	virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
 
 private:
-	TMap<uint32, TArray<uint32>> m_HitActorsMap;
+	TMap<uint32, TArray<FHitGroupPair>> m_ActorGroupsMap;
+
 	TArray<HitData> m_ActiveHitboxes;
 	bool m_DebugTraces = true;
 
 	bool TraceHitbox( const HitData& HitData, FHitResult& OutHit );
-	bool WasActorAlreadyHit( AActor* Actor, uint32 HitboxId ) const;
+	bool WasActorAlreadyHit( AActor* Actor, uint32 HitboxId );
 	void RegisterHitActor( AActor* Actor, uint32 HitboxId );
 	void UpdateHitbox( const HitData& HitData );
 
