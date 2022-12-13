@@ -160,7 +160,6 @@ void UHitboxHandlerComponent::RemovePendingHitboxes()
 				} ) )
 				{
 					targetKeys.Emplace( pair.Key );
-					break;
 				}
 			}
 
