@@ -39,7 +39,7 @@ protected:
 public:
 	FHit m_HitDelegate;
 
-	void AddHitbox( HitData HitData );
+	void AddHitbox( HitData Hit );
 	void RemoveHitbox( uint32 HitUniqueId );
 
 	void ShowDebugTraces( bool Show );

@@ -6,12 +6,11 @@
 #include "Animation/AnimNotifies/AnimNotifyState.h"
 #include "HitboxNotifyState.generated.h"
 
-UCLASS()
-class FIGHTINGGAME_API UHitboxNotifyState : public UAnimNotifyState
+USTRUCT( BlueprintType )
+struct FHitboxNotifyData
 {
 	GENERATED_BODY()
 
-public:
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Socket Name (Regular)" )
 	FName m_SocketName;
 
@@ -20,6 +19,9 @@ public:
 
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Priority" )
 	int m_Priority = 0;
+
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Unique Id" )
+	int m_UniqueId = 0;
 
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Group Id" )
 	int m_GroupId = 0;
@@ -47,6 +49,16 @@ public:
 
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Shake" )
 	bool m_Shake = true;
+};
+
+UCLASS()
+class FIGHTINGGAME_API UHitboxNotifyState : public UAnimNotifyState
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Hitboxes" )
+	TArray<FHitboxNotifyData> m_HitBoxes;
 
 	virtual void NotifyBegin( USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration,
 	                          const FAnimNotifyEventReference& EventReference ) override;

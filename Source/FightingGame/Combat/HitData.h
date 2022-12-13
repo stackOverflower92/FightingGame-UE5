@@ -16,15 +16,17 @@ struct HitData
 	FName m_SocketToFollow                 = "";
 	uint32 m_Id;
 	int m_GroupId;
+	int m_Priority;
 	bool m_PendingRemoval = false;
 
 	HitData( bool InForceOpponentFacing, float InDamagePercent, float InRadius, const FVector& InProcessedKnockback, bool InIgnoreKnockbackMultiplier,
 	         float InHitStunDuration,
-	         bool InShake, const UWorld* InWorld, AActor* InOwner, USkeletalMeshComponent* InSkeletalMesh, const FName& InSocketToFollow, uint32 InId, int InGroupId );
+	         bool InShake, const UWorld* InWorld, AActor* InOwner, USkeletalMeshComponent* InSkeletalMesh, const FName& InSocketToFollow, uint32 InId, int InGroupId,
+	         int InPriority );
 
 	HitData( bool InForceOpponentFacing, float InDamagePercent, float InRadius, const FVector& InProcessedKnockback, bool InIgnoreKnockbackMultiplier,
 	         float InHitStunDuration,
-	         bool InShake, const UWorld* InWorld, AActor* InOwner, FVector InLocation, uint32 InId, int InGroupId );
+	         bool InShake, const UWorld* InWorld, AActor* InOwner, FVector InLocation, uint32 InId, int InGroupId, int InPriority );
 
 	friend bool operator==( const HitData& Lhs, const HitData& RHS );
 	friend bool operator!=( const HitData& Lhs, const HitData& RHS );
