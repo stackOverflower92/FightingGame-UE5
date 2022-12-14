@@ -69,4 +69,7 @@ private:
 	void UpdateHitbox( const HitData& HitData );
 
 	void RemovePendingHitboxes();
+
+	void DEBUG_SpawnDebugSphere( const HitData& Hit );
+	void DEBUG_DestroyDebugSphere( int HitboxId );
 };

@@ -32,18 +32,9 @@ void UHitboxHandlerComponent::AddHitbox( HitData Hit )
 {
 	m_ActiveHitboxes.AddUnique( Hit );
 
-	if( m_HitboxVisualizer )
+	if( loc_ShowHitboxTraces && m_HitboxVisualizer )
 	{
-		TObjectPtr<ASphereVisualizer> inst = GetWorld()->SpawnActor<ASphereVisualizer>( m_HitboxVisualizer );
-		inst->SetId( Hit.m_Id );
-		inst->SetRadius( Hit.m_Radius );
-
-		if( m_ReferenceComponent )
-		{
-			inst->AttachToComponent( m_ReferenceComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Hit.m_SocketToFollow );
-		}
-
-		m_HitboxVisualizers.Emplace( inst );
+		DEBUG_SpawnDebugSphere( Hit );
 	}
 }
 
@@ -93,11 +84,9 @@ bool UHitboxHandlerComponent::TraceHitbox( const HitData& HitData, FHitResult& O
 	const bool hasSocketToFollow = !HitData.m_SocketToFollow.ToString().IsEmpty();
 	const FVector location       = hasSocketToFollow ? HitData.m_SkeletalMesh->GetSocketLocation( HitData.m_SocketToFollow ) : HitData.m_Location;
 
-	EDrawDebugTrace::Type debugDrawType = loc_ShowHitboxTraces == 0 ? EDrawDebugTrace::None : EDrawDebugTrace::ForDuration;
-
 	const bool isHitSuccessful = UKismetSystemLibrary::SphereTraceSingleForObjects( HitData.m_World, location, location,
 	                                                                                HitData.m_Radius, targetTraceTypes,
-	                                                                                false, actorsToIgnore, debugDrawType, OutHit, true );
+	                                                                                false, actorsToIgnore, EDrawDebugTrace::None, OutHit, true );
 
 	return isHitSuccessful;
 }
@@ -194,16 +183,35 @@ void UHitboxHandlerComponent::RemovePendingHitboxes()
 				}
 			}
 
-			for( int visIdx = m_HitboxVisualizers.Num() - 1; visIdx >= 0; --visIdx )
-			{
-				if( m_ActiveHitboxes[i].m_Id == m_HitboxVisualizers[visIdx]->GetId() )
-				{
-					GetWorld()->DestroyActor( m_HitboxVisualizers[visIdx] );
-					m_HitboxVisualizers.RemoveAt( visIdx );
-				}
-			}
+			DEBUG_DestroyDebugSphere( m_ActiveHitboxes[i].m_Id );
 
 			m_ActiveHitboxes.RemoveAt( i );
+		}
+	}
+}
+
+void UHitboxHandlerComponent::DEBUG_SpawnDebugSphere( const HitData& Hit )
+{
+	TObjectPtr<ASphereVisualizer> inst = GetWorld()->SpawnActor<ASphereVisualizer>( m_HitboxVisualizer );
+	inst->SetId( Hit.m_Id );
+	inst->SetRadius( Hit.m_Radius );
+
+	if( m_ReferenceComponent )
+	{
+		inst->AttachToComponent( m_ReferenceComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Hit.m_SocketToFollow );
+	}
+
+	m_HitboxVisualizers.Emplace( inst );
+}
+
+void UHitboxHandlerComponent::DEBUG_DestroyDebugSphere( int HitboxId )
+{
+	for( int visIdx = m_HitboxVisualizers.Num() - 1; visIdx >= 0; --visIdx )
+	{
+		if( HitboxId == m_HitboxVisualizers[visIdx]->GetId() )
+		{
+			GetWorld()->DestroyActor( m_HitboxVisualizers[visIdx] );
+			m_HitboxVisualizers.RemoveAt( visIdx );
 		}
 	}
 }
