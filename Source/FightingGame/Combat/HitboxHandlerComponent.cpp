@@ -4,6 +4,7 @@
 #include "Hittable.h"
 #include "FightingGame/Collision/CustomCollisionChannels.h"
 #include "FightingGame/Debug/Debug.h"
+#include "FightingGame/Debug/SphereVisualizer.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 namespace
@@ -22,9 +23,28 @@ void UHitboxHandlerComponent::BeginPlay()
 	Super::BeginPlay();
 }
 
+void UHitboxHandlerComponent::SetReferenceComponent( TObjectPtr<USceneComponent> Component )
+{
+	m_ReferenceComponent = Component;
+}
+
 void UHitboxHandlerComponent::AddHitbox( HitData Hit )
 {
 	m_ActiveHitboxes.AddUnique( Hit );
+
+	if( m_HitboxVisualizer )
+	{
+		TObjectPtr<ASphereVisualizer> inst = GetWorld()->SpawnActor<ASphereVisualizer>( m_HitboxVisualizer );
+		inst->SetId( Hit.m_Id );
+		inst->SetRadius( Hit.m_Radius );
+
+		if( m_ReferenceComponent )
+		{
+			inst->AttachToComponent( m_ReferenceComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Hit.m_SocketToFollow );
+		}
+
+		m_HitboxVisualizers.Emplace( inst );
+	}
 }
 
 void UHitboxHandlerComponent::RemoveHitbox( uint32 HitUniqueId )
@@ -149,8 +169,6 @@ void UHitboxHandlerComponent::RemovePendingHitboxes()
 	{
 		if( m_ActiveHitboxes[i].m_PendingRemoval )
 		{
-			//m_HitActorsMap.Remove( m_ActiveHitboxes[i].m_Id );
-
 			TArray<uint32> targetKeys;
 			for( const auto& pair : m_ActorGroupsMap )
 			{
@@ -173,6 +191,15 @@ void UHitboxHandlerComponent::RemovePendingHitboxes()
 					{
 						m_ActorGroupsMap[targetKey].RemoveAt( j );
 					}
+				}
+			}
+
+			for( int visIdx = m_HitboxVisualizers.Num() - 1; visIdx >= 0; --visIdx )
+			{
+				if( m_ActiveHitboxes[i].m_Id == m_HitboxVisualizers[visIdx]->GetId() )
+				{
+					GetWorld()->DestroyActor( m_HitboxVisualizers[visIdx] );
+					m_HitboxVisualizers.RemoveAt( visIdx );
 				}
 			}
 

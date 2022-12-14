@@ -70,6 +70,8 @@ void AFightingCharacter::BeginPlay()
 	m_InitialMeshRelativeLocation = GetMesh()->GetRelativeLocation();
 
 	InitPushbox();
+
+	GetHitboxHandler()->SetReferenceComponent( GetMesh() );
 }
 
 void AFightingCharacter::EndPlay( const EEndPlayReason::Type EndPlayReason )

@@ -7,6 +7,7 @@
 #include "FightingGame/Combat/HitData.h"
 #include "HitboxHandlerComponent.generated.h"
 
+class ASphereVisualizer;
 DECLARE_MULTICAST_DELEGATE_TwoParams( FHit, AActor*, const HitData& )
 
 struct FHitGroupPair
@@ -34,10 +35,18 @@ public:
 	UHitboxHandlerComponent();
 
 protected:
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Hitbox Visualizer" )
+	TSubclassOf<ASphereVisualizer> m_HitboxVisualizer = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<USceneComponent> m_ReferenceComponent = nullptr;
+
 	virtual void BeginPlay() override;
 
 public:
 	FHit m_HitDelegate;
+
+	void SetReferenceComponent( TObjectPtr<USceneComponent> Component );
 
 	void AddHitbox( HitData Hit );
 	void RemoveHitbox( uint32 HitUniqueId );
@@ -50,6 +59,8 @@ private:
 	TMap<uint32, TArray<FHitGroupPair>> m_ActorGroupsMap;
 
 	TArray<HitData> m_ActiveHitboxes;
+	TArray<TObjectPtr<ASphereVisualizer>> m_HitboxVisualizers;
+
 	bool m_DebugTraces = true;
 
 	bool TraceHitbox( const HitData& HitData, FHitResult& OutHit );
