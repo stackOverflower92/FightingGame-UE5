@@ -150,6 +150,12 @@ protected:
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Push Box Shift Rate (Per Frame)" )
 	float m_PushboxShiftRatePerFrame = 0.1f;
 
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Gravity Scale (Regular)" )
+	float m_RegularGravityScale = 1.f;
+
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Gravity Scale (Falling)" )
+	float m_FallingGravityScale = 2.f;
+
 	virtual void BeginPlay() override;
 	virtual void EndPlay( const EEndPlayReason::Type EndPlayReason ) override;
 
@@ -185,4 +191,6 @@ private:
 	void InitTimeDilations();
 	void InitPushbox();
 	void UpdatePushbox( float DeltaTime );
+
+	void UpdateGravityScale();
 };

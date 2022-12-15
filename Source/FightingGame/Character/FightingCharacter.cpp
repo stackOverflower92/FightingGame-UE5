@@ -167,6 +167,8 @@ void AFightingCharacter::Tick( float DeltaTime )
 	}
 
 	UpdatePushbox( DeltaTime );
+
+	UpdateGravityScale();
 }
 
 void AFightingCharacter::SetupPlayerInputComponent( UInputComponent* PlayerInputComponent )
@@ -337,6 +339,19 @@ void AFightingCharacter::UpdatePushbox( float DeltaTime )
 
 			SetActorLocation( NextLocation );
 		}
+	}
+}
+
+void AFightingCharacter::UpdateGravityScale()
+{
+	float verticalVelocity = GetVelocity().Z;
+	if( verticalVelocity < 0.f )
+	{
+		GetCharacterMovement()->GravityScale = m_FallingGravityScale;
+	}
+	else
+	{
+		GetCharacterMovement()->GravityScale = m_RegularGravityScale;
 	}
 }
 
