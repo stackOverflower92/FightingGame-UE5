@@ -63,34 +63,7 @@ void ACharactersSharedCamera::AddAvailableTargets()
 
 FVector ACharactersSharedCamera::GetCenterPosition() const
 {
-	if( m_Targets.Num() == 0 )
-	{
-		return GetActorLocation();
-	}
-
-	if( m_Targets.Num() == 1 )
-	{
-		const FVector MyLocation = GetActorLocation();
-		const FVector TargetLocation = m_Targets[0]->GetActorLocation();
-
-		return FVector( MyLocation.X, TargetLocation.Y, TargetLocation.Z );
-	}
-
-	TArray<FVector> AllLocations;
-	for( const AActor* Target : m_Targets )
-	{
-		AllLocations.Add( Target->GetActorLocation() );
-	}
-
-	FVector Sum = AllLocations[0];
-	for( int i = 1; i < AllLocations.Num(); ++i )
-	{
-		Sum += AllLocations[i];
-	}
-
-	Sum /= AllLocations.Num();
-
-	return FVector( GetActorLocation().X, Sum.Y, Sum.Z );
+	return UGameplayStatics::GetActorArrayAverageLocation( m_Targets );
 }
 
 void ACharactersSharedCamera::UpdateCameraPosition( float DeltaTime )
@@ -98,9 +71,34 @@ void ACharactersSharedCamera::UpdateCameraPosition( float DeltaTime )
 	FVector TargetPosition = GetCenterPosition() + m_PositionOffset;
 	FVector LerpedLocation = GetActorLocation();
 
-	LerpedLocation.X = FMath::Lerp( LerpedLocation.X, TargetPosition.X, m_MovementDamping.X * DeltaTime );
+	float maxDist     = GetMaxActorsDistance();
+	float clampedDist = FMath::Max( maxDist, m_MinZoomDistance );
+
+	LerpedLocation.X = FMath::Lerp( LerpedLocation.X, -clampedDist, m_MovementDamping.X * DeltaTime );
 	LerpedLocation.Y = FMath::Lerp( LerpedLocation.Y, TargetPosition.Y, m_MovementDamping.Y * DeltaTime );
 	LerpedLocation.Z = FMath::Lerp( LerpedLocation.Z, TargetPosition.Z, m_MovementDamping.Z * DeltaTime );
 
 	SetActorLocation( LerpedLocation );
+}
+
+float ACharactersSharedCamera::GetMaxActorsDistance() const
+{
+	float maxDistance = 0.f;
+
+	for( int i = 1; i < m_Targets.Num(); ++i )
+	{
+		for( int j = 0; j < m_Targets.Num(); ++j )
+		{
+			AActor* A = m_Targets[i];
+			AActor* B = m_Targets[j];
+
+			float currentDistance = FVector::Distance( A->GetActorLocation(), B->GetActorLocation() );
+			if( currentDistance > maxDistance )
+			{
+				maxDistance = currentDistance;
+			}
+		}
+	}
+
+	return maxDistance;
 }
