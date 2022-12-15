@@ -28,7 +28,7 @@ public:
 	static FVector GetKnockbackFromOrientation( AFightingCharacter* Character, float Orientation );
 
 	UFUNCTION( BlueprintCallable, Category = "Combat" )
-	static bool ApplyKnockbackTo( const FVector& Direction, float Force, AFightingCharacter* Character, bool IgnoreMultiplier = false );
+	static bool ApplyKnockbackTo( const FVector& Direction, float Force, AFightingCharacter* Character, bool IgnoreMultiplier );
 
 	UFUNCTION( BlueprintCallable, Category = "Combat" )
 	static float GetMinCustomTimeDilation();

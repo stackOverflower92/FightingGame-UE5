@@ -192,7 +192,7 @@ void AFightingCharacter::OnHitReceived( const HitData& HitData )
 	}
 
 	m_DamagePercent += HitData.m_DamagePercent;
-	UCombatStatics::ApplyKnockbackTo( HitData.m_ProcessedKnockback, HitData.m_ProcessedKnockback.Length(), this );
+	UCombatStatics::ApplyKnockbackTo( HitData.m_ProcessedKnockback, HitData.m_ProcessedKnockback.Length(), this, HitData.m_IgnoreKnockbackMultiplier );
 
 	float DotAbs = FMath::Abs( FVector::DotProduct( GetActorForwardVector(), HitData.m_ProcessedKnockback.GetSafeNormal() ) );
 	if( DotAbs < .9f && HitData.m_ProcessedKnockback.Length() >= 500.f )

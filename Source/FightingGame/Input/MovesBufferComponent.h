@@ -57,6 +57,9 @@ protected:
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Buffer Frame Length" )
 	float m_BufferFrameLength = 0.032;
 
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Analog Movement Deadzone" )
+	float m_AnalogMovementDeadzone = 0.1f;
+
 public:
 	virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
 
@@ -71,7 +74,7 @@ private:
 
 	std::deque<FInputBufferEntry> m_Buffer;
 	float m_ElapsedFrameTime = 0.f;
-	bool m_BufferChanged = false;
+	bool m_BufferChanged     = false;
 
 	float m_MovementDirection = 0.f;
 

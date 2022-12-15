@@ -3,6 +3,7 @@
 #include "MovesBufferComponent.h"
 #include "Components/InputComponent.h"
 #include "FightingGame/Character/FightingCharacter.h"
+#include "FightingGame/Debug/Debug.h"
 
 namespace
 {
@@ -15,6 +16,10 @@ namespace
 	const FString EntryStartMoveLeft{"StartMoveLeft"};
 	const FString EntryStopMove{"StopMove"};
 	const FString EntryAttack{"Attack"};
+
+	// CVars
+	int32 loc_ShowInputBuffer = 0;
+	FG_CVAR_DESC( CVarShowInputBuffer, TEXT( "MovesBufferComponent.ShowInputBuffer" ), TEXT( "1: Enable, 0: Disable" ), loc_ShowInputBuffer );
 }
 
 UMovesBufferComponent::UMovesBufferComponent()
@@ -38,16 +43,19 @@ void UMovesBufferComponent::TickComponent( float DeltaTime, ELevelTick TickType,
 		}
 	}
 
-	if( m_OwnerCharacter && m_OwnerCharacter->m_PlayerIndex == 0 )
+	if( loc_ShowInputBuffer )
 	{
-		for( int i = 0; i < m_Buffer.size(); ++i )
+		if( m_OwnerCharacter && m_OwnerCharacter->m_PlayerIndex == 0 )
 		{
-			FInputBufferEntry& Entry = m_Buffer.at( i );
-			const bool IsEmpty = Entry.Name == NoInput;
-			auto Message = IsEmpty ? "Empty" : Entry.Name;
+			for( int i = 0; i < m_Buffer.size(); ++i )
+			{
+				FInputBufferEntry& Entry = m_Buffer.at( i );
+				const bool IsEmpty       = Entry.Name == NoInput;
+				auto Message             = IsEmpty ? "Empty" : Entry.Name;
 
-			FColor Color = Entry.Used ? FColor::Red : FColor::Green;
-			GEngine->AddOnScreenDebugMessage( i, 1.f, Color, FString::Printf( TEXT( "%s" ), *Message ) );
+				FColor Color = Entry.Used ? FColor::Red : FColor::Green;
+				GEngine->AddOnScreenDebugMessage( i, 1.f, Color, FString::Printf( TEXT( "%s" ), *Message ) );
+			}
 		}
 	}
 
@@ -150,10 +158,13 @@ void UMovesBufferComponent::InitBuffer()
 
 void UMovesBufferComponent::OnMoveHorizontal( float Value )
 {
-	m_InputMovement = Value;
+	if( FMath::Abs( Value ) > m_AnalogMovementDeadzone )
+	{
+		m_InputMovement = Value;
 
-	m_MovingRight = Value > 0.f;
-	m_MovingLeft = Value < 0.f;
+		m_MovingRight = FMath::Sign( Value ) > 0;
+		m_MovingLeft  = FMath::Sign( Value ) < 0;
+	}
 }
 
 // TODO: these are all the same, make it generic maybe?
