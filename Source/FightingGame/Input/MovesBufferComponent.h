@@ -85,11 +85,7 @@ private:
 
 	void OnStartJump();
 	void OnStopJump();
-	void OnStartMoveRight();
-	void OnStopMoveRight();
-	void OnStartMoveLeft();
-	void OnStopMoveLeft();
 	void OnAttack();
 
-	void UpdateMovement();
+	void UpdateMovementDirection();
 };

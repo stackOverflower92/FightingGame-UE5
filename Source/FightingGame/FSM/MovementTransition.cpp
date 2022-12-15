@@ -7,5 +7,10 @@
 
 bool UMovementTransition::CanPerformTransition()
 {
-	return FMath::Abs( m_Character->GetMovesBufferComponent()->m_InputMovement ) > m_Threshold;
+	if( m_ThresholdComparison == EThresholdComparison::GreaterThan )
+	{
+		return FMath::Abs( m_Character->GetMovesBufferComponent()->m_InputMovement ) > m_Threshold;
+	}
+
+	return FMath::Abs( m_Character->GetMovesBufferComponent()->m_InputMovement ) < m_Threshold;
 }

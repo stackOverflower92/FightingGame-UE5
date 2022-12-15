@@ -11,10 +11,6 @@ namespace
 
 	const FString EntryStartJump{"StartJump"};
 	const FString EntryStopJump{"StopJump"};
-	const FString EntryStartMove{"StartMove"};
-	const FString EntryStartMoveRight{"StartMoveRight"};
-	const FString EntryStartMoveLeft{"StartMoveLeft"};
-	const FString EntryStopMove{"StopMove"};
 	const FString EntryAttack{"Attack"};
 
 	// CVars
@@ -61,7 +57,17 @@ void UMovesBufferComponent::TickComponent( float DeltaTime, ELevelTick TickType,
 
 	m_BufferChanged = false;
 
-	UpdateMovement();
+	UpdateMovementDirection();
+
+	if( m_PlayerInput )
+	{
+		float horizontalMovement = m_PlayerInput->GetAxisValue( "MoveHorizontal" );
+
+		m_InputMovement = horizontalMovement;
+
+		m_MovingRight = horizontalMovement > 0.f;
+		m_MovingLeft  = horizontalMovement < 0.f;
+	}
 }
 
 void UMovesBufferComponent::OnSetupPlayerInputComponent( UInputComponent* PlayerInputComponent )
@@ -69,15 +75,12 @@ void UMovesBufferComponent::OnSetupPlayerInputComponent( UInputComponent* Player
 	m_PlayerInput = PlayerInputComponent;
 	if( m_PlayerInput )
 	{
-		m_PlayerInput->BindAction( "Jump", IE_Pressed, this, &UMovesBufferComponent::OnStartJump );
-		m_PlayerInput->BindAction( "Jump", IE_Released, this, &UMovesBufferComponent::OnStopJump );
-		m_PlayerInput->BindAction( "MoveRight", IE_Pressed, this, &UMovesBufferComponent::OnStartMoveRight );
-		m_PlayerInput->BindAction( "MoveRight", IE_Released, this, &UMovesBufferComponent::OnStopMoveRight );
-		m_PlayerInput->BindAction( "MoveLeft", IE_Pressed, this, &UMovesBufferComponent::OnStartMoveLeft );
-		m_PlayerInput->BindAction( "MoveLeft", IE_Released, this, &UMovesBufferComponent::OnStopMoveLeft );
-		m_PlayerInput->BindAction( "Attack", IE_Pressed, this, &UMovesBufferComponent::OnAttack );
+		m_PlayerInput->BindAction( TEXT( "Jump" ), IE_Pressed, this, &UMovesBufferComponent::OnStartJump );
+		m_PlayerInput->BindAction( TEXT( "Jump" ), IE_Released, this, &UMovesBufferComponent::OnStopJump );
+		m_PlayerInput->BindAction( TEXT( "Attack" ), IE_Pressed, this, &UMovesBufferComponent::OnAttack );
 
-		m_PlayerInput->BindAxis( "MoveHorizontal", this, &UMovesBufferComponent::OnMoveHorizontal );
+		//m_PlayerInput->BindAxis( "MoveHorizontal", this, &UMovesBufferComponent::OnMoveHorizontal );
+		m_PlayerInput->BindAxis( TEXT( "MoveHorizontal" ) );
 	}
 
 	InitBuffer();
@@ -178,40 +181,12 @@ void UMovesBufferComponent::OnStopJump()
 	AddMoveToBuffer( EntryStopJump );
 }
 
-void UMovesBufferComponent::OnStartMoveRight()
-{
-	AddMoveToBuffer( EntryStartMoveRight );
-
-	m_MovingRight = true;
-}
-
-void UMovesBufferComponent::OnStopMoveRight()
-{
-	AddMoveToBuffer( EntryStopMove );
-
-	m_MovingRight = false;
-}
-
-void UMovesBufferComponent::OnStartMoveLeft()
-{
-	AddMoveToBuffer( EntryStartMoveLeft );
-
-	m_MovingLeft = true;
-}
-
-void UMovesBufferComponent::OnStopMoveLeft()
-{
-	AddMoveToBuffer( EntryStopMove );
-
-	m_MovingLeft = false;
-}
-
 void UMovesBufferComponent::OnAttack()
 {
 	AddMoveToBuffer( EntryAttack );
 }
 
-void UMovesBufferComponent::UpdateMovement()
+void UMovesBufferComponent::UpdateMovementDirection()
 {
 	if( (m_MovingRight && m_MovingLeft) || (!m_MovingRight && !m_MovingLeft) )
 	{
