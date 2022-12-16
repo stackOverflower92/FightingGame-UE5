@@ -17,6 +17,12 @@ struct FHitboxDescription
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Socket Name (Mirrored)" )
 	FName m_SocketNameMirrored;
 
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Use Location (Instead of sockets)" )
+	bool m_UseLocation = false;
+
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Location (Relative to the owner)" )
+	FVector m_Location = FVector::ZeroVector;
+
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Priority" )
 	int m_Priority = 0;
 

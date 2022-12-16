@@ -8,6 +8,7 @@
 #include "GameFramework/Actor.h"
 #include "Projectile.generated.h"
 
+class UHitboxHandlerComponent;
 class USphereComponent;
 
 DECLARE_MULTICAST_DELEGATE_OneParam( FDestroyRequested, TObjectPtr<AProjectile> )
@@ -34,6 +35,8 @@ public:
 	virtual void SetFacingRight( bool Right, bool Instant ) override;
 	virtual FVector GetLocation() override;
 
+	FORCEINLINE TObjectPtr<UHitboxHandlerComponent> GetHitboxHandlerComponent() const { return m_HitboxHandler; }
+
 	virtual void Tick( float DeltaTime ) override;
 
 protected:
@@ -51,6 +54,9 @@ protected:
 
 	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Horizontal Speed Multiplier Curve" )
 	TObjectPtr<UCurveFloat> m_HorizontalSpeedMultiplierCurve = nullptr;
+
+	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Hitbox Handler" )
+	TObjectPtr<UHitboxHandlerComponent> m_HitboxHandler = nullptr;
 
 private:
 	FTimerHandle m_LifetimeTimerHandle;

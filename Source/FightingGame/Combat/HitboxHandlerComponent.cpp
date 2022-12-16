@@ -3,6 +3,7 @@
 #include "HitboxHandlerComponent.h"
 #include "Hittable.h"
 #include "FightingGame/Collision/CustomCollisionChannels.h"
+#include "FightingGame/Common/CombatStatics.h"
 #include "FightingGame/Debug/Debug.h"
 #include "FightingGame/Debug/SphereVisualizer.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -21,6 +22,11 @@ UHitboxHandlerComponent::UHitboxHandlerComponent()
 void UHitboxHandlerComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	for( const auto& hitboxDesc : m_DefaultHitboxes )
+	{
+		AddHitbox( UCombatStatics::GenerateHitDataFromHitboxDescription( GetOwner(), nullptr, hitboxDesc ) );
+	}
 }
 
 void UHitboxHandlerComponent::SetReferenceComponent( TObjectPtr<USceneComponent> Component )
@@ -81,12 +87,12 @@ bool UHitboxHandlerComponent::TraceHitbox( const HitData& HitData, FHitResult& O
 	TArray<AActor*> actorsToIgnore;
 	actorsToIgnore.Add( HitData.m_Owner );
 
-	const bool hasSocketToFollow = !HitData.m_SocketToFollow.ToString().IsEmpty();
-	const FVector location       = hasSocketToFollow ? HitData.m_SkeletalMesh->GetSocketLocation( HitData.m_SocketToFollow ) : HitData.m_Location;
+	bool hasSocketToFollow = HitData.m_SkeletalMesh ? (!HitData.m_SocketToFollow.ToString().IsEmpty()) : false;
+	FVector location       = hasSocketToFollow ? HitData.m_SkeletalMesh->GetSocketLocation( HitData.m_SocketToFollow ) : HitData.m_Location;
 
-	const bool isHitSuccessful = UKismetSystemLibrary::SphereTraceSingleForObjects( HitData.m_World, location, location,
-	                                                                                HitData.m_Radius, targetTraceTypes,
-	                                                                                false, actorsToIgnore, EDrawDebugTrace::None, OutHit, true );
+	bool isHitSuccessful = UKismetSystemLibrary::SphereTraceSingleForObjects( HitData.m_World, location, location,
+	                                                                          HitData.m_Radius, targetTraceTypes,
+	                                                                          false, actorsToIgnore, EDrawDebugTrace::None, OutHit, true );
 
 	return isHitSuccessful;
 }

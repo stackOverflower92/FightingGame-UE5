@@ -3,6 +3,7 @@
 #include "Projectile.h"
 
 #include "Components/SphereComponent.h"
+#include "FightingGame/Combat/HitboxHandlerComponent.h"
 
 AProjectile::AProjectile()
 {
@@ -10,6 +11,8 @@ AProjectile::AProjectile()
 
 	m_MainCollision = CreateDefaultSubobject<USphereComponent>( TEXT( "Main Collision" ) );
 	RootComponent   = m_MainCollision;
+
+	m_HitboxHandler = CreateDefaultSubobject<UHitboxHandlerComponent>( TEXT( "Hitbox Handler" ) );
 }
 
 void AProjectile::BeginPlay()

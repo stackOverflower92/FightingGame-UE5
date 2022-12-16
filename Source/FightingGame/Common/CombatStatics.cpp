@@ -100,22 +100,27 @@ HitData UCombatStatics::GenerateHitDataFromHitboxDescription( TObjectPtr<AActor>
 
 	FVector processedKnockback = GetKnockbackFromOrientation( facingEntity, HitboxDesc.m_KnockbackOrientation ) * HitboxDesc.m_KnockbackForce;
 
-	const HitData& data = HitData( HitboxDesc.m_ForceOpponentFacing,
-	                               HitboxDesc.m_DamagePercent,
-	                               HitboxDesc.m_Radius,
-	                               processedKnockback,
-	                               HitboxDesc.m_IgnoreKnockbackMultiplier,
-	                               HitboxDesc.m_HitStopDuration,
-	                               HitboxDesc.m_Shake,
-	                               SkeletalMesh->GetWorld(),
-	                               HitboxOwner,
-	                               SkeletalMesh,
-	                               socketName,
-	                               HitboxDesc.m_UniqueId,
-	                               HitboxDesc.m_GroupId,
-	                               HitboxDesc.m_Priority );
+	FVector targetLocation = HitboxDesc.m_Location;
+	if( facingEntity )
+	{
+		targetLocation.Y *= facingEntity->IsFacingRight() ? 1.f : -1.f;
+	}
 
-	return data;
+	return HitData( HitboxDesc.m_ForceOpponentFacing,
+	                HitboxDesc.m_DamagePercent,
+	                HitboxDesc.m_Radius,
+	                processedKnockback,
+	                HitboxDesc.m_IgnoreKnockbackMultiplier,
+	                HitboxDesc.m_HitStopDuration,
+	                HitboxDesc.m_Shake,
+	                HitboxOwner->GetWorld(),
+	                HitboxOwner,
+	                SkeletalMesh,
+	                socketName,
+	                targetLocation,
+	                HitboxDesc.m_UniqueId,
+	                HitboxDesc.m_GroupId,
+	                HitboxDesc.m_Priority );
 }
 
 FVector UCombatStatics::GetKnockbackFromOrientation( IFacingEntity* FacingEntity, float Orientation )

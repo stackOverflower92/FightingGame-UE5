@@ -7,10 +7,11 @@
 #include "CombatStatics.generated.h"
 
 struct FHitboxDescription;
+struct HitData;
+
 class IFacingEntity;
 class AFightingCharacter;
 class UMoveDataAsset;
-struct HitData;
 
 UCLASS()
 class FIGHTINGGAME_API UCombatStatics : public UBlueprintFunctionLibrary
