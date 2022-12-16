@@ -8,7 +8,7 @@
 namespace
 {
 	constexpr float loc_MinCustomTimeDilation = 0.001f;
-	constexpr float loc_HitStunInitialDelay = 0.06f;
+	constexpr float loc_HitStunInitialDelay   = 0.05f;
 }
 
 bool UCombatStatics::ExecuteMove( AFightingCharacter* Character, UMoveDataAsset* Move )
@@ -86,7 +86,7 @@ FVector UCombatStatics::GetKnockbackFromOrientation( AFightingCharacter* Charact
 	ensureMsgf( Character, TEXT("Character is null") );
 
 	bool FacingRight = Character->IsFacingRight();
-	FVector Forward = FacingRight ? FVector::RightVector : -FVector::RightVector;
+	FVector Forward  = FacingRight ? FVector::RightVector : -FVector::RightVector;
 
 	float FinalKnockbackOrientation = FacingRight ? Orientation : -Orientation;
 

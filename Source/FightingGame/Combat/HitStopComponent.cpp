@@ -52,7 +52,15 @@ void UHitStopComponent::StartBeginHitStopTimer( float Duration, bool Shake )
 	//m_CachedConsiderShake   = ConsiderShake;
 
 	// #TODO instead of using GetHitStunInitialDelay, interpolate directly to the next reaction animation to ensure the correcto pose is always visible
-	TimerManager.SetTimer( m_HitStopBeginTimerHandle, this, &UHitStopComponent::OnHitStopBeginTimerEnded, UCombatStatics::GetHitStunInitialDelay() );
+	float hitStunInitialDelay = UCombatStatics::GetHitStunInitialDelay();
+	if( hitStunInitialDelay > 0.f )
+	{
+		TimerManager.SetTimer( m_HitStopBeginTimerHandle, this, &UHitStopComponent::OnHitStopBeginTimerEnded, UCombatStatics::GetHitStunInitialDelay() );
+	}
+	else
+	{
+		OnHitStopBeginTimerEnded();
+	}
 }
 
 void UHitStopComponent::OnHitStopBeginTimerEnded()
