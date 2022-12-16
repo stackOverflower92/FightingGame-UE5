@@ -89,6 +89,7 @@ public:
 	FORCEINLINE TObjectPtr<UMovesBufferComponent> GetMovesBufferComponent() const { return m_MovesBuffer; }
 	FORCEINLINE TObjectPtr<UFSM> GetFSM() const { return m_FSM; }
 	FORCEINLINE TObjectPtr<UHitStopComponent> GetHitStopComponent() const { return m_HitStopComponent; }
+	FORCEINLINE TObjectPtr<UProjectileSpawnerComponent> GetProjectileSpawnerComponent() const { return m_ProjectileSpawnerComponent; }
 
 	FORCEINLINE bool HasJustLandedHit() const { return m_HasJustLandedHit; }
 	FORCEINLINE void ResetHasJustLandedHit() { m_HasJustLandedHit = false; }
