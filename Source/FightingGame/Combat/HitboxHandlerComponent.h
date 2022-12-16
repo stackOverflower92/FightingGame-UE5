@@ -8,6 +8,7 @@
 #include "HitboxHandlerComponent.generated.h"
 
 class ASphereVisualizer;
+
 DECLARE_MULTICAST_DELEGATE_TwoParams( FHit, AActor*, const HitData& )
 
 struct FHitGroupPair

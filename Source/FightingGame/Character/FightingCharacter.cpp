@@ -10,6 +10,7 @@
 #include "FightingGame/Combat/HitStopComponent.h"
 #include "FightingGame/Common/CombatStatics.h"
 #include "FightingGame/Debug/Debug.h"
+#include "FightingGame/Projectile/ProjectileSpawnerComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 
@@ -29,10 +30,11 @@ AFightingCharacter::AFightingCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	m_FSM              = CreateDefaultSubobject<UFSM>( TEXT( "FSM" ) );
-	m_MovesBuffer      = CreateDefaultSubobject<UMovesBufferComponent>( TEXT( "Moves Buffer" ) );
-	m_HitboxHandler    = CreateDefaultSubobject<UHitboxHandlerComponent>( TEXT( "Hitbox Handler" ) );
-	m_HitStopComponent = CreateDefaultSubobject<UHitStopComponent>( TEXT( "Hit Stop" ) );
+	m_FSM                        = CreateDefaultSubobject<UFSM>( TEXT( "FSM" ) );
+	m_MovesBuffer                = CreateDefaultSubobject<UMovesBufferComponent>( TEXT( "Moves Buffer" ) );
+	m_HitboxHandler              = CreateDefaultSubobject<UHitboxHandlerComponent>( TEXT( "Hitbox Handler" ) );
+	m_HitStopComponent           = CreateDefaultSubobject<UHitStopComponent>( TEXT( "Hit Stop" ) );
+	m_ProjectileSpawnerComponent = CreateDefaultSubobject<UProjectileSpawnerComponent>( TEXT( "Projectile Spawner" ) );
 }
 
 bool AFightingCharacter::IsAirborne() const

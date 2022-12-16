@@ -12,6 +12,7 @@ namespace
 	const FString EntryStartJump{"StartJump"};
 	const FString EntryStopJump{"StopJump"};
 	const FString EntryAttack{"Attack"};
+	const FString EntrySpecial{"Special"};
 
 	// CVars
 	int32 loc_ShowInputBuffer = 0;
@@ -78,6 +79,7 @@ void UMovesBufferComponent::OnSetupPlayerInputComponent( UInputComponent* Player
 		m_PlayerInput->BindAction( TEXT( "Jump" ), IE_Pressed, this, &UMovesBufferComponent::OnStartJump );
 		m_PlayerInput->BindAction( TEXT( "Jump" ), IE_Released, this, &UMovesBufferComponent::OnStopJump );
 		m_PlayerInput->BindAction( TEXT( "Attack" ), IE_Pressed, this, &UMovesBufferComponent::OnAttack );
+		m_PlayerInput->BindAction( TEXT( "Special" ), IE_Pressed, this, &UMovesBufferComponent::OnSpecial );
 
 		//m_PlayerInput->BindAxis( "MoveHorizontal", this, &UMovesBufferComponent::OnMoveHorizontal );
 		m_PlayerInput->BindAxis( TEXT( "MoveHorizontal" ) );
@@ -184,6 +186,11 @@ void UMovesBufferComponent::OnStopJump()
 void UMovesBufferComponent::OnAttack()
 {
 	AddMoveToBuffer( EntryAttack );
+}
+
+void UMovesBufferComponent::OnSpecial()
+{
+	AddMoveToBuffer( EntrySpecial );
 }
 
 void UMovesBufferComponent::UpdateMovementDirection()

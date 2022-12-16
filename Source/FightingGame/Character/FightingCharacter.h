@@ -5,6 +5,7 @@
 #include "GameFramework/Character.h"
 #include "FightingCharacter.generated.h"
 
+class UProjectileSpawnerComponent;
 class UBoxComponent;
 class UHitStopComponent;
 class UFSM;
@@ -111,8 +112,11 @@ protected:
 	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Knockback Multiplier Curve" )
 	TObjectPtr<UCurveFloat> m_KnockbackMultiplierCurve = nullptr;
 
-	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Hit Stop" )
+	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Hit Stop Component" )
 	TObjectPtr<UHitStopComponent> m_HitStopComponent = nullptr;
+
+	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Projectile Spawner Component" )
+	TObjectPtr<UProjectileSpawnerComponent> m_ProjectileSpawnerComponent = nullptr;
 
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "FSM First State" )
 	FName m_FirstState = "IDLE";

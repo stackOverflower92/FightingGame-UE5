@@ -86,6 +86,7 @@ private:
 	void OnStartJump();
 	void OnStopJump();
 	void OnAttack();
+	void OnSpecial();
 
 	void UpdateMovementDirection();
 };
