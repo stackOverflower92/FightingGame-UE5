@@ -5,6 +5,7 @@
 #include "HitboxHandlerComponent.h"
 #include "FightingGame/Character/FightingCharacter.h"
 #include "FightingGame/Common/CombatStatics.h"
+#include "FightingGame/Combat/HitboxDescription.h"
 
 void UHitboxNotifyState::NotifyBegin( USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration,
                                       const FAnimNotifyEventReference& EventReference )
@@ -13,24 +14,24 @@ void UHitboxNotifyState::NotifyBegin( USkeletalMeshComponent* MeshComp, UAnimSeq
 
 	if( auto* character = Cast<AFightingCharacter>( MeshComp->GetOwner() ) )
 	{
-		for( const FHitboxNotifyData& notifyData : m_HitBoxes )
+		for( const FHitboxDescription& hitboxDesc : m_HitBoxes )
 		{
-			FName socketName = character->IsFacingRight() ? notifyData.m_SocketName : notifyData.m_SocketNameMirrored;
+			FName socketName = character->IsFacingRight() ? hitboxDesc.m_SocketName : hitboxDesc.m_SocketNameMirrored;
 
-			const HitData& Data = HitData( notifyData.m_ForceOpponentFacing,
-			                               notifyData.m_DamagePercent,
-			                               notifyData.m_Radius,
-			                               UCombatStatics::GetKnockbackFromOrientation( character, notifyData.m_KnockbackOrientation ) * notifyData.m_KnockbackForce,
-			                               notifyData.m_IgnoreKnockbackMultiplier,
-			                               notifyData.m_HitStopDuration,
-			                               notifyData.m_Shake,
+			const HitData& Data = HitData( hitboxDesc.m_ForceOpponentFacing,
+			                               hitboxDesc.m_DamagePercent,
+			                               hitboxDesc.m_Radius,
+			                               UCombatStatics::GetKnockbackFromOrientation( character, hitboxDesc.m_KnockbackOrientation ) * hitboxDesc.m_KnockbackForce,
+			                               hitboxDesc.m_IgnoreKnockbackMultiplier,
+			                               hitboxDesc.m_HitStopDuration,
+			                               hitboxDesc.m_Shake,
 			                               MeshComp->GetWorld(),
 			                               character,
 			                               MeshComp,
 			                               socketName,
-			                               notifyData.m_UniqueId,
-			                               notifyData.m_GroupId,
-			                               notifyData.m_Priority );
+			                               hitboxDesc.m_UniqueId,
+			                               hitboxDesc.m_GroupId,
+			                               hitboxDesc.m_Priority );
 
 			character->GetHitboxHandler()->AddHitbox( Data );
 		}
@@ -43,9 +44,9 @@ void UHitboxNotifyState::NotifyEnd( USkeletalMeshComponent* MeshComp, UAnimSeque
 
 	if( auto* character = Cast<AFightingCharacter>( MeshComp->GetOwner() ) )
 	{
-		for( const FHitboxNotifyData& notifyData : m_HitBoxes )
+		for( const FHitboxDescription& hitboxDesc : m_HitBoxes )
 		{
-			character->GetHitboxHandler()->RemoveHitbox( notifyData.m_UniqueId );
+			character->GetHitboxHandler()->RemoveHitbox( hitboxDesc.m_UniqueId );
 		}
 	}
 }

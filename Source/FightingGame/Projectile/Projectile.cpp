@@ -33,6 +33,7 @@ void AProjectile::Init( TObjectPtr<AActor> OwnerActor, FVector Location, float H
 
 void AProjectile::OnHitReceived( const HitData& HitData )
 {
+	m_DestroyRequestedDelegate.Broadcast( this );
 }
 
 void AProjectile::Tick( float DeltaTime )

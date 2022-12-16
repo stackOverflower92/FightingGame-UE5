@@ -34,7 +34,7 @@ public:
 	virtual void Tick( float DeltaTime ) override;
 
 protected:
-	UPROPERTY()
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Main Collision" )
 	TObjectPtr<USphereComponent> m_MainCollision = nullptr;
 
 	UPROPERTY()
