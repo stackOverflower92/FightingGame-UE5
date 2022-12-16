@@ -6,8 +6,11 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "CombatStatics.generated.h"
 
+struct FHitboxDescription;
+class IFacingEntity;
 class AFightingCharacter;
 class UMoveDataAsset;
+struct HitData;
 
 UCLASS()
 class FIGHTINGGAME_API UCombatStatics : public UBlueprintFunctionLibrary
@@ -18,14 +21,14 @@ public:
 	UFUNCTION( BlueprintCallable, Category = "Combat" )
 	static bool ExecuteMove( AFightingCharacter* Character, UMoveDataAsset* Move );
 
-	UFUNCTION( BlueprintCallable, Category = "Combat" )
-	static bool FaceOther( AFightingCharacter* A, AActor* B, bool Instant = false );
+	static bool FaceOther( IFacingEntity* A, AActor* B, bool Instant = false );
 
-	UFUNCTION( BlueprintCallable, Category = "Combat" )
-	static bool FaceLocation( AFightingCharacter* A, const FVector& Location );
+	static bool FaceLocation( IFacingEntity* A, const FVector& Location );
 
-	UFUNCTION( BlueprintCallable, Category = "Combat" )
-	static FVector GetKnockbackFromOrientation( AFightingCharacter* Character, float Orientation );
+	static HitData GenerateHitDataFromHitboxDescription( TObjectPtr<AActor> HitboxOwner, TObjectPtr<USkeletalMeshComponent> SkeletalMesh,
+	                                                     const FHitboxDescription& HitboxDesc );
+
+	static FVector GetKnockbackFromOrientation( IFacingEntity* FacingEntity, float Orientation );
 
 	UFUNCTION( BlueprintCallable, Category = "Combat" )
 	static bool ApplyKnockbackTo( const FVector& Direction, float Force, AFightingCharacter* Character, bool IgnoreMultiplier );

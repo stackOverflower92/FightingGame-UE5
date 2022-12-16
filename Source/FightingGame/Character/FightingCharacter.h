@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "FightingGame/Combat/FacingEntity.h"
 #include "FightingGame/Combat/Hittable.h"
 #include "GameFramework/Character.h"
 #include "FightingCharacter.generated.h"
@@ -29,7 +30,7 @@ enum class EFightingCharacterFacingTechnique : uint8
 };
 
 UCLASS()
-class FIGHTINGGAME_API AFightingCharacter : public ACharacter, public IHittable
+class FIGHTINGGAME_API AFightingCharacter : public ACharacter, public IHittable, public IFacingEntity
 {
 	GENERATED_BODY()
 
@@ -52,10 +53,12 @@ public:
 	void UpdateHorizontalMovement( float value );
 
 	UFUNCTION( BlueprintCallable )
-	bool IsFacingRight() const;
+	virtual bool IsFacingRight() override;
 
 	UFUNCTION( BlueprintCallable )
-	void SetFacingRight( bool Right, bool Instant = false );
+	virtual void SetFacingRight( bool Right, bool Instant ) override;
+
+	virtual FVector GetLocation() override;
 
 	UFUNCTION( BlueprintCallable )
 	UHitboxHandlerComponent* GetHitboxHandler() const { return m_HitboxHandler; }

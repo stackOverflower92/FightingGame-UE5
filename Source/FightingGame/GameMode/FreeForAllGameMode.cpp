@@ -4,6 +4,7 @@
 #include "FightingGame/Camera/CameraManager.h"
 #include "FightingGame/Character/FightingCharacter.h"
 #include "FightingGame/Common/CombatStatics.h"
+#include "FightingGame/Debug/Debug.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetStringLibrary.h"
@@ -40,15 +41,22 @@ void AFreeForAllGameMode::SpawnCharacters()
 
 		m_PlayerControllers.Emplace( player );
 
-		APlayerStart* start = m_PlayerStarts[i];
+		APlayerStart* start           = m_PlayerStarts[i];
 		AFightingCharacter* character = GetWorld()->SpawnActor<AFightingCharacter>( m_CharacterClass, start->GetTransform() );
-		character->m_PlayerIndex = i;
+		character->m_PlayerIndex      = i;
 
 		m_Characters.Emplace( character );
 
 		player->Possess( character );
 
-		UCombatStatics::FaceLocation( character, FVector::ZeroVector );
+		if( auto* facingEntity = Cast<IFacingEntity>( character ) )
+		{
+			UCombatStatics::FaceLocation( facingEntity, FVector::ZeroVector );
+		}
+		else
+		{
+			FG_SLOG_ERR( TEXT("Cast to IFacingEntity from character failed") );
+		}
 	}
 
 	EnablePlayersInput( true );

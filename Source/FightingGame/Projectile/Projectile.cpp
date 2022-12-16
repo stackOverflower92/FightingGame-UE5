@@ -36,6 +36,20 @@ void AProjectile::OnHitReceived( const HitData& HitData )
 	m_DestroyRequestedDelegate.Broadcast( this );
 }
 
+bool AProjectile::IsFacingRight()
+{
+	return m_HorizontalDirectionMultiplier > 0.f;
+}
+
+void AProjectile::SetFacingRight( bool /*Right*/, bool /*Instant*/ )
+{
+}
+
+FVector AProjectile::GetLocation()
+{
+	return GetActorLocation();
+}
+
 void AProjectile::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );

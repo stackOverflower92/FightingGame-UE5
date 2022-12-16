@@ -4,6 +4,7 @@
 #include "FightingGame/Character/FightingCharacter.h"
 #include "FightingGame/Combat/MoveDataAsset.h"
 #include "FightingGame/Animation/FightingCharacterAnimInstance.h"
+#include "FightingGame/Combat/HitboxDescription.h"
 
 namespace
 {
@@ -47,7 +48,7 @@ bool UCombatStatics::ExecuteMove( AFightingCharacter* Character, UMoveDataAsset*
 	return true;
 }
 
-bool UCombatStatics::FaceOther( AFightingCharacter* A, AActor* B, bool Instant /*= false*/ )
+bool UCombatStatics::FaceOther( IFacingEntity* A, AActor* B, bool Instant /*= false*/ )
 {
 	if( !A )
 	{
@@ -61,13 +62,13 @@ bool UCombatStatics::FaceOther( AFightingCharacter* A, AActor* B, bool Instant /
 		return false;
 	}
 
-	bool Right = A->GetActorLocation().Y < B->GetActorLocation().Y;
+	bool Right = A->GetLocation().Y < B->GetActorLocation().Y;
 	A->SetFacingRight( Right, Instant );
 
 	return true;
 }
 
-bool UCombatStatics::FaceLocation( AFightingCharacter* A, const FVector& Location )
+bool UCombatStatics::FaceLocation( IFacingEntity* A, const FVector& Location )
 {
 	if( !A )
 	{
@@ -75,17 +76,53 @@ bool UCombatStatics::FaceLocation( AFightingCharacter* A, const FVector& Locatio
 		return false;
 	}
 
-	bool Right = A->GetActorLocation().Y < Location.Y;
-	A->SetFacingRight( Right );
+	bool Right = A->GetLocation().Y < Location.Y;
+	A->SetFacingRight( Right, false );
 
 	return true;
 }
 
-FVector UCombatStatics::GetKnockbackFromOrientation( AFightingCharacter* Character, float Orientation )
+HitData UCombatStatics::GenerateHitDataFromHitboxDescription( TObjectPtr<AActor> HitboxOwner, TObjectPtr<USkeletalMeshComponent> SkeletalMesh,
+                                                              const FHitboxDescription& HitboxDesc )
 {
-	ensureMsgf( Character, TEXT("Character is null") );
+	FName socketName;
+	IFacingEntity* facingEntity = Cast<IFacingEntity>( HitboxOwner );
 
-	bool FacingRight = Character->IsFacingRight();
+	// #TODO how to handle the case where the owner is not an IFacingEntity? should we require it?
+	if( facingEntity )
+	{
+		socketName = facingEntity->IsFacingRight() ? HitboxDesc.m_SocketName : HitboxDesc.m_SocketNameMirrored;
+	}
+	else
+	{
+		socketName = HitboxDesc.m_SocketName;
+	}
+
+	FVector processedKnockback = GetKnockbackFromOrientation( facingEntity, HitboxDesc.m_KnockbackOrientation ) * HitboxDesc.m_KnockbackForce;
+
+	const HitData& data = HitData( HitboxDesc.m_ForceOpponentFacing,
+	                               HitboxDesc.m_DamagePercent,
+	                               HitboxDesc.m_Radius,
+	                               processedKnockback,
+	                               HitboxDesc.m_IgnoreKnockbackMultiplier,
+	                               HitboxDesc.m_HitStopDuration,
+	                               HitboxDesc.m_Shake,
+	                               SkeletalMesh->GetWorld(),
+	                               HitboxOwner,
+	                               SkeletalMesh,
+	                               socketName,
+	                               HitboxDesc.m_UniqueId,
+	                               HitboxDesc.m_GroupId,
+	                               HitboxDesc.m_Priority );
+
+	return data;
+}
+
+FVector UCombatStatics::GetKnockbackFromOrientation( IFacingEntity* FacingEntity, float Orientation )
+{
+	ensureMsgf( FacingEntity, TEXT("Character is null") );
+
+	bool FacingRight = FacingEntity->IsFacingRight();
 	FVector Forward  = FacingRight ? FVector::RightVector : -FVector::RightVector;
 
 	float FinalKnockbackOrientation = FacingRight ? Orientation : -Orientation;

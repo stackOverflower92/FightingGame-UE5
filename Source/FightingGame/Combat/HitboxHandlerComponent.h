@@ -7,6 +7,7 @@
 #include "FightingGame/Combat/HitData.h"
 #include "HitboxHandlerComponent.generated.h"
 
+struct FHitboxDescription;
 class ASphereVisualizer;
 
 DECLARE_MULTICAST_DELEGATE_TwoParams( FHit, AActor*, const HitData& )
@@ -38,6 +39,9 @@ public:
 protected:
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Hitbox Visualizer" )
 	TSubclassOf<ASphereVisualizer> m_HitboxVisualizer = nullptr;
+
+	/*UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Default Hitboxes" )
+	TArray<FHitboxDescription> m_DefaultHitboxes;*/
 
 	UPROPERTY()
 	TObjectPtr<USceneComponent> m_ReferenceComponent = nullptr;

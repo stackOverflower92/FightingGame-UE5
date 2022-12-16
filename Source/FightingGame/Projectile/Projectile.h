@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "FightingGame/Combat/FacingEntity.h"
 #include "FightingGame/Combat/Hittable.h"
 #include "GameFramework/Actor.h"
 #include "Projectile.generated.h"
@@ -12,7 +13,7 @@ class USphereComponent;
 DECLARE_MULTICAST_DELEGATE_OneParam( FDestroyRequested, TObjectPtr<AProjectile> )
 
 UCLASS()
-class FIGHTINGGAME_API AProjectile : public AActor, public IHittable
+class FIGHTINGGAME_API AProjectile : public AActor, public IHittable, public IFacingEntity
 {
 	GENERATED_BODY()
 
@@ -27,9 +28,11 @@ public:
 
 	void Init( TObjectPtr<AActor> OwnerActor, FVector Location, float HorizontalDirectionMultiplier, float Lifetime = -1.f );
 
-#pragma region IHITTABLE
 	virtual void OnHitReceived( const HitData& HitData ) override;
-#pragma endregion
+
+	virtual bool IsFacingRight() override;
+	virtual void SetFacingRight( bool Right, bool Instant ) override;
+	virtual FVector GetLocation() override;
 
 	virtual void Tick( float DeltaTime ) override;
 

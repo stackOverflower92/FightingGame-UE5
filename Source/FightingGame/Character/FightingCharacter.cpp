@@ -83,7 +83,7 @@ void AFightingCharacter::EndPlay( const EEndPlayReason::Type EndPlayReason )
 	m_HitboxHandler->m_HitDelegate.Remove( m_HitDelegateHandle );
 }
 
-bool AFightingCharacter::IsFacingRight() const
+bool AFightingCharacter::IsFacingRight()
 {
 	return m_FacingRight;
 }
@@ -99,6 +99,11 @@ void AFightingCharacter::SetFacingRight( bool Right, bool Instant /*= false*/ )
 
 		SetActorRotation( TargetRotation );
 	}
+}
+
+FVector AFightingCharacter::GetLocation()
+{
+	return GetActorLocation();
 }
 
 float AFightingCharacter::GetKnockbackMultiplier() const
