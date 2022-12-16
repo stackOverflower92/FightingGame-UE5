@@ -16,6 +16,8 @@ void UProjectileSpawnerComponent::BeginPlay()
 
 void UProjectileSpawnerComponent::SpawnProjectile( TSubclassOf<AProjectile> ProjectileClass, FVector SpawnLocation, float HorizontalDirectionMultiplier, float Lifetime )
 {
+	ensureMsgf( ProjectileClass, TEXT("Projectile class is null") );
+
 	TObjectPtr<AProjectile> inst = GetWorld()->SpawnActor<AProjectile>( ProjectileClass, SpawnLocation, FRotator::ZeroRotator );
 	inst->Init( GetOwner(), SpawnLocation, HorizontalDirectionMultiplier, Lifetime );
 	inst->m_DestroyRequestedDelegate.AddUObject( this, &UProjectileSpawnerComponent::OnProjectileDestroyRequested );

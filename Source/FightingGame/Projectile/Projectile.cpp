@@ -25,9 +25,6 @@ void AProjectile::Init( TObjectPtr<AActor> OwnerActor, FVector Location, float H
 
 	TeleportTo( Location, FRotator::ZeroRotator );
 
-	FVector targetVelocity = FVector::RightVector * HorizontalDirectionMultiplier * m_BaseSpeed;
-	m_MainCollision->SetPhysicsLinearVelocity( targetVelocity );
-
 	if( m_Lifetime > 0.f )
 	{
 		GetWorldTimerManager().SetTimer( m_LifetimeTimerHandle, this, &AProjectile::OnLifetimeTimerEnded, m_Lifetime );
@@ -41,6 +38,11 @@ void AProjectile::OnHitReceived( const HitData& HitData )
 void AProjectile::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
+
+	FVector currentLocation = GetActorLocation();
+	currentLocation.Y += (m_HorizontalDirectionMultiplier * m_BaseSpeed * DeltaTime);
+
+	SetActorLocation( currentLocation );
 }
 
 void AProjectile::OnLifetimeTimerEnded()
