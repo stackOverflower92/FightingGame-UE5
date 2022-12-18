@@ -76,6 +76,9 @@ private:
 
 	void RemovePendingHitboxes();
 
+	FVector GetHitTraceLocation( const HitData& Hit );
+
 	void DEBUG_SpawnDebugSphere( const HitData& Hit );
 	void DEBUG_DestroyDebugSphere( int HitboxId );
+	void DEBUG_UpdateDebugSpheres();
 };

@@ -74,6 +74,8 @@ void UHitboxHandlerComponent::TickComponent( float DeltaTime, ELevelTick TickTyp
 		}
 	}
 
+	DEBUG_UpdateDebugSpheres();
+
 	RemovePendingHitboxes();
 }
 
@@ -87,14 +89,12 @@ bool UHitboxHandlerComponent::TraceHitbox( const HitData& HitData, FHitResult& O
 	TArray<AActor*> actorsToIgnore;
 	actorsToIgnore.Add( HitData.m_Owner );
 
-	bool hasSocketToFollow = HitData.m_SkeletalMesh ? (!HitData.m_SocketToFollow.ToString().IsEmpty()) : false;
-	FVector location       = hasSocketToFollow ? HitData.m_SkeletalMesh->GetSocketLocation( HitData.m_SocketToFollow ) : HitData.m_Location;
+	FVector location = GetHitTraceLocation( HitData );
 
-	bool isHitSuccessful = UKismetSystemLibrary::SphereTraceSingleForObjects( HitData.m_World, location, location,
-	                                                                          HitData.m_Radius, targetTraceTypes,
-	                                                                          false, actorsToIgnore, EDrawDebugTrace::None, OutHit, true );
+	bool didHit = UKismetSystemLibrary::SphereTraceSingleForObjects( HitData.m_World, location, location, HitData.m_Radius, targetTraceTypes,
+	                                                                 false, actorsToIgnore, EDrawDebugTrace::None, OutHit, true );
 
-	return isHitSuccessful;
+	return didHit;
 }
 
 bool UHitboxHandlerComponent::WasActorAlreadyHit( AActor* Actor, uint32 HitboxId )
@@ -196,15 +196,35 @@ void UHitboxHandlerComponent::RemovePendingHitboxes()
 	}
 }
 
+FVector UHitboxHandlerComponent::GetHitTraceLocation( const HitData& Hit )
+{
+	bool hasSocketToFollow = Hit.m_SkeletalMesh ? (!Hit.m_SocketToFollow.ToString().IsEmpty()) : false;
+
+	return hasSocketToFollow
+		       ? Hit.m_SkeletalMesh->GetSocketLocation( Hit.m_SocketToFollow )
+		       : Hit.m_Owner->GetActorLocation() + Hit.m_Location;
+}
+
 void UHitboxHandlerComponent::DEBUG_SpawnDebugSphere( const HitData& Hit )
 {
 	TObjectPtr<ASphereVisualizer> inst = GetWorld()->SpawnActor<ASphereVisualizer>( m_HitboxVisualizer );
+
+	inst->m_Owner     = Hit.m_Owner;
+	inst->m_Knockback = Hit.m_ProcessedKnockback;
+
 	inst->SetId( Hit.m_Id );
 	inst->SetRadius( Hit.m_Radius );
 
-	if( m_ReferenceComponent )
+	if( Hit.m_SkeletalMesh )
 	{
-		inst->AttachToComponent( m_ReferenceComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Hit.m_SocketToFollow );
+		if( m_ReferenceComponent )
+		{
+			inst->AttachToComponent( m_ReferenceComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Hit.m_SocketToFollow );
+		}
+	}
+	else
+	{
+		inst->m_Location = Hit.m_Location;
 	}
 
 	m_HitboxVisualizers.Emplace( inst );
@@ -218,6 +238,17 @@ void UHitboxHandlerComponent::DEBUG_DestroyDebugSphere( int HitboxId )
 		{
 			GetWorld()->DestroyActor( m_HitboxVisualizers[visIdx] );
 			m_HitboxVisualizers.RemoveAt( visIdx );
+		}
+	}
+}
+
+void UHitboxHandlerComponent::DEBUG_UpdateDebugSpheres()
+{
+	for( TObjectPtr<ASphereVisualizer> visualizer : m_HitboxVisualizers )
+	{
+		if( visualizer->m_Location.IsSet() && visualizer->m_Owner )
+		{
+			visualizer->SetActorLocation( visualizer->m_Owner->GetActorLocation() + visualizer->m_Location.GetValue() );
 		}
 	}
 }

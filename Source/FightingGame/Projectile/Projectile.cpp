@@ -4,6 +4,14 @@
 
 #include "Components/SphereComponent.h"
 #include "FightingGame/Combat/HitboxHandlerComponent.h"
+#include "FightingGame/Debug/Debug.h"
+#include "Kismet/KismetSystemLibrary.h"
+
+namespace
+{
+	int32 loc_DebugFacing = 0;
+	FG_CVAR_DESC( CVarDebugFacing, TEXT("Projectile.DebugFacing"), TEXT("1: enable, 0: disable"), loc_DebugFacing );
+}
 
 AProjectile::AProjectile()
 {
@@ -32,6 +40,8 @@ void AProjectile::Init( TObjectPtr<AActor> OwnerActor, FVector Location, float H
 	{
 		GetWorldTimerManager().SetTimer( m_LifetimeTimerHandle, this, &AProjectile::OnLifetimeTimerEnded, m_Lifetime );
 	}
+
+	m_HitboxHandler->m_HitDelegate.AddUObject( this, &AProjectile::OnHitLanded );
 }
 
 void AProjectile::OnHitReceived( const HitData& HitData )
@@ -61,9 +71,20 @@ void AProjectile::Tick( float DeltaTime )
 	currentLocation.Y += (m_HorizontalDirectionMultiplier * m_BaseSpeed * DeltaTime);
 
 	SetActorLocation( currentLocation );
+
+	if( loc_DebugFacing == 1 )
+	{
+		UKismetSystemLibrary::DrawDebugString( GetWorld(), GetActorLocation(),
+		                                       FString::Printf( TEXT( "[Facing Right: %s]" ), IsFacingRight() ? TEXT( "TRUE" ) : TEXT( "FALSE" ) ) );
+	}
 }
 
 void AProjectile::OnLifetimeTimerEnded()
+{
+	m_DestroyRequestedDelegate.Broadcast( this );
+}
+
+void AProjectile::OnHitLanded( AActor* /*Target*/, const HitData& /*HitData*/ )
 {
 	m_DestroyRequestedDelegate.Broadcast( this );
 }

@@ -61,4 +61,6 @@ protected:
 private:
 	FTimerHandle m_LifetimeTimerHandle;
 	void OnLifetimeTimerEnded();
+
+	void OnHitLanded( AActor* Target, const HitData& HitData );
 };
