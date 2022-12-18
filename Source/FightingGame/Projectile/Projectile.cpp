@@ -10,7 +10,7 @@
 namespace
 {
 	int32 loc_DebugFacing = 0;
-	FG_CVAR_DESC( CVarDebugFacing, TEXT("Projectile.DebugFacing"), TEXT("1: enable, 0: disable"), loc_DebugFacing );
+	FG_CVAR_DESC( CVarProjectileDebugFacing, TEXT("Projectile.DebugFacing"), TEXT("1: enable, 0: disable"), loc_DebugFacing );
 }
 
 AProjectile::AProjectile()
@@ -42,6 +42,7 @@ void AProjectile::Init( TObjectPtr<AActor> OwnerActor, FVector Location, float H
 	}
 
 	m_HitboxHandler->m_HitDelegate.AddUObject( this, &AProjectile::OnHitLanded );
+	m_HitboxHandler->SpawnDefaultHitboxes();
 }
 
 void AProjectile::OnHitReceived( const HitData& HitData )

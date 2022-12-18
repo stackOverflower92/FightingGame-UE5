@@ -23,9 +23,9 @@ void UHitboxHandlerComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	for( const auto& hitboxDesc : m_DefaultHitboxes )
+	if( m_SpawnDefaultHitboxesOnBeginPlay )
 	{
-		AddHitbox( UCombatStatics::GenerateHitDataFromHitboxDescription( GetOwner(), nullptr, hitboxDesc ) );
+		SpawnDefaultHitboxes();
 	}
 }
 
@@ -60,6 +60,14 @@ void UHitboxHandlerComponent::RemoveHitbox( uint32 HitUniqueId )
 void UHitboxHandlerComponent::ShowDebugTraces( bool Show )
 {
 	m_DebugTraces = Show;
+}
+
+void UHitboxHandlerComponent::SpawnDefaultHitboxes()
+{
+	for( const auto& hitboxDesc : m_DefaultHitboxes )
+	{
+		AddHitbox( UCombatStatics::GenerateHitDataFromHitboxDescription( GetOwner(), nullptr, hitboxDesc ) );
+	}
 }
 
 void UHitboxHandlerComponent::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )

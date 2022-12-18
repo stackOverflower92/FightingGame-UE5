@@ -127,13 +127,9 @@ FVector UCombatStatics::GetKnockbackFromOrientation( IFacingEntity* FacingEntity
 {
 	ensureMsgf( FacingEntity, TEXT("Character is null") );
 
-	bool FacingRight = FacingEntity->IsFacingRight();
-	FVector Forward  = FacingRight ? FVector::RightVector : -FVector::RightVector;
-
-	float FinalKnockbackOrientation = FacingRight ? Orientation : -Orientation;
-
-	FRotator Rotator = FRotator( 0, 0, -FinalKnockbackOrientation );
-	return Rotator.RotateVector( Forward );
+	float targetRoll = FacingEntity->IsFacingRight() ? -Orientation : -180.f + Orientation;
+	FRotator rotator = FRotator( 0, 0, targetRoll );
+	return rotator.RotateVector( FVector::RightVector );
 }
 
 bool UCombatStatics::ApplyKnockbackTo( const FVector& Direction, float Force, AFightingCharacter* Character, bool IgnoreMultiplier )

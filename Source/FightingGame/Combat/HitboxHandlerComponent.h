@@ -44,6 +44,9 @@ protected:
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Default Hitboxes" )
 	TArray<FHitboxDescription> m_DefaultHitboxes;
 
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Spawn Default Hitboxes on Begin Play" )
+	bool m_SpawnDefaultHitboxesOnBeginPlay = true;
+
 	UPROPERTY()
 	TObjectPtr<USceneComponent> m_ReferenceComponent = nullptr;
 
@@ -58,6 +61,8 @@ public:
 	void RemoveHitbox( uint32 HitUniqueId );
 
 	void ShowDebugTraces( bool Show );
+
+	void SpawnDefaultHitboxes();
 
 	virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
 
