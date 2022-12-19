@@ -18,17 +18,6 @@ DECLARE_MULTICAST_DELEGATE_OneParam( FHitLanded, AActor* )
 DECLARE_MULTICAST_DELEGATE( FGrounded )
 DECLARE_MULTICAST_DELEGATE( FAirborne )
 
-UENUM( BlueprintType )
-enum class EFightingCharacterFacingTechnique : uint8
-{
-	ChangeRotation,
-	MirrorSkeleton,
-	MirrorScale,
-
-	COUNT UMETA( Hidden ),
-	INVALID UMETA( Hidden )
-};
-
 UCLASS()
 class FIGHTINGGAME_API AFightingCharacter : public ACharacter, public IHittable, public IFacingEntity
 {
@@ -130,9 +119,6 @@ protected:
 
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Facing Rotation Lerp Multiplier" )
 	float m_FacingRotationLerpMultiplier = 1.f;
-
-	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Facing Technique" )
-	EFightingCharacterFacingTechnique m_FacingTechnique = EFightingCharacterFacingTechnique::MirrorScale;
 
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Grounded Reaction State Name" )
 	FName m_GroundedReactionStateName = "REACTION_LIGHT_GROUNDED";
