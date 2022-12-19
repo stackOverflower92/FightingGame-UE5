@@ -5,6 +5,7 @@
 #include "FightingGame/Collision/CustomCollisionChannels.h"
 #include "FightingGame/Common/CombatStatics.h"
 #include "FightingGame/Debug/Debug.h"
+#include "FightingGame/Debug/HitboxVisualizer.h"
 #include "FightingGame/Debug/SphereVisualizer.h"
 #include "Kismet/KismetSystemLibrary.h"
 
@@ -232,13 +233,12 @@ void UHitboxHandlerComponent::DEBUG_SpawnDebugSphere( const HitData& Hit )
 		return;
 	}
 
-	TObjectPtr<ASphereVisualizer> inst = GetWorld()->SpawnActor<ASphereVisualizer>( m_HitboxVisualizer );
-
-	inst->m_Owner     = Hit.m_Owner;
-	inst->m_Knockback = Hit.m_ProcessedKnockback;
+	TObjectPtr<AHitboxVisualizer> inst = GetWorld()->SpawnActor<AHitboxVisualizer>( m_HitboxVisualizer );
 
 	inst->SetId( Hit.m_Id );
 	inst->SetRadius( Hit.m_Radius );
+	inst->SetVisualizerOwner( Hit.m_Owner );
+	inst->SetKnockback( Hit.m_ProcessedKnockback );
 
 	if( Hit.m_SkeletalMesh )
 	{
@@ -249,7 +249,7 @@ void UHitboxHandlerComponent::DEBUG_SpawnDebugSphere( const HitData& Hit )
 	}
 	else
 	{
-		inst->m_Location = Hit.m_Location;
+		inst->SetLocation( Hit.m_Location );
 	}
 
 	m_HitboxVisualizers.Emplace( inst );
@@ -271,9 +271,9 @@ void UHitboxHandlerComponent::DEBUG_UpdateDebugSpheres()
 {
 	for( TObjectPtr<ASphereVisualizer> visualizer : m_HitboxVisualizers )
 	{
-		if( visualizer->m_Location.IsSet() && visualizer->m_Owner )
+		if( visualizer->GetLocation().IsSet() && visualizer->GetVisualizerOwner() )
 		{
-			visualizer->SetActorLocation( visualizer->m_Owner->GetActorLocation() + visualizer->m_Location.GetValue() );
+			visualizer->SetActorLocation( visualizer->GetVisualizerOwner()->GetActorLocation() + visualizer->GetLocation().GetValue() );
 		}
 	}
 }

@@ -8,8 +8,8 @@
 #include "FightingGame/Combat/HitData.h"
 #include "HitboxHandlerComponent.generated.h"
 
+class AHitboxVisualizer;
 struct FHitboxDescription;
-class ASphereVisualizer;
 
 DECLARE_MULTICAST_DELEGATE_TwoParams( FHit, AActor*, const HitData& )
 
@@ -39,7 +39,7 @@ public:
 
 protected:
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Hitbox Visualizer" )
-	TSubclassOf<ASphereVisualizer> m_HitboxVisualizer = nullptr;
+	TSubclassOf<AHitboxVisualizer> m_HitboxVisualizer = nullptr;
 
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Default Hitboxes" )
 	TArray<FHitboxDescription> m_DefaultHitboxes;
@@ -51,7 +51,7 @@ protected:
 	TObjectPtr<USceneComponent> m_ReferenceComponent = nullptr;
 
 	virtual void BeginPlay() override;
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	virtual void EndPlay( const EEndPlayReason::Type EndPlayReason ) override;
 
 public:
 	FHit m_HitDelegate;
@@ -71,7 +71,7 @@ private:
 	TMap<uint32, TArray<FHitGroupPair>> m_ActorGroupsMap;
 
 	TArray<HitData> m_ActiveHitboxes;
-	TArray<TObjectPtr<ASphereVisualizer>> m_HitboxVisualizers;
+	TArray<TObjectPtr<AHitboxVisualizer>> m_HitboxVisualizers;
 
 	bool m_DebugTraces = true;
 
