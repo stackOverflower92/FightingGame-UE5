@@ -34,9 +34,12 @@ void UHitboxHandlerComponent::EndPlay( const EEndPlayReason::Type EndPlayReason 
 {
 	Super::EndPlay( EndPlayReason );
 
-	for( const auto& hit : m_ActiveHitboxes )
+	for( const auto& tuple : m_ActiveGroupedHitboxes )
 	{
-		DEBUG_DestroyDebugSphere( hit.m_Id );
+		for( const auto& hit : tuple.Value )
+		{
+			DEBUG_DestroyDebugSphere( hit.m_Id );
+		}
 	}
 }
 
@@ -167,6 +170,7 @@ bool UHitboxHandlerComponent::WasActorAlreadyHit( AActor* Actor, uint32 HitboxId
 
 	if( !m_ActorGroupsMap.Find( Actor->GetUniqueID() ) ) return false;
 
+	// #TODO optimize
 	const TArray<HitData>::ElementType* it = nullptr;
 	for( const auto& tuple : m_ActiveGroupedHitboxes )
 	{
@@ -188,6 +192,7 @@ void UHitboxHandlerComponent::RegisterHitActor( AActor* Actor, uint32 HitboxId )
 {
 	ensureMsgf( Actor, TEXT("Actor is null") );
 
+	// #TODO optimize
 	const TArray<HitData>::ElementType* it = nullptr;
 	for( const auto& tuple : m_ActiveGroupedHitboxes )
 	{
