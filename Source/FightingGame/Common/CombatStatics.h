@@ -27,7 +27,7 @@ public:
 	static bool FaceLocation( IFacingEntity* A, const FVector& Location );
 
 	static HitData GenerateHitDataFromHitboxDescription( TObjectPtr<AActor> HitboxOwner, TObjectPtr<USkeletalMeshComponent> SkeletalMesh,
-	                                                     const FHitboxDescription& HitboxDesc );
+	                                                     const FHitboxDescription& HitboxDesc, int Id, int32 GroupId );
 
 	static FVector GetKnockbackFromOrientation( IFacingEntity* FacingEntity, float Orientation );
 

@@ -76,8 +76,8 @@ private:
 	bool m_DebugTraces = true;
 
 	bool TraceHitbox( const HitData& HitData, FHitResult& OutHit );
-	bool WasActorAlreadyHit( AActor* Actor, uint32 HitboxId );
-	void RegisterHitActor( AActor* Actor, uint32 HitboxId );
+	bool WasActorAlreadyHit( AActor* Actor, const HitData& Hit );
+	void RegisterHitActor( AActor* Actor, const HitData& Hit );
 	void UpdateHitbox( const HitData& HitData );
 
 	void RemovePendingHitboxes();

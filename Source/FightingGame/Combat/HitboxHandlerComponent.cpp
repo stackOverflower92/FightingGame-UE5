@@ -94,9 +94,9 @@ void UHitboxHandlerComponent::ShowDebugTraces( bool Show )
 
 void UHitboxHandlerComponent::SpawnDefaultHitboxes()
 {
-	for( const auto& hitboxDesc : m_DefaultHitboxes )
+	for( int i = 0; i < m_DefaultHitboxes.Num(); ++i )
 	{
-		AddHitbox( UCombatStatics::GenerateHitDataFromHitboxDescription( GetOwner(), nullptr, hitboxDesc ) );
+		AddHitbox( UCombatStatics::GenerateHitDataFromHitboxDescription( GetOwner(), nullptr, m_DefaultHitboxes[i], i, GetOwner()->GetUniqueID() ) );
 	}
 }
 
@@ -147,56 +147,30 @@ bool UHitboxHandlerComponent::TraceHitbox( const HitData& HitData, FHitResult& O
 	return didHit;
 }
 
-bool UHitboxHandlerComponent::WasActorAlreadyHit( AActor* Actor, uint32 HitboxId )
+bool UHitboxHandlerComponent::WasActorAlreadyHit( AActor* Actor, const HitData& Hit )
 {
 	ensureMsgf( Actor, TEXT("Actor is null") );
 
 	if( !m_ActorGroupsMap.Find( Actor->GetUniqueID() ) ) return false;
 
-	// #TODO optimize
-	const TArray<HitData>::ElementType* it = nullptr;
-	for( const auto& tuple : m_ActiveGroupedHitboxes )
+	return m_ActorGroupsMap[Actor->GetUniqueID()].ContainsByPredicate( [&]( const FHitGroupPair _pair )
 	{
-		it = tuple.Value.FindByPredicate( [&]( const HitData& _hitData )
-		{
-			return _hitData.m_Id == HitboxId;
-		} );
-	}
-
-	ensureMsgf( it, TEXT("HitData should be available at this point") );
-
-	return m_ActorGroupsMap[Actor->GetUniqueID()].ContainsByPredicate( [&]( const FHitGroupPair& _hitPair )
-	{
-		return _hitPair.m_GroupId == it->m_GroupId;
+		return _pair.m_GroupId == Hit.m_GroupId;
 	} );
 }
 
-void UHitboxHandlerComponent::RegisterHitActor( AActor* Actor, uint32 HitboxId )
+void UHitboxHandlerComponent::RegisterHitActor( AActor* Actor, const HitData& Hit )
 {
 	ensureMsgf( Actor, TEXT("Actor is null") );
 
-	// #TODO optimize
-	const TArray<HitData>::ElementType* it = nullptr;
-	for( const auto& tuple : m_ActiveGroupedHitboxes )
-	{
-		it = tuple.Value.FindByPredicate( [&]( const HitData& _hitData )
-		{
-			return _hitData.m_Id == HitboxId;
-		} );
-	}
-
-	ensureMsgf( it, TEXT("HitData should be available at this point") );
-
 	if( m_ActorGroupsMap.Contains( Actor->GetUniqueID() ) )
 	{
-		m_ActorGroupsMap[Actor->GetUniqueID()].AddUnique( FHitGroupPair{HitboxId, it->m_GroupId} );
+		m_ActorGroupsMap[Actor->GetUniqueID()].AddUnique( FHitGroupPair{Hit.m_Id, Hit.m_GroupId} );
 	}
 	else
 	{
-		TArray<FHitGroupPair> pairs;
-		pairs.AddUnique( FHitGroupPair{HitboxId, it->m_GroupId} );
-
-		m_ActorGroupsMap.Emplace( Actor->GetUniqueID(), pairs );
+		TArray groupsArray = {FHitGroupPair{Hit.m_Id, Hit.m_GroupId}};
+		m_ActorGroupsMap.Emplace( Actor->GetUniqueID(), groupsArray );
 	}
 }
 
@@ -206,9 +180,9 @@ void UHitboxHandlerComponent::UpdateHitbox( const HitData& HitData )
 	const bool success = TraceHitbox( HitData, outHit );
 
 	AActor* hitActor = outHit.GetActor();
-	if( success && !WasActorAlreadyHit( hitActor, HitData.m_Id ) )
+	if( success && !WasActorAlreadyHit( hitActor, HitData ) )
 	{
-		RegisterHitActor( hitActor, HitData.m_Id );
+		RegisterHitActor( hitActor, HitData );
 
 		if( auto* Hittable = Cast<IHittable>( hitActor ) )
 		{

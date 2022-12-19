@@ -5,7 +5,6 @@
 #include "HitboxHandlerComponent.h"
 #include "FightingGame/Character/FightingCharacter.h"
 #include "FightingGame/Common/CombatStatics.h"
-#include "FightingGame/Combat/HitboxDescription.h"
 
 void UHitboxNotifyState::NotifyBegin( USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration,
                                       const FAnimNotifyEventReference& EventReference )
@@ -14,9 +13,9 @@ void UHitboxNotifyState::NotifyBegin( USkeletalMeshComponent* MeshComp, UAnimSeq
 
 	if( auto* character = Cast<AFightingCharacter>( MeshComp->GetOwner() ) )
 	{
-		for( const FHitboxDescription& hitboxDesc : m_HitBoxes )
+		for( int i = 0; i < m_HitBoxes.Num(); ++i )
 		{
-			const HitData& Data = UCombatStatics::GenerateHitDataFromHitboxDescription( character, MeshComp, hitboxDesc );
+			const HitData& Data = UCombatStatics::GenerateHitDataFromHitboxDescription( character, MeshComp, m_HitBoxes[i], i, GetUniqueID() );
 			character->GetHitboxHandler()->AddHitbox( Data );
 		}
 	}
@@ -28,9 +27,9 @@ void UHitboxNotifyState::NotifyEnd( USkeletalMeshComponent* MeshComp, UAnimSeque
 
 	if( auto* character = Cast<AFightingCharacter>( MeshComp->GetOwner() ) )
 	{
-		for( const FHitboxDescription& hitboxDesc : m_HitBoxes )
+		for( int i = 0; i < m_HitBoxes.Num(); ++i )
 		{
-			character->GetHitboxHandler()->RemoveHitbox( hitboxDesc.m_UniqueId );
+			character->GetHitboxHandler()->RemoveHitbox( i );
 		}
 	}
 }
