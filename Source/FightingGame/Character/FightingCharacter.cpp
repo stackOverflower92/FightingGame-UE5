@@ -44,15 +44,37 @@ bool AFightingCharacter::IsAirborne() const
 
 void AFightingCharacter::UpdateHorizontalMovement( float value )
 {
+	float lastHorizontalMovement = GetLastMovementInputVector().Y;
+
 	m_CurrentHorizontalMovement = value;
 	AddMovementInput( FVector( 0.f, 1.f, 0.f ), m_CurrentHorizontalMovement );
+
+	float lastHorizontalMovementSign    = FMath::Sign( lastHorizontalMovement );
+	float currentHorizontalMovementSign = FMath::Sign( m_CurrentHorizontalMovement );
 
 	if( !IsAirborne() || m_UpdateFacingWhenAirborne )
 	{
 		if( !FMath::IsNearlyZero( m_CurrentHorizontalMovement ) )
 		{
-			float HorizontalMovementSign = FMath::Sign( m_CurrentHorizontalMovement );
-			m_TargetRotatorYaw           = HorizontalMovementSign * 95.f;
+			if( lastHorizontalMovementSign != currentHorizontalMovementSign )
+			{
+				FRotator actorRotation = GetActorRotation();
+
+				if( lastHorizontalMovementSign > currentHorizontalMovementSign )
+				{
+					// Left movement requested
+					actorRotation.Yaw += 1.f;
+					SetActorRotation( actorRotation );
+				}
+				else if( lastHorizontalMovementSign < currentHorizontalMovementSign )
+				{
+					// Right movement requested
+					actorRotation.Yaw -= 1.f;
+					SetActorRotation( actorRotation );
+				}
+			}
+
+			m_TargetRotatorYaw = currentHorizontalMovementSign * 90.f;
 		}
 	}
 }
