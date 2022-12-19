@@ -226,6 +226,12 @@ FVector UHitboxHandlerComponent::GetHitTraceLocation( const HitData& Hit )
 
 void UHitboxHandlerComponent::DEBUG_SpawnDebugSphere( const HitData& Hit )
 {
+	if( !m_HitboxVisualizer )
+	{
+		FG_SLOG_WARN( TEXT("HitboxVisualizer is null, hiboxes will not be shown for this object") );
+		return;
+	}
+
 	TObjectPtr<ASphereVisualizer> inst = GetWorld()->SpawnActor<ASphereVisualizer>( m_HitboxVisualizer );
 
 	inst->m_Owner     = Hit.m_Owner;
