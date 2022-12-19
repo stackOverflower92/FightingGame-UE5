@@ -35,9 +35,10 @@ void UHitboxHandlerComponent::EndPlay( const EEndPlayReason::Type EndPlayReason 
 	Super::EndPlay( EndPlayReason );
 
 	// Clean-up hitboxes. Maybe we can clean every hitbox since the component is being shut down?
-	for( HitData& hit : m_ActiveHitboxes )
+
+	for( const auto& hit : m_ActiveHitboxes )
 	{
-		hit.m_PendingRemoval = true;
+		DEBUG_DestroyDebugSphere( hit.m_Id );
 	}
 }
 
