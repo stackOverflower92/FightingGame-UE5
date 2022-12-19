@@ -50,13 +50,6 @@ void UHitboxHandlerComponent::SetReferenceComponent( TObjectPtr<USceneComponent>
 
 void UHitboxHandlerComponent::AddHitbox( HitData Hit )
 {
-	/*m_ActiveHitboxes.AddUnique( Hit );
-
-	if( loc_ShowHitboxTraces && m_HitboxVisualizer )
-	{
-		DEBUG_SpawnDebugSphere( Hit );
-	}*/
-
 	if( m_ActiveGroupedHitboxes.Contains( Hit.m_GroupId ) )
 	{
 		m_ActiveGroupedHitboxes[Hit.m_GroupId].AddUnique( Hit );
@@ -80,16 +73,6 @@ void UHitboxHandlerComponent::AddHitbox( HitData Hit )
 
 void UHitboxHandlerComponent::RemoveHitbox( uint32 HitUniqueId )
 {
-	/*auto* it = m_ActiveHitboxes.FindByPredicate( [&HitUniqueId]( const HitData& HitData )
-	{
-		return HitData.m_Id == HitUniqueId;
-	} );
-
-	if( it )
-	{
-		it->m_PendingRemoval = true;
-	}*/
-
 	for( auto& tuple : m_ActiveGroupedHitboxes )
 	{
 		auto* it = tuple.Value.FindByPredicate( [&HitUniqueId]( const HitData& HitData )
