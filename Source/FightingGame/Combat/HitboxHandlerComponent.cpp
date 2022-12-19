@@ -47,7 +47,27 @@ void UHitboxHandlerComponent::SetReferenceComponent( TObjectPtr<USceneComponent>
 
 void UHitboxHandlerComponent::AddHitbox( HitData Hit )
 {
-	m_ActiveHitboxes.AddUnique( Hit );
+	/*m_ActiveHitboxes.AddUnique( Hit );
+
+	if( loc_ShowHitboxTraces && m_HitboxVisualizer )
+	{
+		DEBUG_SpawnDebugSphere( Hit );
+	}*/
+
+	if( m_ActiveGroupedHitboxes.Contains( Hit.m_GroupId ) )
+	{
+		m_ActiveGroupedHitboxes[Hit.m_GroupId].AddUnique( Hit );
+
+		// #TODO temp, this is expensive
+		m_ActiveGroupedHitboxes[Hit.m_GroupId].Sort( []( const HitData& A, const HitData& B )
+		{
+			return A.m_Priority < B.m_Priority;
+		} );
+	}
+	else
+	{
+		m_ActiveGroupedHitboxes.Add( Hit.m_GroupId, {Hit} );
+	}
 
 	if( loc_ShowHitboxTraces && m_HitboxVisualizer )
 	{
@@ -57,7 +77,7 @@ void UHitboxHandlerComponent::AddHitbox( HitData Hit )
 
 void UHitboxHandlerComponent::RemoveHitbox( uint32 HitUniqueId )
 {
-	auto* it = m_ActiveHitboxes.FindByPredicate( [&HitUniqueId]( const HitData& HitData )
+	/*auto* it = m_ActiveHitboxes.FindByPredicate( [&HitUniqueId]( const HitData& HitData )
 	{
 		return HitData.m_Id == HitUniqueId;
 	} );
@@ -65,6 +85,19 @@ void UHitboxHandlerComponent::RemoveHitbox( uint32 HitUniqueId )
 	if( it )
 	{
 		it->m_PendingRemoval = true;
+	}*/
+
+	for( auto& tuple : m_ActiveGroupedHitboxes )
+	{
+		auto* it = tuple.Value.FindByPredicate( [&HitUniqueId]( const HitData& HitData )
+		{
+			return HitData.m_Id == HitUniqueId;
+		} );
+
+		if( it )
+		{
+			it->m_PendingRemoval = true;
+		}
 	}
 }
 
@@ -85,11 +118,23 @@ void UHitboxHandlerComponent::TickComponent( float DeltaTime, ELevelTick TickTyp
 {
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
 
-	for( const auto& hitData : m_ActiveHitboxes )
+	/*for( const auto& hitData : m_ActiveHitboxes )
 	{
 		if( !hitData.m_PendingRemoval )
 		{
 			UpdateHitbox( hitData );
+		}
+	}*/
+
+	for( const auto& tuple : m_ActiveGroupedHitboxes )
+	{
+		for( int hitIdx = 0; hitIdx < tuple.Value.Num(); ++hitIdx )
+		{
+			const auto& hit = tuple.Value[hitIdx];
+			if( !hit.m_PendingRemoval )
+			{
+				UpdateHitbox( hit );
+			}
 		}
 	}
 
@@ -122,16 +167,20 @@ bool UHitboxHandlerComponent::WasActorAlreadyHit( AActor* Actor, uint32 HitboxId
 
 	if( !m_ActorGroupsMap.Find( Actor->GetUniqueID() ) ) return false;
 
-	auto* activeHitboxesIt = m_ActiveHitboxes.FindByPredicate( [&]( const HitData& _hitData )
+	const TArray<HitData>::ElementType* it = nullptr;
+	for( const auto& tuple : m_ActiveGroupedHitboxes )
 	{
-		return _hitData.m_Id == HitboxId;
-	} );
+		it = tuple.Value.FindByPredicate( [&]( const HitData& _hitData )
+		{
+			return _hitData.m_Id == HitboxId;
+		} );
+	}
 
-	ensureMsgf( activeHitboxesIt, TEXT("HitData should be available at this point") );
+	ensureMsgf( it, TEXT("HitData should be available at this point") );
 
 	return m_ActorGroupsMap[Actor->GetUniqueID()].ContainsByPredicate( [&]( const FHitGroupPair& _hitPair )
 	{
-		return _hitPair.m_GroupId == activeHitboxesIt->m_GroupId;
+		return _hitPair.m_GroupId == it->m_GroupId;
 	} );
 }
 
@@ -139,10 +188,14 @@ void UHitboxHandlerComponent::RegisterHitActor( AActor* Actor, uint32 HitboxId )
 {
 	ensureMsgf( Actor, TEXT("Actor is null") );
 
-	auto* it = m_ActiveHitboxes.FindByPredicate( [&]( const HitData& _hitData )
+	const TArray<HitData>::ElementType* it = nullptr;
+	for( const auto& tuple : m_ActiveGroupedHitboxes )
 	{
-		return _hitData.m_Id == HitboxId;
-	} );
+		it = tuple.Value.FindByPredicate( [&]( const HitData& _hitData )
+		{
+			return _hitData.m_Id == HitboxId;
+		} );
+	}
 
 	ensureMsgf( it, TEXT("HitData should be available at this point") );
 
@@ -184,38 +237,41 @@ void UHitboxHandlerComponent::UpdateHitbox( const HitData& HitData )
 
 void UHitboxHandlerComponent::RemovePendingHitboxes()
 {
-	for( int i = m_ActiveHitboxes.Num() - 1; i >= 0; --i )
+	for( auto& tuple : m_ActiveGroupedHitboxes )
 	{
-		if( m_ActiveHitboxes[i].m_PendingRemoval )
+		for( int i = tuple.Value.Num() - 1; i >= 0; --i )
 		{
-			TArray<uint32> targetKeys;
-			for( const auto& pair : m_ActorGroupsMap )
+			if( tuple.Value[i].m_PendingRemoval )
 			{
-				if( pair.Value.ContainsByPredicate( [&]( const FHitGroupPair& hitPair )
+				TArray<uint32> targetKeys;
+				for( const auto& pair : m_ActorGroupsMap )
 				{
-					return hitPair.m_Id == m_ActiveHitboxes[i].m_Id;
-				} ) )
-				{
-					targetKeys.Emplace( pair.Key );
-				}
-			}
-
-			for( int keyIdx = 0; keyIdx < targetKeys.Num(); ++keyIdx )
-			{
-				uint32 targetKey = targetKeys[keyIdx];
-
-				for( int j = m_ActorGroupsMap[targetKey].Num() - 1; j >= 0; --j )
-				{
-					if( m_ActorGroupsMap[targetKey][j].m_Id == m_ActiveHitboxes[i].m_Id )
+					if( pair.Value.ContainsByPredicate( [&]( const FHitGroupPair& hitPair )
 					{
-						m_ActorGroupsMap[targetKey].RemoveAt( j );
+						return hitPair.m_Id == tuple.Value[i].m_Id;
+					} ) )
+					{
+						targetKeys.Emplace( pair.Key );
 					}
 				}
+
+				for( int keyIdx = 0; keyIdx < targetKeys.Num(); ++keyIdx )
+				{
+					uint32 targetKey = targetKeys[keyIdx];
+
+					for( int j = m_ActorGroupsMap[targetKey].Num() - 1; j >= 0; --j )
+					{
+						if( m_ActorGroupsMap[targetKey][j].m_Id == tuple.Value[i].m_Id )
+						{
+							m_ActorGroupsMap[targetKey].RemoveAt( j );
+						}
+					}
+				}
+
+				DEBUG_DestroyDebugSphere( tuple.Value[i].m_Id );
+
+				tuple.Value.RemoveAt( i );
 			}
-
-			DEBUG_DestroyDebugSphere( m_ActiveHitboxes[i].m_Id );
-
-			m_ActiveHitboxes.RemoveAt( i );
 		}
 	}
 }

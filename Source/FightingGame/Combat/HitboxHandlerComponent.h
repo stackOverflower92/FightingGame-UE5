@@ -71,6 +71,8 @@ private:
 	TMap<uint32, TArray<FHitGroupPair>> m_ActorGroupsMap;
 
 	TArray<HitData> m_ActiveHitboxes;
+	TMap<int, TArray<HitData>> m_ActiveGroupedHitboxes;
+
 	TArray<TObjectPtr<AHitboxVisualizer>> m_HitboxVisualizers;
 
 	bool m_DebugTraces = true;
