@@ -6,7 +6,8 @@ ASphereVisualizer::ASphereVisualizer()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	m_Sphere = CreateDefaultSubobject<UStaticMeshComponent>( TEXT( "Sphere" ) );
+	m_Sphere      = CreateDefaultSubobject<UStaticMeshComponent>( TEXT( "Sphere" ) );
+	RootComponent = m_Sphere;
 }
 
 void ASphereVisualizer::BeginPlay()
