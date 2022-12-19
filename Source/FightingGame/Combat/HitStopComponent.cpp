@@ -4,7 +4,7 @@
 
 #include "FightingGame/Character/FightingCharacter.h"
 #include "FightingGame/Common/CombatStatics.h"
-#include "FightingGame/Debug/Debug.h"
+#include "FightingGame/Debugging/Debug.h"
 
 UHitStopComponent::UHitStopComponent()
 {

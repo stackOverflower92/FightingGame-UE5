@@ -4,7 +4,7 @@
 #include "FightingGame/Camera/CameraManager.h"
 #include "FightingGame/Character/FightingCharacter.h"
 #include "FightingGame/Common/CombatStatics.h"
-#include "FightingGame/Debug/Debug.h"
+#include "FightingGame/Debugging/Debug.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetStringLibrary.h"

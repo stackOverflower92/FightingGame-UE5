@@ -4,7 +4,7 @@
 
 #include "Components/SphereComponent.h"
 #include "FightingGame/Combat/HitboxHandlerComponent.h"
-#include "FightingGame/Debug/Debug.h"
+#include "FightingGame/Debugging/Debug.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 namespace

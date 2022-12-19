@@ -4,9 +4,9 @@
 #include "Hittable.h"
 #include "FightingGame/Collision/CustomCollisionChannels.h"
 #include "FightingGame/Common/CombatStatics.h"
-#include "FightingGame/Debug/Debug.h"
-#include "FightingGame/Debug/HitboxVisualizer.h"
-#include "FightingGame/Debug/SphereVisualizer.h"
+#include "FightingGame/Debugging/Debug.h"
+#include "FightingGame/Debugging/HitboxVisualizer.h"
+#include "FightingGame/Debugging/SphereVisualizer.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 namespace

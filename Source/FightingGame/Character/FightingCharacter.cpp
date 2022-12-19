@@ -9,7 +9,7 @@
 #include "Components/BoxComponent.h"
 #include "FightingGame/Combat/HitStopComponent.h"
 #include "FightingGame/Common/CombatStatics.h"
-#include "FightingGame/Debug/Debug.h"
+#include "FightingGame/Debugging/Debug.h"
 #include "FightingGame/Projectile/ProjectileSpawnerComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"

@@ -3,7 +3,7 @@
 #include "MovesBufferComponent.h"
 #include "Components/InputComponent.h"
 #include "FightingGame/Character/FightingCharacter.h"
-#include "FightingGame/Debug/Debug.h"
+#include "FightingGame/Debugging/Debug.h"
 
 namespace
 {
