@@ -9,8 +9,8 @@
 
 namespace
 {
-	int32 loc_DebugFacing = 0;
-	FG_CVAR_DESC( CVarProjectileDebugFacing, TEXT("Projectile.DebugFacing"), TEXT("1: enable, 0: disable"), loc_DebugFacing );
+	int32 loc_ProjectileDebugFacing = 0;
+	FG_CVAR_DESC( CVarProjectileDebugFacing, TEXT("Projectile.DebugFacing"), TEXT("1: enable, 0: disable"), loc_ProjectileDebugFacing );
 }
 
 AProjectile::AProjectile()
@@ -73,7 +73,7 @@ void AProjectile::Tick( float DeltaTime )
 
 	SetActorLocation( currentLocation );
 
-	if( loc_DebugFacing == 1 )
+	if( loc_ProjectileDebugFacing == 1 )
 	{
 		UKismetSystemLibrary::DrawDebugString( GetWorld(), GetActorLocation(),
 		                                       FString::Printf( TEXT( "[Facing Right: %s]" ), IsFacingRight() ? TEXT( "TRUE" ) : TEXT( "FALSE" ) ) );
