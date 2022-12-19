@@ -52,7 +52,7 @@ void AFightingCharacter::UpdateHorizontalMovement( float value )
 		if( !FMath::IsNearlyZero( m_CurrentHorizontalMovement ) )
 		{
 			float HorizontalMovementSign = FMath::Sign( m_CurrentHorizontalMovement );
-			m_TargetRotatorYaw           = HorizontalMovementSign * 90.f;
+			m_TargetRotatorYaw           = HorizontalMovementSign * 95.f;
 		}
 	}
 }
@@ -92,12 +92,27 @@ void AFightingCharacter::SetFacingRight( bool Right, bool Instant /*= false*/ )
 {
 	m_TargetRotatorYaw = Right ? 90.f : -90.f;
 
+	FRotator TargetRotation = GetActorRotation();
+
 	if( Instant )
 	{
-		FRotator TargetRotation = GetActorRotation();
-		TargetRotation.Yaw      = m_TargetRotatorYaw;
+		TargetRotation.Yaw = m_TargetRotatorYaw;
 
 		SetActorRotation( TargetRotation );
+	}
+	else
+	{
+		if( !IsFacingRight() && Right )
+		{
+			TargetRotation.Yaw -= 1.f;
+			SetActorRotation( TargetRotation );
+		}
+
+		if( IsFacingRight() && !Right )
+		{
+			TargetRotation.Yaw += 1.f;
+			SetActorRotation( TargetRotation );
+		}
 	}
 }
 
