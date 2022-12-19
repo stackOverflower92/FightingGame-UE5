@@ -19,6 +19,12 @@ protected:
 	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Knockback Line Thickness" )
 	float m_KnockbackLineThickness = 3.f;
 
+	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Regular Color" )
+	FLinearColor m_RegularColor = FLinearColor::Red;
+
+	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Hit Color" )
+	FLinearColor m_HitColor = FLinearColor::Green;
+
 	virtual void BeginPlay() override;
 
 public:
@@ -26,6 +32,11 @@ public:
 
 	virtual void Tick( float DeltaTime ) override;
 
+	void SetRegularState();
+	void SetHitState();
+
 protected:
 	TOptional<FVector> m_Knockback;
+
+	void SetColor( const FLinearColor& Color );
 };

@@ -139,11 +139,11 @@ void UHitboxHandlerComponent::RegisterHitActor( AActor* Actor, uint32 HitboxId )
 {
 	ensureMsgf( Actor, TEXT("Actor is null") );
 
-	// Update actor groups map
 	auto* it = m_ActiveHitboxes.FindByPredicate( [&]( const HitData& _hitData )
 	{
 		return _hitData.m_Id == HitboxId;
 	} );
+
 	ensureMsgf( it, TEXT("HitData should be available at this point") );
 
 	if( m_ActorGroupsMap.Contains( Actor->GetUniqueID() ) )
@@ -173,6 +173,11 @@ void UHitboxHandlerComponent::UpdateHitbox( const HitData& HitData )
 		{
 			Hittable->OnHitReceived( HitData );
 			m_HitDelegate.Broadcast( hitActor, HitData );
+		}
+
+		if( TObjectPtr<AHitboxVisualizer> visualizer = DEBUG_GetHitboxVisualizerOrDefault( HitData.m_Id ) )
+		{
+			visualizer->SetHitState();
 		}
 	}
 }
@@ -258,6 +263,16 @@ void UHitboxHandlerComponent::DEBUG_SpawnDebugSphere( const HitData& Hit )
 	}
 
 	m_HitboxVisualizers.Emplace( inst );
+}
+
+TObjectPtr<AHitboxVisualizer> UHitboxHandlerComponent::DEBUG_GetHitboxVisualizerOrDefault( int HitboxId )
+{
+	auto* it = m_HitboxVisualizers.FindByPredicate( [&HitboxId]( TObjectPtr<AHitboxVisualizer> _vis )
+	{
+		return _vis->GetId() == HitboxId;
+	} );
+
+	return it ? *it : nullptr;
 }
 
 void UHitboxHandlerComponent::DEBUG_DestroyDebugSphere( int HitboxId )

@@ -20,7 +20,8 @@ struct FHitboxDescription
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Use Location (Instead of sockets)" )
 	bool m_UseLocation = false;
 
-	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Location (Relative to the owner)" )
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Location (Relative to the owner)",
+		meta = (EditCondition = "m_UseLocation", EditConditionHides = "m_UseLocation") )
 	FVector m_Location = FVector::ZeroVector;
 
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Priority" )

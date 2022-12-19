@@ -22,3 +22,21 @@ void AHitboxVisualizer::Tick( float DeltaTime )
 		DrawDebugLine( GetWorld(), GetActorLocation(), lineEnd, FColor::White, false, -1, SDPG_Foreground, m_KnockbackLineThickness );
 	}
 }
+
+void AHitboxVisualizer::SetRegularState()
+{
+	SetColor( m_RegularColor );
+}
+
+void AHitboxVisualizer::SetHitState()
+{
+	SetColor( m_HitColor );
+}
+
+void AHitboxVisualizer::SetColor( const FLinearColor& Color )
+{
+	if( UMaterialInstanceDynamic* materialInstance = m_Sphere->CreateDynamicMaterialInstance( 0, m_Sphere->GetMaterial( 0 ) ) )
+	{
+		materialInstance->SetVectorParameterValue( TEXT( "Color" ), Color );
+	}
+}

@@ -85,6 +85,7 @@ private:
 	FVector GetHitTraceLocation( const HitData& Hit );
 
 	void DEBUG_SpawnDebugSphere( const HitData& Hit );
+	TObjectPtr<AHitboxVisualizer> DEBUG_GetHitboxVisualizerOrDefault( int HitboxId );
 	void DEBUG_DestroyDebugSphere( int HitboxId );
 	void DEBUG_UpdateDebugSpheres();
 };
