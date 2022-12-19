@@ -220,9 +220,15 @@ FVector UHitboxHandlerComponent::GetHitTraceLocation( const HitData& Hit )
 {
 	bool hasSocketToFollow = Hit.m_SkeletalMesh ? (!Hit.m_SocketToFollow.ToString().IsEmpty()) : false;
 
-	return hasSocketToFollow
-		       ? Hit.m_SkeletalMesh->GetSocketLocation( Hit.m_SocketToFollow )
-		       : Hit.m_Owner->GetActorLocation() + Hit.m_Location;
+	if( hasSocketToFollow )
+	{
+		FVector socketLocation = Hit.m_SkeletalMesh->GetSocketLocation( Hit.m_SocketToFollow );
+		socketLocation.X       = Hit.m_Owner->GetActorLocation().X;
+
+		return socketLocation;
+	}
+
+	return Hit.m_Owner->GetActorLocation() + Hit.m_Location;
 }
 
 void UHitboxHandlerComponent::DEBUG_SpawnDebugSphere( const HitData& Hit )
