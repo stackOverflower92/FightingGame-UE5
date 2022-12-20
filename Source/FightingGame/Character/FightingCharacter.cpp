@@ -254,6 +254,11 @@ void AFightingCharacter::OnHitReceived( const HitData& HitData )
 	}
 }
 
+bool AFightingCharacter::IsHittable()
+{
+	return m_Hittable;
+}
+
 void AFightingCharacter::UpdateYaw( float DeltaTime )
 {
 	FRotator TargetRotator = GetActorRotation();

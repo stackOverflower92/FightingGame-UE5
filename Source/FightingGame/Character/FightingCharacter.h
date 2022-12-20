@@ -77,6 +77,7 @@ public:
 	virtual void SetupPlayerInputComponent( class UInputComponent* PlayerInputComponent ) override;
 
 	virtual void OnHitReceived( const HitData& HitData ) override;
+	virtual bool IsHittable() override;
 
 	FORCEINLINE TObjectPtr<UMovesBufferComponent> GetMovesBufferComponent() const { return m_MovesBuffer; }
 	FORCEINLINE TObjectPtr<UFSM> GetFSM() const { return m_FSM; }

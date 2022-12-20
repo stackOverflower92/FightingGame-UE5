@@ -175,19 +175,22 @@ void UHitboxHandlerComponent::UpdateHitbox( const HitData& HitData )
 	const bool success = TraceHitbox( HitData, outHit );
 
 	AActor* hitActor = outHit.GetActor();
-	if( success && !WasActorAlreadyHit( hitActor, HitData ) )
+	if( auto* hittable = Cast<IHittable>( hitActor ) )
 	{
-		RegisterHitActor( hitActor, HitData );
-
-		if( auto* Hittable = Cast<IHittable>( hitActor ) )
+		if( hittable->IsHittable() )
 		{
-			Hittable->OnHitReceived( HitData );
-			m_HitDelegate.Broadcast( hitActor, HitData );
-		}
+			if( success && !WasActorAlreadyHit( hitActor, HitData ) )
+			{
+				RegisterHitActor( hitActor, HitData );
 
-		if( TObjectPtr<AHitboxVisualizer> visualizer = DEBUG_GetHitboxVisualizerOrDefault( HitData.m_Id ) )
-		{
-			visualizer->SetHitState();
+				hittable->OnHitReceived( HitData );
+				m_HitDelegate.Broadcast( hitActor, HitData );
+
+				if( TObjectPtr<AHitboxVisualizer> visualizer = DEBUG_GetHitboxVisualizerOrDefault( HitData.m_Id ) )
+				{
+					visualizer->SetHitState();
+				}
+			}
 		}
 	}
 }

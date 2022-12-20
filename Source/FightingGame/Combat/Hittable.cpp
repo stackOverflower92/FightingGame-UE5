@@ -5,3 +5,8 @@
 void IHittable::OnHitReceived( const HitData& HitData )
 {
 }
+
+bool IHittable::IsHittable()
+{
+	return true;
+}

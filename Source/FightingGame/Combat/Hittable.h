@@ -21,4 +21,5 @@ class FIGHTINGGAME_API IHittable
 
 public:
 	virtual void OnHitReceived( const HitData& HitData );
+	virtual bool IsHittable();
 };
