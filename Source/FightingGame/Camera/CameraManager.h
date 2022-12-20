@@ -17,7 +17,7 @@ public:
 
 protected:
 	UPROPERTY( EditAnywhere, DisplayName="First Camera Id" )
-	FString m_FirstCameraId = "";
+	FString m_FirstCameraId = TEXT( "" );
 
 	virtual void BeginPlay() override;
 

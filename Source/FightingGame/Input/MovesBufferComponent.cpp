@@ -48,7 +48,7 @@ void UMovesBufferComponent::TickComponent( float DeltaTime, ELevelTick TickType,
 			{
 				FInputBufferEntry& Entry = m_Buffer.at( i );
 				const bool IsEmpty       = Entry.Name == NoInput;
-				auto Message             = IsEmpty ? "Empty" : Entry.Name;
+				auto Message             = IsEmpty ? TEXT( "Empty" ) : Entry.Name;
 
 				FColor Color = Entry.Used ? FColor::Red : FColor::Green;
 				GEngine->AddOnScreenDebugMessage( i, 1.f, Color, FString::Printf( TEXT( "%s" ), *Message ) );
@@ -62,7 +62,7 @@ void UMovesBufferComponent::TickComponent( float DeltaTime, ELevelTick TickType,
 
 	if( m_PlayerInput )
 	{
-		float horizontalMovement = m_PlayerInput->GetAxisValue( "MoveHorizontal" );
+		float horizontalMovement = m_PlayerInput->GetAxisValue( TEXT( "MoveHorizontal" ) );
 
 		m_InputMovement = horizontalMovement;
 
