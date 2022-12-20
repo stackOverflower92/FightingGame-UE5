@@ -48,11 +48,6 @@ void AProjectile::Init( TObjectPtr<AActor> OwnerActor, FVector Location, float H
 	GetHitboxHandlerComponent()->SpawnDefaultHitboxes();
 }
 
-void AProjectile::OnHitReceived( const HitData& HitData )
-{
-	m_DestroyRequestedDelegate.Broadcast( this );
-}
-
 bool AProjectile::IsFacingRight()
 {
 	return m_HorizontalDirectionMultiplier > 0.f;

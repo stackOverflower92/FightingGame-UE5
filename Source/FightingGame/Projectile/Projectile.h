@@ -14,7 +14,7 @@ class USphereComponent;
 DECLARE_MULTICAST_DELEGATE_OneParam( FDestroyRequested, TObjectPtr<AProjectile> )
 
 UCLASS()
-class FIGHTINGGAME_API AProjectile : public AActor, public IHittable, public IFacingEntity
+class FIGHTINGGAME_API AProjectile : public AActor, public IFacingEntity
 {
 	GENERATED_BODY()
 
@@ -28,8 +28,6 @@ public:
 	FDestroyRequested m_DestroyRequestedDelegate;
 
 	void Init( TObjectPtr<AActor> OwnerActor, FVector Location, float HorizontalDirectionMultiplier, float BaseSpeed, float Lifetime = -1.f );
-
-	virtual void OnHitReceived( const HitData& HitData ) override;
 
 	virtual bool IsFacingRight() override;
 	virtual void SetFacingRight( bool Right, bool Instant ) override;
