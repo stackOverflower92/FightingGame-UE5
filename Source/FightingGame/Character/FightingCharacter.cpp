@@ -405,14 +405,8 @@ void AFightingCharacter::UpdatePushbox( float DeltaTime )
 void AFightingCharacter::UpdateGravityScale()
 {
 	float verticalVelocity = GetVelocity().Z;
-	if( verticalVelocity < 0.f )
-	{
-		GetCharacterMovement()->GravityScale = m_FallingGravityScale;
-	}
-	else
-	{
-		GetCharacterMovement()->GravityScale = m_RegularGravityScale;
-	}
+
+	GetCharacterMovement()->GravityScale = verticalVelocity < 0.f ? m_FallingGravityScale : m_RegularGravityScale;
 }
 
 void AFightingCharacter::UpdateMeshShake()
