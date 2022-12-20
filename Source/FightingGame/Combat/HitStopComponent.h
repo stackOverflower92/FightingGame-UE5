@@ -31,6 +31,8 @@ private:
 	bool m_CachedDoMeshShake      = false;
 	bool m_UpdateMeshShake        = false;
 
+	bool m_HitStopRunning = false;
+
 	UPROPERTY()
 	TObjectPtr<AFightingCharacter> m_Character = nullptr;
 

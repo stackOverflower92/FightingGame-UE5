@@ -5,6 +5,13 @@
 #include "FightingGame/Character/FightingCharacter.h"
 #include "FightingGame/Common/CombatStatics.h"
 #include "FightingGame/Debugging/Debug.h"
+#include "Kismet/KismetSystemLibrary.h"
+
+namespace
+{
+	int32 loc_ShowHitStopState = 0;
+	FG_CVAR_DESC( CVarShowHitStopState, TEXT( "HitStopComponent.ShowHitStopState" ), TEXT("1: Enable, 0: Disable"), loc_ShowHitStopState );
+}
 
 UHitStopComponent::UHitStopComponent()
 {
@@ -35,6 +42,12 @@ void UHitStopComponent::TickComponent( float DeltaTime, ELevelTick TickType, FAc
 	{
 		m_Character->UpdateMeshShake();
 	}
+
+	if( loc_ShowHitStopState )
+	{
+		UKismetSystemLibrary::DrawDebugString( GetWorld(), GetOwner()->GetActorLocation(),
+		                                       FString::Printf( TEXT( "[Hit Stop: %s]" ), m_HitStopRunning ? TEXT( "TRUE" ) : TEXT( "FALSE" ) ) );
+	}
 }
 
 void UHitStopComponent::StartBeginHitStopTimer( float Duration, bool Shake )
@@ -48,8 +61,6 @@ void UHitStopComponent::StartBeginHitStopTimer( float Duration, bool Shake )
 
 	m_CachedHitStopDuration = Duration;
 	m_CachedDoMeshShake     = Shake;
-
-	//m_CachedConsiderShake   = ConsiderShake;
 
 	// #TODO instead of using GetHitStunInitialDelay, interpolate directly to the next reaction animation to ensure the correcto pose is always visible
 	float hitStunInitialDelay = UCombatStatics::GetHitStunInitialDelay();
@@ -80,7 +91,10 @@ void UHitStopComponent::StartStopHitStopTimer()
 	if( TimerManager.IsTimerActive( m_HitStopStopTimerHandle ) )
 	{
 		TimerManager.ClearTimer( m_HitStopStopTimerHandle );
+		m_Character->PopTimeDilation();
 	}
+
+	m_HitStopRunning = true;
 
 	// #TODO pass shake from hitdata
 	m_Character->PushTimeDilation( UCombatStatics::GetMinCustomTimeDilation() );
@@ -93,4 +107,6 @@ void UHitStopComponent::OnHitStopStopTimerEnded()
 	m_UpdateMeshShake = false;
 
 	m_Character->ResetMeshRelativeLocation();
+
+	m_HitStopRunning = false;
 }
