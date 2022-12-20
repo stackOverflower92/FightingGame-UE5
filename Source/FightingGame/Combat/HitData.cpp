@@ -18,7 +18,8 @@ HitData::HitData( bool InForceOpponentFacing, float InDamagePercent, float InRad
 	  m_Id( InId ),
 	  m_GroupId( InGroupId ),
 	  m_Priority( InPriority ),
-	  m_AdditionalActorsToIgnore( InAdditionalActorsToIgnore )
+	  m_AdditionalActorsToIgnore( InAdditionalActorsToIgnore ),
+	  m_PendingRemoval( false )
 {
 }
 
