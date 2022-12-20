@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "FightingGame/Combat/FacingEntity.h"
+#include "FightingGame/Combat/GroundSensitiveEntity.h"
 #include "FightingGame/Combat/Hittable.h"
 #include "GameFramework/Character.h"
 #include "FightingCharacter.generated.h"
@@ -19,7 +20,8 @@ DECLARE_MULTICAST_DELEGATE( FGrounded )
 DECLARE_MULTICAST_DELEGATE( FAirborne )
 
 UCLASS()
-class FIGHTINGGAME_API AFightingCharacter : public ACharacter, public IHittable, public IFacingEntity
+class FIGHTINGGAME_API AFightingCharacter : public ACharacter,
+                                            public IHittable, public IFacingEntity, public IGroundSensitiveEntity
 {
 	GENERATED_BODY()
 
@@ -36,7 +38,10 @@ public:
 	float m_CurrentHorizontalMovement = 0.f;
 
 	UFUNCTION( BlueprintCallable )
-	bool IsAirborne() const;
+	virtual bool IsAirborne() const override;
+
+	UFUNCTION( BlueprintCallable )
+	virtual bool IsGrounded() const override;
 
 	UFUNCTION( BlueprintCallable )
 	void UpdateHorizontalMovement( float value );

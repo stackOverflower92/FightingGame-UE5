@@ -27,6 +27,7 @@ struct HitData
 	                  FVector InLocation, uint32 InId, int InGroupId, int InPriority, const TArray<TObjectPtr<AActor>>& InAdditionalActorsToIgnore );
 
 	TArray<TObjectPtr<AActor>> GetActorsToIgnore() const
+	
 	{
 		TArray<TObjectPtr<AActor>> excluded = m_AdditionalActorsToIgnore;
 		excluded.Add( m_Owner );

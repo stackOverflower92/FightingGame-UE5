@@ -41,13 +41,13 @@ public:
 	UFUNCTION( BlueprintCallable )
 	void InitBuffer();
 
-	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Input Movement" )
+	UPROPERTY( BlueprintReadOnly, DisplayName = "Input Movement" )
 	float m_InputMovement = 0.f;
 
-	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Moving Right" )
+	UPROPERTY( BlueprintReadOnly, DisplayName = "Moving Right" )
 	bool m_MovingRight = false;
 
-	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Moving Left" )
+	UPROPERTY( BlueprintReadOnly, DisplayName = "Moving Left" )
 	bool m_MovingLeft = false;
 
 protected:

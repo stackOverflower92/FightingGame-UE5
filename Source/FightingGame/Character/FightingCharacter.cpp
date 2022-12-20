@@ -42,6 +42,11 @@ bool AFightingCharacter::IsAirborne() const
 	return GetCharacterMovement()->IsFalling();
 }
 
+bool AFightingCharacter::IsGrounded() const
+{
+	return !IsAirborne();
+}
+
 void AFightingCharacter::UpdateHorizontalMovement( float value )
 {
 	float lastHorizontalMovement = GetLastMovementInputVector().Y;
@@ -370,24 +375,29 @@ void AFightingCharacter::InitPushbox()
 
 void AFightingCharacter::UpdatePushbox( float DeltaTime )
 {
-	if( m_Pushbox )
+	if( m_Pushbox && IsGrounded() )
 	{
-		TArray<UPrimitiveComponent*> overlappingComponents;
+		TArray<TObjectPtr<UPrimitiveComponent>> overlappingComponents;
 		m_Pushbox->GetOverlappingComponents( overlappingComponents );
 
-		// #TODO only update this logic if grounded
-		// #TODO temp, let's start by handling a single other enemy
-		if( overlappingComponents.Num() == 1 )
+		for( auto component : overlappingComponents )
 		{
-			AActor* otherActor         = overlappingComponents[0]->GetOwner();
-			bool isOtherOnTheRight     = otherActor->GetActorLocation().Y > GetActorLocation().Y;
-			float myShiftingMultiplier = isOtherOnTheRight ? -1.f : 1.f;
+			TObjectPtr<AActor> otherActor = component->GetOwner();
 
-			const FVector currentLocation      = GetActorLocation();
-			const float nextHorizontalPosition = currentLocation.Y + (m_PushboxShiftRatePerFrame * myShiftingMultiplier * DeltaTime);
-			const FVector nextLocation         = FVector( currentLocation.X, nextHorizontalPosition, currentLocation.Z );
+			if( TObjectPtr<IGroundSensitiveEntity> groundSensitiveEntity = Cast<IGroundSensitiveEntity>( otherActor ) )
+			{
+				if( groundSensitiveEntity->IsGrounded() )
+				{
+					bool isOtherOnTheRight     = otherActor->GetActorLocation().Y > GetActorLocation().Y;
+					float myShiftingMultiplier = isOtherOnTheRight ? -1.f : 1.f;
 
-			SetActorLocation( nextLocation );
+					const FVector currentLocation      = GetActorLocation();
+					const float nextHorizontalPosition = currentLocation.Y + (m_PushboxShiftRatePerFrame * myShiftingMultiplier * DeltaTime);
+					const FVector nextLocation         = FVector( currentLocation.X, nextHorizontalPosition, currentLocation.Z );
+
+					SetActorLocation( nextLocation );
+				}
+			}
 		}
 	}
 }
