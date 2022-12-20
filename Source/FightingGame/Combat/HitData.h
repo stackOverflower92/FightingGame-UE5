@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+// #TODO this should become a USTRUCT i think
 struct HitData
 {
 	bool m_ForceOpponentFacing = true;
@@ -11,6 +12,7 @@ struct HitData
 	bool m_Shake                     = false;
 	const UWorld* m_World            = nullptr;
 	AActor* m_Owner                  = nullptr;
+	TArray<TObjectPtr<AActor>> m_AdditionalActorsToIgnore;
 	FVector m_Location;
 	USkeletalMeshComponent* m_SkeletalMesh = nullptr;
 	FName m_SocketToFollow                 = "";
@@ -21,7 +23,15 @@ struct HitData
 
 	HitData( bool InForceOpponentFacing, float InDamagePercent, float InRadius, const FVector& InProcessedKnockback, bool InIgnoreKnockbackMultiplier,
 	         float InHitStunDuration, bool InShake, const UWorld* InWorld, AActor* InOwner, USkeletalMeshComponent* InSkeletalMesh, const FName& InSocketToFollow,
-	         FVector InLocation, uint32 InId, int InGroupId, int InPriority );
+	         FVector InLocation, uint32 InId, int InGroupId, int InPriority, const TArray<TObjectPtr<AActor>>& InAdditionalActorsToIgnore );
+
+	TArray<TObjectPtr<AActor>> GetActorsToIgnore() const
+	{
+		TArray<TObjectPtr<AActor>> excluded = m_AdditionalActorsToIgnore;
+		excluded.Add( m_Owner );
+
+		return excluded;
+	}
 
 	friend bool operator==( const HitData& Lhs, const HitData& RHS );
 	friend bool operator!=( const HitData& Lhs, const HitData& RHS );

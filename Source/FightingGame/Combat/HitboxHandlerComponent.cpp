@@ -87,31 +87,8 @@ void UHitboxHandlerComponent::RemoveHitbox( uint32 HitUniqueId )
 	}
 }
 
-void UHitboxHandlerComponent::ShowDebugTraces( bool Show )
+void UHitboxHandlerComponent::UpdateHitboxes()
 {
-	m_DebugTraces = Show;
-}
-
-void UHitboxHandlerComponent::SpawnDefaultHitboxes()
-{
-	for( int i = 0; i < m_DefaultHitboxes.Num(); ++i )
-	{
-		AddHitbox( UCombatStatics::GenerateHitDataFromHitboxDescription( GetOwner(), nullptr, m_DefaultHitboxes[i], i, GetOwner()->GetUniqueID() ) );
-	}
-}
-
-void UHitboxHandlerComponent::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
-{
-	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
-
-	/*for( const auto& hitData : m_ActiveHitboxes )
-	{
-		if( !hitData.m_PendingRemoval )
-		{
-			UpdateHitbox( hitData );
-		}
-	}*/
-
 	for( const auto& tuple : m_ActiveGroupedHitboxes )
 	{
 		for( int hitIdx = 0; hitIdx < tuple.Value.Num(); ++hitIdx )
@@ -123,6 +100,27 @@ void UHitboxHandlerComponent::TickComponent( float DeltaTime, ELevelTick TickTyp
 			}
 		}
 	}
+}
+
+void UHitboxHandlerComponent::ShowDebugTraces( bool Show )
+{
+	m_DebugTraces = Show;
+}
+
+void UHitboxHandlerComponent::SpawnDefaultHitboxes()
+{
+	for( int i = 0; i < m_DefaultHitboxes.Num(); ++i )
+	{
+		AddHitbox( UCombatStatics::GenerateHitDataFromHitboxDescription( GetOwner(), nullptr, m_DefaultHitboxes[i],
+		                                                                 i, GetOwner()->GetUniqueID(), m_AdditionalActorsToIgnore ) );
+	}
+}
+
+void UHitboxHandlerComponent::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
+{
+	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
+
+	UpdateHitboxes();
 
 	DEBUG_UpdateDebugSpheres();
 
@@ -136,13 +134,10 @@ bool UHitboxHandlerComponent::TraceHitbox( const HitData& HitData, FHitResult& O
 	const EObjectTypeQuery targetCollisionType = UEngineTypes::ConvertToObjectType( CUSTOM_TRACE_HURTBOX );
 	targetTraceTypes.Add( targetCollisionType );
 
-	TArray<AActor*> actorsToIgnore;
-	actorsToIgnore.Add( HitData.m_Owner );
-
 	FVector location = GetHitTraceLocation( HitData );
 
 	bool didHit = UKismetSystemLibrary::SphereTraceSingleForObjects( HitData.m_World, location, location, HitData.m_Radius, targetTraceTypes,
-	                                                                 false, actorsToIgnore, EDrawDebugTrace::None, OutHit, true );
+	                                                                 false, HitData.GetActorsToIgnore(), EDrawDebugTrace::None, OutHit, true );
 
 	return didHit;
 }

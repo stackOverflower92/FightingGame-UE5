@@ -55,11 +55,13 @@ protected:
 
 public:
 	FHit m_HitDelegate;
+	TArray<TObjectPtr<AActor>> m_AdditionalActorsToIgnore;
 
 	void SetReferenceComponent( TObjectPtr<USceneComponent> Component );
 
 	void AddHitbox( HitData Hit );
 	void RemoveHitbox( uint32 HitUniqueId );
+	void UpdateHitboxes();
 
 	void ShowDebugTraces( bool Show );
 

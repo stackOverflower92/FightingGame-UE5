@@ -28,11 +28,14 @@ void AProjectile::BeginPlay()
 	Super::BeginPlay();
 }
 
-void AProjectile::Init( TObjectPtr<AActor> OwnerActor, FVector Location, float HorizontalDirectionMultiplier, float Lifetime /* = -1.f*/ )
+void AProjectile::Init( TObjectPtr<AActor> OwnerActor, FVector Location, float HorizontalDirectionMultiplier, float BaseSpeed, float Lifetime /* = -1.f*/ )
 {
 	m_Owner                         = OwnerActor;
 	m_HorizontalDirectionMultiplier = HorizontalDirectionMultiplier;
+	m_BaseSpeed                     = BaseSpeed;
 	m_Lifetime                      = Lifetime;
+
+	GetHitboxHandlerComponent()->m_AdditionalActorsToIgnore.Emplace( m_Owner );
 
 	TeleportTo( Location, FRotator::ZeroRotator );
 
@@ -41,8 +44,8 @@ void AProjectile::Init( TObjectPtr<AActor> OwnerActor, FVector Location, float H
 		GetWorldTimerManager().SetTimer( m_LifetimeTimerHandle, this, &AProjectile::OnLifetimeTimerEnded, m_Lifetime );
 	}
 
-	m_HitboxHandler->m_HitDelegate.AddUObject( this, &AProjectile::OnHitLanded );
-	m_HitboxHandler->SpawnDefaultHitboxes();
+	GetHitboxHandlerComponent()->m_HitDelegate.AddUObject( this, &AProjectile::OnHitLanded );
+	GetHitboxHandlerComponent()->SpawnDefaultHitboxes();
 }
 
 void AProjectile::OnHitReceived( const HitData& HitData )

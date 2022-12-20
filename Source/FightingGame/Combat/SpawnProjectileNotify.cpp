@@ -18,6 +18,6 @@ void USpawnProjectileNotify::Notify( USkeletalMeshComponent* MeshComp, UAnimSequ
 		FVector spawnLocation      = character->GetActorLocation() + rotatedOffset;
 		float horizontalMultiplier = character->IsFacingRight() ? 1.f : -1.f;
 
-		character->GetProjectileSpawnerComponent()->SpawnProjectile( m_ProjectileClass, spawnLocation, horizontalMultiplier, m_Lifetime );
+		character->GetProjectileSpawnerComponent()->SpawnProjectile( m_ProjectileClass, spawnLocation, horizontalMultiplier, m_BaseSpeed, m_Lifetime );
 	}
 }

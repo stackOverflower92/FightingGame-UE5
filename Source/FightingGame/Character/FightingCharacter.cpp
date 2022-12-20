@@ -367,21 +367,22 @@ void AFightingCharacter::UpdatePushbox( float DeltaTime )
 {
 	if( m_Pushbox )
 	{
-		TArray<UPrimitiveComponent*> OverlappingComponents;
-		m_Pushbox->GetOverlappingComponents( OverlappingComponents );
+		TArray<UPrimitiveComponent*> overlappingComponents;
+		m_Pushbox->GetOverlappingComponents( overlappingComponents );
 
-		// TODO: temp, let's start by handling a single other enemy
-		if( OverlappingComponents.Num() == 1 )
+		// #TODO only update this logic if grounded
+		// #TODO temp, let's start by handling a single other enemy
+		if( overlappingComponents.Num() == 1 )
 		{
-			AActor* OtherActor         = OverlappingComponents[0]->GetOwner();
-			bool OtherOnTheRight       = OtherActor->GetActorLocation().Y > GetActorLocation().Y;
-			float MyShiftingMultiplier = OtherOnTheRight ? -1.f : 1.f;
+			AActor* otherActor         = overlappingComponents[0]->GetOwner();
+			bool isOtherOnTheRight     = otherActor->GetActorLocation().Y > GetActorLocation().Y;
+			float myShiftingMultiplier = isOtherOnTheRight ? -1.f : 1.f;
 
-			const FVector CurrentLocation = GetActorLocation();
-			const float NextPosition      = CurrentLocation.Y + (m_PushboxShiftRatePerFrame * MyShiftingMultiplier * DeltaTime);
-			const FVector NextLocation    = FVector( CurrentLocation.X, NextPosition, CurrentLocation.Z );
+			const FVector currentLocation      = GetActorLocation();
+			const float nextHorizontalPosition = currentLocation.Y + (m_PushboxShiftRatePerFrame * myShiftingMultiplier * DeltaTime);
+			const FVector nextLocation         = FVector( currentLocation.X, nextHorizontalPosition, currentLocation.Z );
 
-			SetActorLocation( NextLocation );
+			SetActorLocation( nextLocation );
 		}
 	}
 }

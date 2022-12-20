@@ -20,7 +20,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	void SpawnProjectile( TSubclassOf<AProjectile> ProjectileClass, FVector SpawnLocation, float HorizontalDirectionMultiplier, float Lifetime );
+	void SpawnProjectile( TSubclassOf<AProjectile> ProjectileClass, FVector SpawnLocation, float HorizontalDirectionMultiplier, float BaseSpeed, float Lifetime );
 
 	virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
 

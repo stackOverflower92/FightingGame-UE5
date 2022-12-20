@@ -2,7 +2,7 @@
 
 HitData::HitData( bool InForceOpponentFacing, float InDamagePercent, float InRadius, const FVector& InProcessedKnockback, bool InIgnoreKnockbackMultiplier,
                   float InHitStunDuration, bool InShake, const UWorld* InWorld, AActor* InOwner, USkeletalMeshComponent* InSkeletalMesh, const FName& InSocketToFollow,
-                  FVector InLocation, uint32 InId, int InGroupId, int InPriority )
+                  FVector InLocation, uint32 InId, int InGroupId, int InPriority, const TArray<TObjectPtr<AActor>>& InAdditionalActorsToIgnore )
 	: m_ForceOpponentFacing( InForceOpponentFacing ),
 	  m_DamagePercent( InDamagePercent ),
 	  m_Radius( InRadius ),
@@ -17,7 +17,8 @@ HitData::HitData( bool InForceOpponentFacing, float InDamagePercent, float InRad
 	  m_Location( InLocation ),
 	  m_Id( InId ),
 	  m_GroupId( InGroupId ),
-	  m_Priority( InPriority )
+	  m_Priority( InPriority ),
+	  m_AdditionalActorsToIgnore( InAdditionalActorsToIgnore )
 {
 }
 

@@ -83,7 +83,8 @@ bool UCombatStatics::FaceLocation( IFacingEntity* A, const FVector& Location )
 }
 
 HitData UCombatStatics::GenerateHitDataFromHitboxDescription( TObjectPtr<AActor> HitboxOwner, TObjectPtr<USkeletalMeshComponent> SkeletalMesh,
-                                                              const FHitboxDescription& HitboxDesc, int Id, int32 GroupId )
+                                                              const FHitboxDescription& HitboxDesc, int Id, int32 GroupId,
+                                                              TArray<TObjectPtr<AActor>> AdditionalActorsToIgnore /*= {}*/ )
 {
 	FName socketName;
 	IFacingEntity* facingEntity = Cast<IFacingEntity>( HitboxOwner );
@@ -120,7 +121,8 @@ HitData UCombatStatics::GenerateHitDataFromHitboxDescription( TObjectPtr<AActor>
 	                targetLocation,
 	                Id,
 	                GroupId,
-	                HitboxDesc.m_Priority );
+	                HitboxDesc.m_Priority,
+	                AdditionalActorsToIgnore );
 }
 
 FVector UCombatStatics::GetKnockbackFromOrientation( IFacingEntity* FacingEntity, float Orientation )

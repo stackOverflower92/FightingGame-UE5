@@ -22,6 +22,9 @@ protected:
 	UPROPERTY( EditAnywhere, DisplayName = "Spawn Offset (Account Facing)" )
 	FVector m_SpawnOffset;
 
+	UPROPERTY( EditAnywhere, DisplayName = "Base Speed" )
+	float m_BaseSpeed = 100.f;
+
 	UPROPERTY( EditAnywhere, DisplayName = "Lifetime" )
 	float m_Lifetime = -1.f;
 };

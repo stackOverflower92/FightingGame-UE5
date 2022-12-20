@@ -27,7 +27,7 @@ protected:
 public:
 	FDestroyRequested m_DestroyRequestedDelegate;
 
-	void Init( TObjectPtr<AActor> OwnerActor, FVector Location, float HorizontalDirectionMultiplier, float Lifetime = -1.f );
+	void Init( TObjectPtr<AActor> OwnerActor, FVector Location, float HorizontalDirectionMultiplier, float BaseSpeed, float Lifetime = -1.f );
 
 	virtual void OnHitReceived( const HitData& HitData ) override;
 
@@ -46,8 +46,14 @@ protected:
 	UPROPERTY()
 	TObjectPtr<AActor> m_Owner = nullptr;
 
+	/*
+	 * -1: left, 1: right
+	 */
+	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Horizontal Direction Multiplier" )
 	float m_HorizontalDirectionMultiplier = 0.f;
-	float m_Lifetime                      = -1.f;
+
+	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Lifetime" )
+	float m_Lifetime = -1.f;
 
 	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Base Speed" )
 	float m_BaseSpeed = 10.f;
