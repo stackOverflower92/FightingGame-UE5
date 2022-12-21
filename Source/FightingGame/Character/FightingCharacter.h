@@ -150,6 +150,9 @@ protected:
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Push Box Shift Rate (Per Frame)" )
 	float m_PushboxShiftRatePerFrame = 0.1f;
 
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Use Velocity for Pushbox Force" )
+	bool m_UseVelocityForPushboxForce = false;
+
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Gravity Scale (Regular)" )
 	float m_RegularGravityScale = 1.f;
 

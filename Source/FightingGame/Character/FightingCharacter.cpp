@@ -17,13 +17,13 @@
 namespace
 {
 	int32 loc_DebugDamageStats = 0;
-	FG_CVAR_DESC( CVarDebugDamageStats, TEXT("FightingCharacter.DebugDamageStats"), TEXT("1: enable, 0: disable"), loc_DebugDamageStats );
+	FG_CVAR_FLAG_DESC( CVarDebugDamageStats, TEXT("FightingCharacter.DebugDamageStats"), loc_DebugDamageStats );
 
 	int32 loc_DebugFacing = 0;
-	FG_CVAR_DESC( CVarDebugFacing, TEXT("FightingCharacter.DebugFacing"), TEXT("1: enable, 0: disable"), loc_DebugFacing );
+	FG_CVAR_FLAG_DESC( CVarDebugFacing, TEXT("FightingCharacter.DebugFacing"), loc_DebugFacing );
 
 	int32 loc_DebugEnableShake = 0;
-	FG_CVAR_DESC( CVarDebugEnableShake, TEXT("FightingCharacter.DebugEnableShake"), TEXT("1: enable, 0: disable"), loc_DebugEnableShake );
+	FG_CVAR_FLAG_DESC( CVarDebugEnableShake, TEXT( "FightingCharacter.DebugEnableShake" ), loc_DebugEnableShake );
 }
 
 AFightingCharacter::AFightingCharacter()
@@ -391,11 +391,18 @@ void AFightingCharacter::UpdatePushbox( float DeltaTime )
 					bool isOtherOnTheRight     = otherActor->GetActorLocation().Y > GetActorLocation().Y;
 					float myShiftingMultiplier = isOtherOnTheRight ? -1.f : 1.f;
 
-					const FVector currentLocation      = GetActorLocation();
-					const float nextHorizontalPosition = currentLocation.Y + (m_PushboxShiftRatePerFrame * myShiftingMultiplier * DeltaTime);
-					const FVector nextLocation         = FVector( currentLocation.X, nextHorizontalPosition, currentLocation.Z );
+					if( m_UseVelocityForPushboxForce )
+					{
+						GetCharacterMovement()->Velocity += FVector( 0.f, myShiftingMultiplier * m_PushboxShiftRatePerFrame, 0.f );
+					}
+					else
+					{
+						const FVector currentLocation      = GetActorLocation();
+						const float nextHorizontalPosition = currentLocation.Y + (m_PushboxShiftRatePerFrame * myShiftingMultiplier * DeltaTime);
+						const FVector nextLocation         = FVector( currentLocation.X, nextHorizontalPosition, currentLocation.Z );
 
-					SetActorLocation( nextLocation );
+						SetActorLocation( nextLocation );
+					}
 				}
 			}
 		}
