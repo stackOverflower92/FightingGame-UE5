@@ -10,7 +10,7 @@
 namespace
 {
 	int32 loc_ProjectileDebugFacing = 0;
-	FG_CVAR_DESC( CVarProjectileDebugFacing, TEXT("Projectile.DebugFacing"), TEXT("1: enable, 0: disable"), loc_ProjectileDebugFacing );
+	FG_CVAR_FLAG_DESC( CVarProjectileDebugFacing, TEXT("Projectile.DebugFacing"), loc_ProjectileDebugFacing );
 }
 
 AProjectile::AProjectile()

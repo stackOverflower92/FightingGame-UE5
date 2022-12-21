@@ -10,7 +10,7 @@
 namespace
 {
 	int32 loc_ShowHitStopState = 0;
-	FG_CVAR_DESC( CVarShowHitStopState, TEXT( "HitStopComponent.ShowHitStopState" ), TEXT("1: Enable, 0: Disable"), loc_ShowHitStopState );
+	FG_CVAR_FLAG_DESC( CVarShowHitStopState, TEXT( "HitStopComponent.ShowHitStopState" ), loc_ShowHitStopState );
 }
 
 UHitStopComponent::UHitStopComponent()

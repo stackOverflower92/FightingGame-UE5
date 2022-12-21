@@ -12,7 +12,7 @@
 namespace
 {
 	int32 loc_ShowHitboxTraces = 0;
-	FG_CVAR_DESC( CVarShowHitboxTraces, TEXT( "HitboxHandlerComponent.ShowHitboxTraces" ), TEXT("1: Enable, 0: Disable"), loc_ShowHitboxTraces );
+	FG_CVAR_FLAG_DESC( CVarShowHitboxTraces, TEXT( "HitboxHandlerComponent.ShowHitboxTraces" ), loc_ShowHitboxTraces );
 }
 
 UHitboxHandlerComponent::UHitboxHandlerComponent()
@@ -136,8 +136,11 @@ bool UHitboxHandlerComponent::TraceHitbox( const HitData& HitData, FHitResult& O
 
 	FVector location = GetHitTraceLocation( HitData );
 
+	TArray<TObjectPtr<AActor>> actorsToIgnore;
+	HitData.GetActorsToIgnore( actorsToIgnore );
+
 	bool didHit = UKismetSystemLibrary::SphereTraceSingleForObjects( HitData.m_World, location, location, HitData.m_Radius, targetTraceTypes,
-	                                                                 false, HitData.GetActorsToIgnore(), EDrawDebugTrace::None, OutHit, true );
+	                                                                 false, actorsToIgnore, EDrawDebugTrace::None, OutHit, true );
 
 	return didHit;
 }

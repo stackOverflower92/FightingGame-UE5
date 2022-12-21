@@ -26,13 +26,15 @@ struct HitData
 	                  const FName& InSocketToFollow,
 	                  FVector InLocation, uint32 InId, int InGroupId, int InPriority, const TArray<TObjectPtr<AActor>>& InAdditionalActorsToIgnore );
 
-	TArray<TObjectPtr<AActor>> GetActorsToIgnore() const
-	
+	void GetActorsToIgnore( TArray<TObjectPtr<AActor>>& OutActors ) const
 	{
-		TArray<TObjectPtr<AActor>> excluded = m_AdditionalActorsToIgnore;
-		excluded.Add( m_Owner );
+		OutActors.Reset();
 
-		return excluded;
+		OutActors.Emplace( m_Owner );
+		for( int i = 0; i < m_AdditionalActorsToIgnore.Num(); ++i )
+		{
+			OutActors.Emplace( m_AdditionalActorsToIgnore[i] );
+		}
 	}
 
 	friend bool operator==( const HitData& Lhs, const HitData& RHS );

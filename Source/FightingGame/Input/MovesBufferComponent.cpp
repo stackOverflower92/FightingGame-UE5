@@ -16,7 +16,7 @@ namespace
 
 	// CVars
 	int32 loc_ShowInputBuffer = 0;
-	FG_CVAR_DESC( CVarShowInputBuffer, TEXT( "MovesBufferComponent.ShowInputBuffer" ), TEXT( "1: Enable, 0: Disable" ), loc_ShowInputBuffer );
+	FG_CVAR_FLAG_DESC( CVarShowInputBuffer, TEXT( "MovesBufferComponent.ShowInputBuffer" ), loc_ShowInputBuffer );
 }
 
 UMovesBufferComponent::UMovesBufferComponent()
