@@ -184,7 +184,7 @@ private:
 	void UpdateYaw( float DeltaTime );
 	void UpdateVerticalScale();
 
-	void OnHitLanded( AActor* Target, const HitData& HitData );
+	void OnHitLanded( TObjectPtr<AActor> Target, const HitData& HitData );
 	void StartHitLandedTimer();
 	void OnHitLandedTimerEnded();
 

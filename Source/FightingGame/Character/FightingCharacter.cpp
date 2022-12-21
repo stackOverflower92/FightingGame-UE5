@@ -291,7 +291,7 @@ void AFightingCharacter::UpdateVerticalScale()
 	GetMesh()->SetRelativeScale3D( Scale );
 }
 
-void AFightingCharacter::OnHitLanded( AActor* Target, const HitData& HitData )
+void AFightingCharacter::OnHitLanded( TObjectPtr<AActor> Target, const HitData& HitData )
 {
 	m_HitLandedDelegate.Broadcast( Target );
 
