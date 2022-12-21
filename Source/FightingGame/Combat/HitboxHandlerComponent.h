@@ -11,7 +11,7 @@
 class AHitboxVisualizer;
 struct FHitboxDescription;
 
-DECLARE_MULTICAST_DELEGATE_TwoParams( FHit, AActor*, const HitData& )
+DECLARE_MULTICAST_DELEGATE_TwoParams( FHit, TObjectPtr<AActor>, const HitData& )
 
 struct FHitGroupPair
 {

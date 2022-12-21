@@ -23,11 +23,6 @@ AProjectile::AProjectile()
 	m_HitboxHandler = CreateDefaultSubobject<UHitboxHandlerComponent>( TEXT( "Hitbox Handler" ) );
 }
 
-void AProjectile::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
 void AProjectile::Init( TObjectPtr<AActor> OwnerActor, FVector Location, float HorizontalDirectionMultiplier, float BaseSpeed, float Lifetime /* = -1.f*/ )
 {
 	m_Owner                         = OwnerActor;
@@ -83,7 +78,7 @@ void AProjectile::OnLifetimeTimerEnded()
 	m_DestroyRequestedDelegate.Broadcast( this );
 }
 
-void AProjectile::OnHitLanded( AActor* /*Target*/, const HitData& /*HitData*/ )
+void AProjectile::OnHitLanded( TObjectPtr<AActor> /*Target*/, const HitData& /*HitData*/ )
 {
 	m_DestroyRequestedDelegate.Broadcast( this );
 }

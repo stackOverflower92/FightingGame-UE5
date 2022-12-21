@@ -5,6 +5,7 @@
 #include "FightingGame/Combat/MoveDataAsset.h"
 #include "FightingGame/Animation/FightingCharacterAnimInstance.h"
 #include "FightingGame/Combat/HitboxDescription.h"
+#include "FightingGame/Debugging/Debug.h"
 
 namespace
 {
@@ -16,20 +17,20 @@ bool UCombatStatics::ExecuteMove( AFightingCharacter* Character, UMoveDataAsset*
 {
 	if( !Character )
 	{
-		UE_LOG( LogTemp, Error, TEXT( "Character is null" ) );
+		FG_SLOG_ERR( TEXT( "Character is null" ) );
 		return false;
 	}
 
 	if( !Move )
 	{
-		UE_LOG( LogTemp, Error, TEXT( "Move data asset is null" ) );
+		FG_SLOG_ERR( TEXT( "Move data asset is null" ) );
 		return false;
 	}
 
 	USkeletalMeshComponent* Mesh = Character->GetMesh();
 	if( !Mesh )
 	{
-		UE_LOG( LogTemp, Error, TEXT( "Character has no skeletal mesh" ) );
+		FG_SLOG_ERR( TEXT( "Character has no skeletal mesh" ) );
 		return false;
 	}
 
@@ -38,7 +39,7 @@ bool UCombatStatics::ExecuteMove( AFightingCharacter* Character, UMoveDataAsset*
 		UFightingCharacterAnimInstance* Inst = Cast<UFightingCharacterAnimInstance>( Mesh->GetAnimInstance() );
 		if( !Inst )
 		{
-			UE_LOG( LogTemp, Error, TEXT( "Anim instance must be UFightingCharacterAnimInstance type" ) );
+			FG_SLOG_ERR( TEXT( "Anim instance must be UFightingCharacterAnimInstance type" ) );
 			return false;
 		}
 
@@ -48,17 +49,17 @@ bool UCombatStatics::ExecuteMove( AFightingCharacter* Character, UMoveDataAsset*
 	return true;
 }
 
-bool UCombatStatics::FaceOther( IFacingEntity* A, AActor* B, bool Instant /*= false*/ )
+bool UCombatStatics::FaceOther( TObjectPtr<IFacingEntity> A, TObjectPtr<AActor> B, bool Instant /*= false*/ )
 {
 	if( !A )
 	{
-		UE_LOG( LogTemp, Error, TEXT("Character A is null") );
+		FG_SLOG_ERR( TEXT("Character A is null") );
 		return false;
 	}
 
 	if( !B )
 	{
-		UE_LOG( LogTemp, Error, TEXT("Actor B is null") );
+		FG_SLOG_ERR( TEXT( "Actor B is null" ) );
 		return false;
 	}
 
@@ -68,11 +69,11 @@ bool UCombatStatics::FaceOther( IFacingEntity* A, AActor* B, bool Instant /*= fa
 	return true;
 }
 
-bool UCombatStatics::FaceLocation( IFacingEntity* A, const FVector& Location )
+bool UCombatStatics::FaceLocation( TObjectPtr<IFacingEntity> A, const FVector& Location )
 {
 	if( !A )
 	{
-		UE_LOG( LogTemp, Error, TEXT("Character A is null") );
+		FG_SLOG_ERR( TEXT( "Character A is null" ) );
 		return false;
 	}
 
@@ -125,7 +126,7 @@ HitData UCombatStatics::GenerateHitDataFromHitboxDescription( TObjectPtr<AActor>
 	                AdditionalActorsToIgnore );
 }
 
-FVector UCombatStatics::GetKnockbackFromOrientation( IFacingEntity* FacingEntity, float Orientation )
+FVector UCombatStatics::GetKnockbackFromOrientation( TObjectPtr<IFacingEntity> FacingEntity, float Orientation )
 {
 	ensureMsgf( FacingEntity, TEXT("Character is null") );
 
@@ -138,7 +139,7 @@ bool UCombatStatics::ApplyKnockbackTo( const FVector& Direction, float Force, AF
 {
 	if( !Character )
 	{
-		UE_LOG( LogTemp, Error, TEXT("Character is null") );
+		FG_SLOG_ERR( TEXT("Character is null") );
 		return false;
 	}
 

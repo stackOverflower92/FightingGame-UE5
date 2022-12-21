@@ -21,10 +21,6 @@ class FIGHTINGGAME_API AProjectile : public AActor, public IFacingEntity
 public:
 	AProjectile();
 
-protected:
-	virtual void BeginPlay() override;
-
-public:
 	FDestroyRequested m_DestroyRequestedDelegate;
 
 	void Init( TObjectPtr<AActor> OwnerActor, FVector Location, float HorizontalDirectionMultiplier, float BaseSpeed, float Lifetime = -1.f );
@@ -45,7 +41,7 @@ protected:
 	TObjectPtr<AActor> m_Owner = nullptr;
 
 	/*
-	 * -1: left, 1: right
+	 * -1: Left (negative Y), 1: Right (positive Y)
 	 */
 	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Horizontal Direction Multiplier" )
 	float m_HorizontalDirectionMultiplier = 0.f;
@@ -66,5 +62,5 @@ private:
 	FTimerHandle m_LifetimeTimerHandle;
 	void OnLifetimeTimerEnded();
 
-	void OnHitLanded( AActor* Target, const HitData& HitData );
+	void OnHitLanded( TObjectPtr<AActor> Target, const HitData& HitData );
 };

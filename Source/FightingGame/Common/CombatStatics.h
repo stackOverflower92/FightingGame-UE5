@@ -22,15 +22,15 @@ public:
 	UFUNCTION( BlueprintCallable, Category = "Combat" )
 	static bool ExecuteMove( AFightingCharacter* Character, UMoveDataAsset* Move );
 
-	static bool FaceOther( IFacingEntity* A, AActor* B, bool Instant = false );
+	static bool FaceOther( TObjectPtr<IFacingEntity> A, TObjectPtr<AActor> B, bool Instant = false );
 
-	static bool FaceLocation( IFacingEntity* A, const FVector& Location );
+	static bool FaceLocation( TObjectPtr<IFacingEntity> A, const FVector& Location );
 
 	static HitData GenerateHitDataFromHitboxDescription( TObjectPtr<AActor> HitboxOwner, TObjectPtr<USkeletalMeshComponent> SkeletalMesh,
 	                                                     const FHitboxDescription& HitboxDesc, int Id, int32 GroupId,
 	                                                     TArray<TObjectPtr<AActor>> AdditionalActorsToIgnore = {} );
 
-	static FVector GetKnockbackFromOrientation( IFacingEntity* FacingEntity, float Orientation );
+	static FVector GetKnockbackFromOrientation( TObjectPtr<IFacingEntity> FacingEntity, float Orientation );
 
 	UFUNCTION( BlueprintCallable, Category = "Combat" )
 	static bool ApplyKnockbackTo( const FVector& Direction, float Force, AFightingCharacter* Character, bool IgnoreMultiplier );
