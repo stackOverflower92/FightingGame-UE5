@@ -149,12 +149,12 @@ bool UCombatStatics::ApplyKnockbackTo( const FVector& Direction, float Force, AF
 	return true;
 }
 
-float UCombatStatics::GetMinCustomTimeDilation()
+float UCombatStatics::GetHitStopTimeDilation()
 {
 	return loc_MinCustomTimeDilation;
 }
 
-float UCombatStatics::GetHitStunInitialDelay()
+float UCombatStatics::GetHitStopInitialDelay()
 {
 	return loc_HitStunInitialDelay;
 }

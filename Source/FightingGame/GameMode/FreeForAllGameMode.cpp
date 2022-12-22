@@ -16,6 +16,7 @@ void AFreeForAllGameMode::BeginPlay()
 	SpawnCharacters();
 }
 
+// #TODO check which part of this class can be moved to GameState
 void AFreeForAllGameMode::SpawnCharacters()
 {
 	UWorld* world = GetWorld();
@@ -35,21 +36,21 @@ void AFreeForAllGameMode::SpawnCharacters()
 
 	for( int i = 0; i < m_AdditionalPlayers + 1; ++i )
 	{
-		APlayerController* player = i == 0 ? UGameplayStatics::GetPlayerController( world, 0 ) : UGameplayStatics::CreatePlayer( GetWorld() );
+		TObjectPtr<APlayerController> player = i == 0 ? UGameplayStatics::GetPlayerController( world, 0 ) : UGameplayStatics::CreatePlayer( GetWorld() );
 		//ABasePlayerState* playerState = Cast<ABasePlayerState>( player->PlayerState );
 		//playerState->CustomSetPlayerName( FName( FString::Printf( TEXT( "Player %d" ), i ) ) );
 
 		m_PlayerControllers.Emplace( player );
 
-		APlayerStart* start           = m_PlayerStarts[i];
-		AFightingCharacter* character = GetWorld()->SpawnActor<AFightingCharacter>( m_CharacterClass, start->GetTransform() );
-		character->m_PlayerIndex      = i;
+		TObjectPtr<APlayerStart> start           = m_PlayerStarts[i];
+		TObjectPtr<AFightingCharacter> character = GetWorld()->SpawnActor<AFightingCharacter>( m_CharacterClass, start->GetTransform() );
+		character->m_PlayerIndex                 = i;
 
 		m_Characters.Emplace( character );
 
 		player->Possess( character );
 
-		if( auto* facingEntity = Cast<IFacingEntity>( character ) )
+		if( TObjectPtr<IFacingEntity> facingEntity = Cast<IFacingEntity>( character ) )
 		{
 			UCombatStatics::FaceLocation( facingEntity, FVector::ZeroVector );
 		}
@@ -59,12 +60,9 @@ void AFreeForAllGameMode::SpawnCharacters()
 		}
 	}
 
-	EnablePlayersInput( true );
+	InitCameraManager();
 
-	if( m_CameraManager )
-	{
-		m_CameraManager->Init();
-	}
+	EnablePlayersInput( true );
 }
 
 void AFreeForAllGameMode::EnablePlayersInput( bool Enable )

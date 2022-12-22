@@ -147,6 +147,12 @@ protected:
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Push Box" )
 	TObjectPtr<UBoxComponent> m_Pushbox = nullptr;
 
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Wall Box (Back)" )
+	TObjectPtr<UBoxComponent> m_BackWallBox = nullptr;
+
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Wall Box (Front)" )
+	TObjectPtr<UBoxComponent> m_FrontWallBox = nullptr;
+
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Push Box Shift Rate (Per Frame)" )
 	float m_PushboxShiftRatePerFrame = 0.1f;
 
@@ -194,6 +200,8 @@ private:
 	void InitTimeDilations();
 	void InitPushbox();
 	void UpdatePushbox( float DeltaTime );
+	void InitWallBoxes();
+	void UpdateWallBoxes();
 
 	void UpdateGravityScale();
 };

@@ -8,6 +8,8 @@ class ACameraManager;
 class AFightingCharacter;
 class APlayerStart;
 
+// #TODO check which part of this class can be moved to GameState
+
 UCLASS()
 class FIGHTINGGAME_API AFreeForAllGameMode : public AFightingGameGameModeBase
 {
@@ -23,14 +25,9 @@ protected:
 	int m_AdditionalPlayers = 0;
 
 private:
-	UPROPERTY()
-	TArray<APlayerStart*> m_PlayerStarts;
-
-	UPROPERTY()
-	TArray<APlayerController*> m_PlayerControllers;
-
-	UPROPERTY()
-	TArray<AFightingCharacter*> m_Characters;
+	TArray<TObjectPtr<APlayerStart>> m_PlayerStarts;
+	TArray<TObjectPtr<APlayerController>> m_PlayerControllers;
+	TArray<TObjectPtr<AFightingCharacter>> m_Characters;
 
 	void SpawnCharacters();
 	void EnablePlayersInput( bool Enable );

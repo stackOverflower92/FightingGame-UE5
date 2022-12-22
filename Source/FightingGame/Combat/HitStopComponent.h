@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "FightingGame/Common/GameFramework.h"
 #include "HitStopComponent.generated.h"
 
+class ACombatManager;
 class AFightingCharacter;
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class FIGHTINGGAME_API UHitStopComponent : public UActorComponent

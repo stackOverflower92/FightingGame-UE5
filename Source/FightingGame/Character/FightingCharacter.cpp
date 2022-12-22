@@ -409,6 +409,37 @@ void AFightingCharacter::UpdatePushbox( float DeltaTime )
 	}
 }
 
+void AFightingCharacter::InitWallBoxes()
+{
+	TArray<UActorComponent*> frontWallBoxes = GetComponentsByTag( UBoxComponent::StaticClass(), TEXT( "FrontWallbox" ) );
+	ensure( frontWallBoxes.Num() <= 1 );
+
+	if( frontWallBoxes.Num() > 0 )
+	{
+		m_FrontWallBox = Cast<UBoxComponent>( frontWallBoxes[0] );
+		if( !m_FrontWallBox )
+		{
+			FG_SLOG_WARN( FString::Printf( TEXT( "Character [%s] has no Front Wallbox"), *GetName() ) );
+		}
+	}
+
+	TArray<UActorComponent*> backWallBoxes = GetComponentsByTag( UBoxComponent::StaticClass(), TEXT( "BackWallbox" ) );
+	ensure( frontWallBoxes.Num() <= 1 );
+
+	if( backWallBoxes.Num() > 0 )
+	{
+		m_BackWallBox = Cast<UBoxComponent>( backWallBoxes[0] );
+		if( !m_BackWallBox )
+		{
+			FG_SLOG_WARN( FString::Printf( TEXT( "Character [%s] has no Back Wallbox"), *GetName() ) );
+		}
+	}
+}
+
+void AFightingCharacter::UpdateWallBoxes()
+{
+}
+
 void AFightingCharacter::UpdateGravityScale()
 {
 	float verticalVelocity = GetVelocity().Z;

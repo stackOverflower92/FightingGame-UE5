@@ -36,8 +36,8 @@ public:
 	static bool ApplyKnockbackTo( const FVector& Direction, float Force, AFightingCharacter* Character, bool IgnoreMultiplier );
 
 	UFUNCTION( BlueprintCallable, Category = "Combat" )
-	static float GetMinCustomTimeDilation();
+	static float GetHitStopTimeDilation();
 
 	UFUNCTION( BlueprintCallable, Category = "Combat" )
-	static float GetHitStunInitialDelay();
+	static float GetHitStopInitialDelay();
 };
