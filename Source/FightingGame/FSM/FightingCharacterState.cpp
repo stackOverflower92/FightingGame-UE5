@@ -36,18 +36,23 @@ void UFightingCharacterState::Enter_Implementation()
 	m_AnimInstance->m_MontageEvent.AddDynamic( this, &UFightingCharacterState::OnMontageEvent );
 
 	m_CharacterHitLandedHandle = m_OwnerCharacter->m_HitLandedDelegate.AddUObject( this, &UFightingCharacterState::OnCharacterHitLanded );
-	m_CharacterGroundedHandle = m_OwnerCharacter->m_GroundedDelegate.AddUObject( this, &UFightingCharacterState::OnCharacterGrounded );
-	m_CharacterAirborneHandle = m_OwnerCharacter->m_AirborneDelegate.AddUObject( this, &UFightingCharacterState::OnCharacterAirborne );
+	m_CharacterGroundedHandle  = m_OwnerCharacter->m_GroundedDelegate.AddUObject( this, &UFightingCharacterState::OnCharacterGrounded );
+	m_CharacterAirborneHandle  = m_OwnerCharacter->m_AirborneDelegate.AddUObject( this, &UFightingCharacterState::OnCharacterAirborne );
 
 	if( m_MoveToExecute )
 	{
 		UCombatStatics::ExecuteMove( m_OwnerCharacter, m_MoveToExecute );
 	}
 
-	// #TODO what happens with AI?
-	if( m_IsReaction && m_OwnerCharacter->IsPlayerControlled() )
+	if( m_IsReaction )
 	{
-		m_OwnerCharacter->DisableInput( Cast<APlayerController>( m_OwnerCharacter->GetController() ) );
+		m_OwnerCharacter->m_IsReacting = true;
+
+		// #TODO what happens with AI?
+		if( m_OwnerCharacter->IsPlayerControlled() )
+		{
+			m_OwnerCharacter->DisableInput( Cast<APlayerController>( m_OwnerCharacter->GetController() ) );
+		}
 	}
 
 	for( auto Pair : m_InstancedTransitions )
@@ -69,11 +74,17 @@ void UFightingCharacterState::Exit_Implementation()
 	m_OwnerCharacter->m_GroundedDelegate.Remove( m_CharacterGroundedHandle );
 	m_OwnerCharacter->m_AirborneDelegate.Remove( m_CharacterAirborneHandle );
 
-	// #TODO what happens with AI?
-	if( m_IsReaction && m_OwnerCharacter->IsPlayerControlled() )
+	if( m_IsReaction )
 	{
-		m_OwnerCharacter->EnableInput( Cast<APlayerController>( m_OwnerCharacter->GetController() ) );
+		m_OwnerCharacter->m_IsReacting = false;
+
+		// #TODO what happens with AI?
+		if( m_OwnerCharacter->IsPlayerControlled() )
+		{
+			m_OwnerCharacter->EnableInput( Cast<APlayerController>( m_OwnerCharacter->GetController() ) );
+		}
 	}
+
 
 	for( auto Pair : m_InstancedTransitions )
 	{
@@ -109,11 +120,11 @@ void UFightingCharacterState::OnMontageEvent( UAnimMontage* Montage, EMontageEve
 	// #TODO handle other cases
 	switch( EventType )
 	{
-	case EMontageEventType::Ended:
-		{
-			OnMontageEnded( Montage );
-			break;
-		}
+		case EMontageEventType::Ended:
+			{
+				OnMontageEnded( Montage );
+				break;
+			}
 	}
 }
 

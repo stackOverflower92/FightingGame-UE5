@@ -37,6 +37,9 @@ public:
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Current Horizontal Movement" )
 	float m_CurrentHorizontalMovement = 0.f;
 
+	UPROPERTY( BlueprintReadOnly, DisplayName = "Is Reacting" )
+	bool m_IsReacting = false;
+
 	UFUNCTION( BlueprintCallable )
 	virtual bool IsAirborne() const override;
 
