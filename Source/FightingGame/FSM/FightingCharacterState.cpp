@@ -55,6 +55,8 @@ void UFightingCharacterState::Enter_Implementation()
 		}
 	}
 
+	m_OwnerCharacter->m_PretendIsGrounded = m_PretendIsGrounded;
+
 	for( auto Pair : m_InstancedTransitions )
 	{
 		Pair.Value->OnStateEnter();
@@ -85,6 +87,7 @@ void UFightingCharacterState::Exit_Implementation()
 		}
 	}
 
+	m_OwnerCharacter->m_PretendIsGrounded = false;
 
 	for( auto Pair : m_InstancedTransitions )
 	{

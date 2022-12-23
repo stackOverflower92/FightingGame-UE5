@@ -40,6 +40,9 @@ public:
 	UPROPERTY( BlueprintReadOnly, DisplayName = "Is Reacting" )
 	bool m_IsReacting = false;
 
+	UPROPERTY( BlueprintReadOnly, DisplayName = "Pretend is Grounded" )
+	bool m_PretendIsGrounded = false;
+
 	UFUNCTION( BlueprintCallable )
 	virtual bool IsAirborne() const override;
 

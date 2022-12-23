@@ -44,6 +44,9 @@ protected:
 	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Update Movement" )
 	bool m_UpdateMovement = false;
 
+	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Pretend is Grounded" )
+	bool m_PretendIsGrounded = false;
+
 	UFUNCTION()
 	void OnMontageEvent( UAnimMontage* Montage, EMontageEventType EventType );
 
