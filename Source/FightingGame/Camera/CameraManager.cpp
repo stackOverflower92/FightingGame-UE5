@@ -8,54 +8,54 @@
 
 ACameraManager::ACameraManager()
 {
-	PrimaryActorTick.bCanEverTick = true;
+    PrimaryActorTick.bCanEverTick = true;
 }
 
 void ACameraManager::BeginPlay()
 {
-	Super::BeginPlay();
+    Super::BeginPlay();
 }
 
 void ACameraManager::Tick( float DeltaTime )
 {
-	Super::Tick( DeltaTime );
+    Super::Tick( DeltaTime );
 }
 
 void ACameraManager::Init()
 {
-	TArray<TObjectPtr<AActor>> AllGameCameraActors;
-	UGameplayStatics::GetAllActorsOfClass( GetWorld(), AGameCamera::StaticClass(), AllGameCameraActors );
+    TArray<TObjectPtr<AActor>> AllGameCameraActors;
+    UGameplayStatics::GetAllActorsOfClass( GetWorld(), AGameCamera::StaticClass(), AllGameCameraActors );
 
-	for( int i = 0; i < AllGameCameraActors.Num(); ++i )
-	{
-		m_GameCameras.Emplace( Cast<AGameCamera>( AllGameCameraActors[i] ) );
-	}
+    for( int32 i = 0; i < AllGameCameraActors.Num(); ++i )
+    {
+        m_GameCameras.Emplace( Cast<AGameCamera>( AllGameCameraActors[i] ) );
+    }
 
-	if( !m_FirstCameraId.IsEmpty() )
-	{
-		if( ! SetCamera( m_FirstCameraId ) )
-		{
-			UE_LOG( LogTemp, Error, TEXT("Could not set camera with id [%s]"), *m_FirstCameraId );
-		}
-	}
+    if( !m_FirstCameraId.IsEmpty() )
+    {
+        if( !SetCamera( m_FirstCameraId ) )
+        {
+            UE_LOG( LogTemp, Error, TEXT("Could not set camera with id [%s]"), *m_FirstCameraId );
+        }
+    }
 }
 
 bool ACameraManager::SetCamera( FString Id )
 {
-	if( APlayerController* PC = UGameplayStatics::GetPlayerController( GetWorld(), 0 ) )
-	{
-		auto* It = m_GameCameras.FindByPredicate( [&]( AGameCamera* Camera )
-		{
-			return Camera->GetId() == Id;
-		} );
+    if( APlayerController* PC = UGameplayStatics::GetPlayerController( GetWorld(), 0 ) )
+    {
+        auto* It = m_GameCameras.FindByPredicate( [&]( AGameCamera* Camera )
+        {
+            return Camera->GetId() == Id;
+        } );
 
-		if( !It ) return false;
+        if( !It ) return false;
 
-		PC->SetViewTargetWithBlend( *It );
-		(*It)->OnViewSet();
+        PC->SetViewTargetWithBlend( *It );
+        (*It)->OnViewSet();
 
-		return true;
-	}
+        return true;
+    }
 
-	return false;
+    return false;
 }

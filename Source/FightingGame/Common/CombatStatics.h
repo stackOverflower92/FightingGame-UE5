@@ -16,28 +16,28 @@ class UMoveDataAsset;
 UCLASS()
 class FIGHTINGGAME_API UCombatStatics : public UBlueprintFunctionLibrary
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	UFUNCTION( BlueprintCallable, Category = "Combat" )
-	static bool ExecuteMove( AFightingCharacter* Character, UMoveDataAsset* Move );
+    UFUNCTION( BlueprintCallable, Category = "Combat" )
+    static bool ExecuteMove( AFightingCharacter* Character, UMoveDataAsset* Move );
 
-	static bool FaceOther( TObjectPtr<IFacingEntity> A, TObjectPtr<AActor> B, bool Instant = false );
+    static bool FaceOther( TObjectPtr<IFacingEntity> A, TObjectPtr<AActor> B, bool Instant = false );
 
-	static bool FaceLocation( TObjectPtr<IFacingEntity> A, const FVector& Location );
+    static bool FaceLocation( TObjectPtr<IFacingEntity> A, const FVector& Location );
 
-	static HitData GenerateHitDataFromHitboxDescription( TObjectPtr<AActor> HitboxOwner, TObjectPtr<USkeletalMeshComponent> SkeletalMesh,
-	                                                     const FHitboxDescription& HitboxDesc, int Id, int32 GroupId,
-	                                                     TArray<TObjectPtr<AActor>> AdditionalActorsToIgnore = {} );
+    static HitData GenerateHitDataFromHitboxDescription( TObjectPtr<AActor> HitboxOwner, TObjectPtr<USkeletalMeshComponent> SkeletalMesh,
+                                                         const FHitboxDescription& HitboxDesc, int32 Id, int32 GroupId,
+                                                         TArray<TObjectPtr<AActor>> AdditionalActorsToIgnore = {} );
 
-	static FVector GetKnockbackFromOrientation( TObjectPtr<IFacingEntity> FacingEntity, float Orientation );
+    static FVector GetKnockbackFromOrientation( TObjectPtr<IFacingEntity> FacingEntity, float Orientation );
 
-	UFUNCTION( BlueprintCallable, Category = "Combat" )
-	static bool ApplyKnockbackTo( const FVector& Direction, float Force, AFightingCharacter* Character, bool IgnoreMultiplier );
+    UFUNCTION( BlueprintCallable, Category = "Combat" )
+    static bool ApplyKnockbackTo( const FVector& Direction, float Force, AFightingCharacter* Character, bool IgnoreMultiplier );
 
-	UFUNCTION( BlueprintCallable, Category = "Combat" )
-	static float GetHitStopTimeDilation();
+    UFUNCTION( BlueprintCallable, Category = "Combat" )
+    static float GetHitStopTimeDilation();
 
-	UFUNCTION( BlueprintCallable, Category = "Combat" )
-	static float GetHitStopInitialDelay();
+    UFUNCTION( BlueprintCallable, Category = "Combat" )
+    static float GetHitStopInitialDelay();
 };

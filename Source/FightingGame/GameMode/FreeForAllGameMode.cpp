@@ -1,7 +1,6 @@
 #include "FreeForAllGameMode.h"
 
 #include "EngineUtils.h"
-#include "FightingGame/Camera/CameraManager.h"
 #include "FightingGame/Character/FightingCharacter.h"
 #include "FightingGame/Common/CombatStatics.h"
 #include "FightingGame/Debugging/Debug.h"
@@ -11,74 +10,74 @@
 
 void AFreeForAllGameMode::BeginPlay()
 {
-	Super::BeginPlay();
+    Super::BeginPlay();
 
-	SpawnCharacters();
+    SpawnCharacters();
 }
 
 // #TODO check which part of this class can be moved to GameState
 void AFreeForAllGameMode::SpawnCharacters()
 {
-	UWorld* world = GetWorld();
-	for( TActorIterator<APlayerStart> it( world ); it; ++it )
-	{
-		// TODO: missing checks
-		m_PlayerStarts.Emplace( *it );
-	}
+    UWorld* world = GetWorld();
+    for( TActorIterator<APlayerStart> it( world ); it; ++it )
+    {
+        // TODO: missing checks
+        m_PlayerStarts.Emplace( *it );
+    }
 
-	m_PlayerStarts.Sort( []( const APlayerStart& A, const APlayerStart& B )
-	{
-		int32 AStartTag = UKismetStringLibrary::Conv_StringToInt( A.PlayerStartTag.ToString().TrimStartAndEnd() );
-		int32 BStartTag = UKismetStringLibrary::Conv_StringToInt( B.PlayerStartTag.ToString().TrimStartAndEnd() );
+    m_PlayerStarts.Sort( []( const APlayerStart& A, const APlayerStart& B )
+    {
+        int32 AStartTag = UKismetStringLibrary::Conv_StringToInt( A.PlayerStartTag.ToString().TrimStartAndEnd() );
+        int32 BStartTag = UKismetStringLibrary::Conv_StringToInt( B.PlayerStartTag.ToString().TrimStartAndEnd() );
 
-		return AStartTag < BStartTag;
-	} );
+        return AStartTag < BStartTag;
+    } );
 
-	for( int i = 0; i < m_AdditionalPlayers + 1; ++i )
-	{
-		TObjectPtr<APlayerController> player = i == 0 ? UGameplayStatics::GetPlayerController( world, 0 ) : UGameplayStatics::CreatePlayer( GetWorld() );
-		//ABasePlayerState* playerState = Cast<ABasePlayerState>( player->PlayerState );
-		//playerState->CustomSetPlayerName( FName( FString::Printf( TEXT( "Player %d" ), i ) ) );
+    for( int32 i = 0; i < m_AdditionalPlayers + 1; ++i )
+    {
+        TObjectPtr<APlayerController> player = i == 0 ? UGameplayStatics::GetPlayerController( world, 0 ) : UGameplayStatics::CreatePlayer( GetWorld() );
+        //ABasePlayerState* playerState = Cast<ABasePlayerState>( player->PlayerState );
+        //playerState->CustomSetPlayerName( FName( FString::Printf( TEXT( "Player %d" ), i ) ) );
 
-		m_PlayerControllers.Emplace( player );
+        m_PlayerControllers.Emplace( player );
 
-		TObjectPtr<APlayerStart> start           = m_PlayerStarts[i];
-		TObjectPtr<AFightingCharacter> character = GetWorld()->SpawnActor<AFightingCharacter>( m_CharacterClass, start->GetTransform() );
-		character->m_PlayerIndex                 = i;
+        TObjectPtr<APlayerStart> start           = m_PlayerStarts[i];
+        TObjectPtr<AFightingCharacter> character = GetWorld()->SpawnActor<AFightingCharacter>( m_CharacterClass, start->GetTransform() );
+        character->m_PlayerIndex                 = i;
 
-		m_Characters.Emplace( character );
+        m_Characters.Emplace( character );
 
-		player->Possess( character );
+        player->Possess( character );
 
-		if( TObjectPtr<IFacingEntity> facingEntity = Cast<IFacingEntity>( character ) )
-		{
-			UCombatStatics::FaceLocation( facingEntity, FVector::ZeroVector );
-		}
-		else
-		{
-			FG_SLOG_ERR( TEXT("Cast to IFacingEntity from character failed") );
-		}
-	}
+        if( TObjectPtr<IFacingEntity> facingEntity = Cast<IFacingEntity>( character ) )
+        {
+            UCombatStatics::FaceLocation( facingEntity, FVector::ZeroVector );
+        }
+        else
+        {
+            FG_SLOG_ERR( TEXT("Cast to IFacingEntity from character failed") );
+        }
+    }
 
-	InitCameraManager();
+    InitCameraManager();
 
-	EnablePlayersInput( true );
+    EnablePlayersInput( true );
 }
 
 void AFreeForAllGameMode::EnablePlayersInput( bool Enable )
 {
-	for( APlayerController* player : m_PlayerControllers )
-	{
-		if( auto* Pawn = player->GetPawn() )
-		{
-			if( Enable )
-			{
-				Pawn->EnableInput( player );
-			}
-			else
-			{
-				Pawn->DisableInput( player );
-			}
-		}
-	}
+    for( APlayerController* player : m_PlayerControllers )
+    {
+        if( auto* Pawn = player->GetPawn() )
+        {
+            if( Enable )
+            {
+                Pawn->EnableInput( player );
+            }
+            else
+            {
+                Pawn->DisableInput( player );
+            }
+        }
+    }
 }
