@@ -24,4 +24,10 @@ public:
 
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Inputs Sequence" )
     TArray<FMoveInputState> m_InputsSequence;
+
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Allow When Grounded" )
+    bool m_AllowWhenGrounded = true;
+
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Allow When Airborne" )
+    bool m_AllowWhenAirborne = false;
 };
