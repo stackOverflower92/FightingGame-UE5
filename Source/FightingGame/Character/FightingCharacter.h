@@ -43,6 +43,9 @@ public:
     UPROPERTY( BlueprintReadOnly, DisplayName = "Pretend is Grounded" )
     bool m_PretendIsGrounded = false;
 
+    UPROPERTY( BlueprintReadOnly, DisplayName = "Is Moving Backward" )
+    bool m_IsMovingBackward = false;
+
     UFUNCTION( BlueprintCallable )
     virtual bool IsAirborne() const override;
 

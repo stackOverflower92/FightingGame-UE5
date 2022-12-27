@@ -61,6 +61,8 @@ void AFightingCharacter::UpdateHorizontalMovement( float value )
 
     if( m_OpponentToFace )
     {
+        m_IsMovingBackward = m_CurrentHorizontalMovement > 0.f && !IsFacingRight() || m_CurrentHorizontalMovement < 0.f && IsFacingRight();
+
         if( !IsAirborne() )
         {
             FRotator actorRotation = GetActorRotation();
@@ -82,6 +84,8 @@ void AFightingCharacter::UpdateHorizontalMovement( float value )
     }
     else
     {
+        m_IsMovingBackward = false;
+
         if( !IsAirborne() || m_UpdateFacingWhenAirborne )
         {
             if( !FMath::IsNearlyZero( m_CurrentHorizontalMovement ) )
