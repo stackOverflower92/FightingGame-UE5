@@ -12,5 +12,5 @@ class FIGHTINGGAME_API UMathStatics : public UBlueprintFunctionLibrary
 
 public:
     UFUNCTION( BlueprintCallable, Category = "Math" )
-    static float GetAngleBetween( const FVector2D A, const FVector2D B );
+    static float GetSignedAngle( const FVector2D A, const FVector2D B );
 };

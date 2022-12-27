@@ -2,7 +2,7 @@
 
 #include "MathStatics.h"
 
-float UMathStatics::GetAngleBetween( const FVector2D A, const FVector2D B )
+float UMathStatics::GetSignedAngle( const FVector2D A, const FVector2D B )
 {
     auto normA = A.GetSafeNormal();
     auto normB = B.GetSafeNormal();

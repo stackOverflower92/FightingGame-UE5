@@ -218,7 +218,7 @@ void UMovesBufferComponent::UpdateDirectionalInputs( UInputComponent* InputCompo
 
     if( m_DirectionalInputVector.Length() > m_MinDirectionalInputVectorLength )
     {
-        float angle       = UMathStatics::GetAngleBetween( m_DirectionalInputVector, FVector2d( 0.f, 1.f ) );
+        float angle       = UMathStatics::GetSignedAngle( m_DirectionalInputVector, FVector2d( 0.f, 1.f ) );
         EInputEntry entry = GetDirectionalInputEntryFromAngle( angle );
 
         if( loc_ShowDirectionalAngle )
