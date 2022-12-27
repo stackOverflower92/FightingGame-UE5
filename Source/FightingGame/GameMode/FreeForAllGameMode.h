@@ -13,22 +13,28 @@ class APlayerStart;
 UCLASS()
 class FIGHTINGGAME_API AFreeForAllGameMode : public AFightingGameGameModeBase
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 protected:
-	virtual void BeginPlay() override;
+    virtual void BeginPlay() override;
 
-	UPROPERTY( EditAnywhere, BlueprintReadWrite, Category = Classes, DisplayName = "Character Class" )
-	TSubclassOf<AFightingCharacter> m_CharacterClass;
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, Category = Classes, DisplayName = "Character Class" )
+    TSubclassOf<AFightingCharacter> m_CharacterClass;
 
-	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Additional Players" )
-	int m_AdditionalPlayers = 0;
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Additional Players" )
+    int m_AdditionalPlayers = 0;
+
+    /*
+     * This only works with exactly 2 players
+     */
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Enable characters auto-facing" )
+    bool m_EnableCharactersAutoFacing = false;
 
 private:
-	TArray<TObjectPtr<APlayerStart>> m_PlayerStarts;
-	TArray<TObjectPtr<APlayerController>> m_PlayerControllers;
-	TArray<TObjectPtr<AFightingCharacter>> m_Characters;
+    TArray<TObjectPtr<APlayerStart>> m_PlayerStarts;
+    TArray<TObjectPtr<APlayerController>> m_PlayerControllers;
+    TArray<TObjectPtr<AFightingCharacter>> m_Characters;
 
-	void SpawnCharacters();
-	void EnablePlayersInput( bool Enable );
+    void SpawnCharacters();
+    void EnablePlayersInput( bool Enable );
 };

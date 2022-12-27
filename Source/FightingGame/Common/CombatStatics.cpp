@@ -83,6 +83,19 @@ bool UCombatStatics::FaceLocation( TObjectPtr<IFacingEntity> A, const FVector& L
     return true;
 }
 
+bool UCombatStatics::IsOtherOnTheRight( TObjectPtr<IFacingEntity> Me, TObjectPtr<IFacingEntity> Other )
+{
+    ensureMsgf( Me, TEXT("[Me] facing entity is null") );
+    ensureMsgf( Other, TEXT("[Other] facing entity is null") );
+
+    return Other->GetLocation().Y > Me->GetLocation().Y;
+}
+
+bool UCombatStatics::IsOtherOnTheLeft( TObjectPtr<IFacingEntity> Me, TObjectPtr<IFacingEntity> Other )
+{
+    return !IsOtherOnTheRight( Me, Other );
+}
+
 HitData UCombatStatics::GenerateHitDataFromHitboxDescription( TObjectPtr<AActor> HitboxOwner, TObjectPtr<USkeletalMeshComponent> SkeletalMesh,
                                                               const FHitboxDescription& HitboxDesc, int32 Id, int32 GroupId,
                                                               TArray<TObjectPtr<AActor>> AdditionalActorsToIgnore /*= {}*/ )

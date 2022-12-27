@@ -7,14 +7,6 @@
 
 namespace
 {
-    const FString NoInput{""};
-
-    const FString EntryStartJump{"StartJump"};
-    const FString EntryStopJump{"StopJump"};
-    const FString EntryAttack{"Attack"};
-    const FString EntrySpecial{"Special"};
-
-    // CVars
     int32 loc_ShowInputBuffer = 0;
     FG_CVAR_FLAG_DESC( CVarShowInputBuffer, TEXT( "MovesBufferComponent.ShowInputBuffer" ), loc_ShowInputBuffer );
 }
@@ -36,7 +28,7 @@ void UMovesBufferComponent::TickComponent( float DeltaTime, ELevelTick TickType,
 
         if( !m_BufferChanged )
         {
-            AddMoveToBuffer( NoInput );
+            AddMoveToBuffer( EInputEntry::None );
         }
     }
 
@@ -44,15 +36,15 @@ void UMovesBufferComponent::TickComponent( float DeltaTime, ELevelTick TickType,
     {
         if( m_OwnerCharacter && m_OwnerCharacter->m_PlayerIndex == 0 )
         {
-            for( int i = 0; i < m_Buffer.size(); ++i )
+            /*for( int i = 0; i < m_Buffer.size(); ++i )
             {
                 FInputBufferEntry& Entry = m_Buffer.at( i );
-                const bool IsEmpty       = Entry.Name == NoInput;
-                auto Message             = IsEmpty ? TEXT( "Empty" ) : Entry.Name;
+                const bool IsEmpty       = Entry.m_MoveType == EInputEntry::None;
+                auto Message             = IsEmpty ? TEXT( "Empty" ) : Entry.m_MoveType;
 
-                FColor Color = Entry.Used ? FColor::Red : FColor::Green;
+                FColor Color = Entry.m_Used ? FColor::Red : FColor::Green;
                 GEngine->AddOnScreenDebugMessage( i, 1.f, Color, FString::Printf( TEXT( "%s" ), *Message ) );
-            }
+            }*/
         }
     }
 
@@ -87,16 +79,16 @@ void UMovesBufferComponent::OnSetupPlayerInputComponent( UInputComponent* Player
     InitBuffer();
 }
 
-bool UMovesBufferComponent::IsInputBuffered( FString Input, bool ConsumeEntry )
+bool UMovesBufferComponent::IsInputBuffered( EInputEntry Input, bool ConsumeEntry )
 {
     for( int i = 0; i < m_Buffer.size(); ++i )
     {
         FInputBufferEntry& Entry = m_Buffer.at( i );
-        if( Entry.Name != NoInput && Entry.Name == Input && !Entry.Used )
+        if( Entry.m_MoveType != EInputEntry::None && Entry.m_MoveType == Input && !Entry.m_Used )
         {
             if( ConsumeEntry )
             {
-                Entry.Used = true;
+                Entry.m_Used = true;
             }
             return true;
         }
@@ -105,14 +97,14 @@ bool UMovesBufferComponent::IsInputBuffered( FString Input, bool ConsumeEntry )
     return false;
 }
 
-TArray<FString> UMovesBufferComponent::GetBufferedInputs() const
+TArray<EInputEntry> UMovesBufferComponent::GetBufferedInputs() const
 {
-    TArray<FString> BufferedInputs;
+    TArray<EInputEntry> BufferedInputs;
     for( const FInputBufferEntry& Input : m_Buffer )
     {
-        if( Input.Name != NoInput && !Input.Used )
+        if( Input.m_MoveType != EInputEntry::None && !Input.m_Used )
         {
-            BufferedInputs.Emplace( Input.Name );
+            BufferedInputs.Emplace( Input.m_MoveType );
         }
     }
 
@@ -124,19 +116,19 @@ float UMovesBufferComponent::GetMovementDirection() const
     return m_MovementDirection;
 }
 
-void UMovesBufferComponent::AddMoveToBuffer( const FString& MoveName )
+void UMovesBufferComponent::AddMoveToBuffer( EInputEntry MoveType )
 {
-    m_Buffer.emplace_back( FInputBufferEntry{FString( MoveName ), false} );
+    m_Buffer.emplace_back( FInputBufferEntry{MoveType, false} );
     m_Buffer.pop_front();
 
     m_BufferChanged = true;
 }
 
-bool UMovesBufferComponent::BufferContainsConsumableInput( const FString& Input ) const
+bool UMovesBufferComponent::BufferContainsConsumableInput( EInputEntry MoveType ) const
 {
     for( const FInputBufferEntry& CurrentInput : m_Buffer )
     {
-        if( CurrentInput.Name == Input && !CurrentInput.Used )
+        if( CurrentInput.m_MoveType == MoveType && !CurrentInput.m_Used )
         {
             return true;
         }
@@ -156,7 +148,7 @@ void UMovesBufferComponent::InitBuffer()
 
     for( int i = 0; i < m_BufferSizeFrames; ++i )
     {
-        m_Buffer.emplace_back( FInputBufferEntry{NoInput, false} );
+        m_Buffer.emplace_back( FInputBufferEntry{EInputEntry::None, false} );
     }
 }
 
@@ -174,22 +166,22 @@ void UMovesBufferComponent::OnMoveHorizontal( float Value )
 // TODO: these are all the same, make it generic maybe?
 void UMovesBufferComponent::OnStartJump()
 {
-    AddMoveToBuffer( EntryStartJump );
+    AddMoveToBuffer( EInputEntry::StartJump );
 }
 
 void UMovesBufferComponent::OnStopJump()
 {
-    AddMoveToBuffer( EntryStopJump );
+    AddMoveToBuffer( EInputEntry::StopJump );
 }
 
 void UMovesBufferComponent::OnAttack()
 {
-    AddMoveToBuffer( EntryAttack );
+    AddMoveToBuffer( EInputEntry::Attack );
 }
 
 void UMovesBufferComponent::OnSpecial()
 {
-    AddMoveToBuffer( EntrySpecial );
+    AddMoveToBuffer( EInputEntry::Special );
 }
 
 void UMovesBufferComponent::UpdateMovementDirection()
@@ -211,15 +203,15 @@ void UMovesBufferComponent::UpdateMovementDirection()
     }
 }
 
-void UMovesBufferComponent::UseBufferedInput( FString Input )
+void UMovesBufferComponent::UseBufferedInput( EInputEntry Input )
 {
     verify( BufferContainsConsumableInput( Input ) );
 
     for( FInputBufferEntry& CurrentInput : m_Buffer )
     {
-        if( CurrentInput.Name == Input )
+        if( CurrentInput.m_MoveType == Input )
         {
-            CurrentInput.Used = true;
+            CurrentInput.m_Used = true;
         }
     }
 }

@@ -26,6 +26,9 @@ public:
 
     static bool FaceLocation( TObjectPtr<IFacingEntity> A, const FVector& Location );
 
+    static bool IsOtherOnTheRight( TObjectPtr<IFacingEntity> Me, TObjectPtr<IFacingEntity> Other );
+    static bool IsOtherOnTheLeft( TObjectPtr<IFacingEntity> Me, TObjectPtr<IFacingEntity> Other );
+
     static HitData GenerateHitDataFromHitboxDescription( TObjectPtr<AActor> HitboxOwner, TObjectPtr<USkeletalMeshComponent> SkeletalMesh,
                                                          const FHitboxDescription& HitboxDesc, int32 Id, int32 GroupId,
                                                          TArray<TObjectPtr<AActor>> AdditionalActorsToIgnore = {} );

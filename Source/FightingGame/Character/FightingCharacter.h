@@ -101,6 +101,9 @@ public:
     FORCEINLINE void SetHittable( bool Hittable ) { m_Hittable = Hittable; }
     FORCEINLINE bool IsHittable() const { return m_Hittable; }
 
+    FORCEINLINE void SetOpponentToFace( TObjectPtr<AFightingCharacter> Opponent ) { m_OpponentToFace = Opponent; }
+    FORCEINLINE TObjectPtr<AFightingCharacter> GetOpponentToFace() const { return m_OpponentToFace; }
+
     void UpdateMeshShake();
     void ResetMeshRelativeLocation();
 
@@ -170,6 +173,12 @@ protected:
 
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Gravity Scale (Falling)" )
     float m_FallingGravityScale = 2.f;
+
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Auto-face Opponent" )
+    bool m_AutoFaceOpponent = false;
+
+    UPROPERTY()
+    TObjectPtr<AFightingCharacter> m_OpponentToFace = nullptr;
 
     virtual void BeginPlay() override;
     virtual void EndPlay( const EEndPlayReason::Type EndPlayReason ) override;

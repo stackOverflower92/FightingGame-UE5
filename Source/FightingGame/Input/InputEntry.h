@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 UENUM( BlueprintType )
-enum class EMoveType : uint8
+enum class EInputEntry : uint8
 {
     None,
     StartJump,

@@ -59,6 +59,14 @@ void AFreeForAllGameMode::SpawnCharacters()
         }
     }
 
+    if( m_EnableCharactersAutoFacing && m_AdditionalPlayers == 1 )
+    {
+        ensureMsgf( m_Characters.Num() == 2, TEXT("Additional players var is set to 1 but the total number of characters is not 2") );
+
+        m_Characters[0]->SetOpponentToFace( m_Characters[1] );
+        m_Characters[1]->SetOpponentToFace( m_Characters[0] );
+    }
+
     InitCameraManager();
 
     EnablePlayersInput( true );
