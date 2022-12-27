@@ -3,12 +3,17 @@
 #include "MovesBufferComponent.h"
 #include "Components/InputComponent.h"
 #include "FightingGame/Character/FightingCharacter.h"
+#include "FightingGame/Common/MathStatics.h"
 #include "FightingGame/Debugging/Debug.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 namespace
 {
     int32 loc_ShowInputBuffer = 0;
     FG_CVAR_FLAG_DESC( CVarShowInputBuffer, TEXT( "MovesBufferComponent.ShowInputBuffer" ), loc_ShowInputBuffer );
+
+    int32 loc_ShowDirectionalAngle = 0;
+    FG_CVAR_FLAG_DESC( CVarShowDirectionalAngle, TEXT("MovesBufferComponent.ShowDirectionalAngle"), loc_ShowDirectionalAngle );
 }
 
 UMovesBufferComponent::UMovesBufferComponent()
@@ -36,15 +41,15 @@ void UMovesBufferComponent::TickComponent( float DeltaTime, ELevelTick TickType,
     {
         if( m_OwnerCharacter && m_OwnerCharacter->m_PlayerIndex == 0 )
         {
-            /*for( int i = 0; i < m_Buffer.size(); ++i )
+            for( int i = 0; i < m_Buffer.size(); ++i )
             {
                 FInputBufferEntry& Entry = m_Buffer.at( i );
                 const bool IsEmpty       = Entry.m_MoveType == EInputEntry::None;
-                auto Message             = IsEmpty ? TEXT( "Empty" ) : Entry.m_MoveType;
+                auto Message             = IsEmpty ? TEXT( "Empty" ) : InputEntryToString( Entry.m_MoveType );
 
                 FColor Color = Entry.m_Used ? FColor::Red : FColor::Green;
                 GEngine->AddOnScreenDebugMessage( i, 1.f, Color, FString::Printf( TEXT( "%s" ), *Message ) );
-            }*/
+            }
         }
     }
 
@@ -58,8 +63,10 @@ void UMovesBufferComponent::TickComponent( float DeltaTime, ELevelTick TickType,
 
         m_InputMovement = horizontalMovement;
 
-        m_MovingRight = horizontalMovement > 0.f;
-        m_MovingLeft  = horizontalMovement < 0.f;
+        m_MovingRight = horizontalMovement > m_AnalogMovementDeadzone;
+        m_MovingLeft  = horizontalMovement < -m_AnalogMovementDeadzone;
+
+        UpdateDirectionalInputs( m_PlayerInput );
     }
 }
 
@@ -74,6 +81,7 @@ void UMovesBufferComponent::OnSetupPlayerInputComponent( UInputComponent* Player
         m_PlayerInput->BindAction( TEXT( "Special" ), IE_Pressed, this, &UMovesBufferComponent::OnSpecial );
 
         m_PlayerInput->BindAxis( TEXT( "MoveHorizontal" ) );
+        m_PlayerInput->BindAxis( TEXT( "MoveVertical" ) );
     }
 
     InitBuffer();
@@ -203,15 +211,42 @@ void UMovesBufferComponent::UpdateMovementDirection()
     }
 }
 
+void UMovesBufferComponent::UpdateDirectionalInputs( UInputComponent* InputComponent )
+{
+    m_DirectionalInputVector.X = InputComponent->GetAxisValue( "MoveHorizontal" );
+    m_DirectionalInputVector.Y = InputComponent->GetAxisValue( "MoveVertical" );
+
+    if( m_DirectionalInputVector.Length() > m_MinDirectionalInputVectorLength )
+    {
+        float angle       = UMathStatics::GetAngleBetween( m_DirectionalInputVector, FVector2d( 0.f, 1.f ) );
+        EInputEntry entry = GetDirectionalInputEntryFromAngle( angle );
+
+        if( loc_ShowDirectionalAngle )
+        {
+            UKismetSystemLibrary::DrawDebugString( GetWorld(), GetOwner()->GetActorLocation(),
+                                                   FString::Printf( TEXT( "[Input: %s]" ), *InputEntryToString( entry ) ) );
+        }
+
+        if( entry != m_LastDirectionalInputEntry )
+        {
+            m_LastDirectionalInputEntry = entry;
+
+            AddMoveToBuffer( entry );
+        }
+    }
+
+    m_LastDirectionalInputVector = m_DirectionalInputVector;
+}
+
 void UMovesBufferComponent::UseBufferedInput( EInputEntry Input )
 {
     verify( BufferContainsConsumableInput( Input ) );
 
-    for( FInputBufferEntry& CurrentInput : m_Buffer )
+    for( FInputBufferEntry& currentInput : m_Buffer )
     {
-        if( CurrentInput.m_MoveType == Input )
+        if( currentInput.m_MoveType == Input )
         {
-            CurrentInput.m_Used = true;
+            currentInput.m_Used = true;
         }
     }
 }

@@ -23,6 +23,8 @@ class FIGHTINGGAME_API UMovesBufferComponent : public UActorComponent
 {
     GENERATED_BODY()
 
+    using AngleRange = TTuple<float, float>;
+
 public:
     UMovesBufferComponent();
 
@@ -62,6 +64,12 @@ protected:
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Analog Movement Deadzone" )
     float m_AnalogMovementDeadzone = 0.1f;
 
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Directional Input Min Vector Length" )
+    float m_MinDirectionalInputVectorLength = .5f;
+
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Directional Change Rotation Epsilon" )
+    float m_DirectionalChangeRotationEpsilon = 15.f;
+
 public:
     virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
 
@@ -80,6 +88,72 @@ private:
 
     float m_MovementDirection = 0.f;
 
+    FVector2D m_LastDirectionalInputVector;
+    FVector2D m_DirectionalInputVector;
+
+    EInputEntry m_LastDirectionalInputEntry = EInputEntry::None;
+
+    FORCEINLINE EInputEntry GetDirectionalInputEntryFromAngle( float Angle ) const
+    {
+        static float halfDelta = 10.f;
+
+        static float forwardAngle = 90.f;
+        static float downAngle    = 180.f;
+        static float backAngle    = -90.f;
+        static float upAngle      = 0.f;
+
+        // Up
+        if( Angle > upAngle - halfDelta && Angle < upAngle + halfDelta )
+        {
+            return EInputEntry::Up;
+        }
+
+        // Up-forward
+        if( Angle >= upAngle + halfDelta && Angle < forwardAngle - halfDelta )
+        {
+            return EInputEntry::UpForward;
+        }
+
+        // Forward
+        if( Angle > forwardAngle - halfDelta && Angle < forwardAngle + halfDelta )
+        {
+            return EInputEntry::Forward;
+        }
+
+        // Forward-down
+        if( Angle >= forwardAngle + halfDelta && Angle < downAngle - halfDelta )
+        {
+            return EInputEntry::ForwardDown;
+        }
+
+        // Down
+        if( (Angle >= downAngle && Angle >= downAngle - halfDelta) ||
+            (Angle > -downAngle && Angle < -downAngle + halfDelta) )
+        {
+            return EInputEntry::Down;
+        }
+
+        // Down-back
+        if( Angle > -downAngle + halfDelta && Angle < backAngle - halfDelta )
+        {
+            return EInputEntry::DownBackward;
+        }
+
+        // Back
+        if( Angle > backAngle - halfDelta && Angle < backAngle + halfDelta )
+        {
+            return EInputEntry::Backward;
+        }
+
+        // Back-Up
+        if( Angle >= backAngle + halfDelta && Angle < upAngle - halfDelta )
+        {
+            return EInputEntry::BackwardUp;
+        }
+
+        return EInputEntry::None;
+    }
+
     void AddMoveToBuffer( EInputEntry MoveType );
     bool BufferContainsConsumableInput( EInputEntry MoveType ) const;
 
@@ -91,4 +165,5 @@ private:
     void OnSpecial();
 
     void UpdateMovementDirection();
+    void UpdateDirectionalInputs( UInputComponent* InputComponent );
 };
