@@ -95,58 +95,56 @@ private:
 
     FORCEINLINE EInputEntry GetDirectionalInputEntryFromAngle( float Angle ) const
     {
-        static float halfDelta = 10.f;
-
         static float forwardAngle = 90.f;
         static float downAngle    = 180.f;
         static float backAngle    = -90.f;
         static float upAngle      = 0.f;
 
         // Up
-        if( Angle > upAngle - halfDelta && Angle < upAngle + halfDelta )
+        if( Angle > upAngle - m_DirectionalChangeRotationEpsilon && Angle < upAngle + m_DirectionalChangeRotationEpsilon )
         {
             return EInputEntry::Up;
         }
 
         // Up-forward
-        if( Angle >= upAngle + halfDelta && Angle < forwardAngle - halfDelta )
+        if( Angle >= upAngle + m_DirectionalChangeRotationEpsilon && Angle < forwardAngle - m_DirectionalChangeRotationEpsilon )
         {
             return EInputEntry::UpForward;
         }
 
         // Forward
-        if( Angle > forwardAngle - halfDelta && Angle < forwardAngle + halfDelta )
+        if( Angle > forwardAngle - m_DirectionalChangeRotationEpsilon && Angle < forwardAngle + m_DirectionalChangeRotationEpsilon )
         {
             return EInputEntry::Forward;
         }
 
         // Forward-down
-        if( Angle >= forwardAngle + halfDelta && Angle < downAngle - halfDelta )
+        if( Angle >= forwardAngle + m_DirectionalChangeRotationEpsilon && Angle < downAngle - m_DirectionalChangeRotationEpsilon )
         {
             return EInputEntry::ForwardDown;
         }
 
         // Down
-        if( (Angle >= downAngle && Angle >= downAngle - halfDelta) ||
-            (Angle > -downAngle && Angle < -downAngle + halfDelta) )
+        if( (Angle >= downAngle && Angle >= downAngle - m_DirectionalChangeRotationEpsilon) ||
+            (Angle > -downAngle && Angle < -downAngle + m_DirectionalChangeRotationEpsilon) )
         {
             return EInputEntry::Down;
         }
 
         // Down-back
-        if( Angle > -downAngle + halfDelta && Angle < backAngle - halfDelta )
+        if( Angle > -downAngle + m_DirectionalChangeRotationEpsilon && Angle < backAngle - m_DirectionalChangeRotationEpsilon )
         {
             return EInputEntry::DownBackward;
         }
 
         // Back
-        if( Angle > backAngle - halfDelta && Angle < backAngle + halfDelta )
+        if( Angle > backAngle - m_DirectionalChangeRotationEpsilon && Angle < backAngle + m_DirectionalChangeRotationEpsilon )
         {
             return EInputEntry::Backward;
         }
 
         // Back-Up
-        if( Angle >= backAngle + halfDelta && Angle < upAngle - halfDelta )
+        if( Angle >= backAngle + m_DirectionalChangeRotationEpsilon && Angle < upAngle - m_DirectionalChangeRotationEpsilon )
         {
             return EInputEntry::BackwardUp;
         }
