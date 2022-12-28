@@ -7,10 +7,12 @@
 #include <deque>
 
 #include "InputEntry.h"
+#include "FightingGame/Combat/MoveDataAsset.h"
 #include "MovesBufferComponent.generated.h"
 
 class AFightingCharacter;
 class UInputComponent;
+class UInputSequenceResolver;
 
 struct FInputBufferEntry
 {
@@ -18,17 +20,19 @@ struct FInputBufferEntry
     bool m_Used;
 };
 
+DECLARE_MULTICAST_DELEGATE_OneParam( FMoveRouteEnded, TObjectPtr<UMoveDataAsset> )
+
 UCLASS( ClassGroup = ( Custom ), meta = ( BlueprintSpawnableComponent ) )
 class FIGHTINGGAME_API UMovesBufferComponent : public UActorComponent
 {
     GENERATED_BODY()
 
-    using AngleRange = TTuple<float, float>;
-
 public:
     UMovesBufferComponent();
 
     TObjectPtr<AFightingCharacter> m_OwnerCharacter = nullptr;
+
+    FMoveRouteEnded m_MoveRouteEndedDelegate;
 
     UFUNCTION( BlueprintCallable )
     void UseBufferedInput( EInputEntry Input );
@@ -58,8 +62,8 @@ protected:
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Buffer Size Frames" )
     int m_BufferSizeFrames = 6;
 
-    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Buffer Frame Length" )
-    float m_BufferFrameLength = 0.032;
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Buffer Frame Rate (FPS)" )
+    float m_BufferFrameRate = 30;
 
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Analog Movement Deadzone" )
     float m_AnalogMovementDeadzone = 0.1f;
@@ -69,6 +73,11 @@ protected:
 
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Directional Change Rotation Epsilon" )
     float m_DirectionalChangeRotationEpsilon = 15.f;
+
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Moves List" )
+    TArray<TObjectPtr<UMoveDataAsset>> m_MovesList;
+
+    virtual void BeginPlay() override;
 
 public:
     virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
@@ -82,6 +91,9 @@ private:
     UPROPERTY()
     UInputComponent* m_PlayerInput = nullptr;
 
+    UPROPERTY()
+    TObjectPtr<UInputSequenceResolver> m_InputSequenceResolver = nullptr;
+
     std::deque<FInputBufferEntry> m_Buffer;
     float m_ElapsedFrameTime = 0.f;
     bool m_BufferChanged     = false;
@@ -90,67 +102,7 @@ private:
 
     FVector2D m_LastDirectionalInputVector;
     FVector2D m_DirectionalInputVector;
-
     EInputEntry m_LastDirectionalInputEntry = EInputEntry::None;
-
-    FORCEINLINE EInputEntry GetDirectionalInputEntryFromAngle( float Angle ) const
-    {
-        static float forwardAngle = 90.f;
-        static float downAngle    = 180.f;
-        static float backAngle    = -90.f;
-        static float upAngle      = 0.f;
-
-        // Up
-        if( Angle > upAngle - m_DirectionalChangeRotationEpsilon && Angle < upAngle + m_DirectionalChangeRotationEpsilon )
-        {
-            return EInputEntry::Up;
-        }
-
-        // Up-forward
-        if( Angle >= upAngle + m_DirectionalChangeRotationEpsilon && Angle < forwardAngle - m_DirectionalChangeRotationEpsilon )
-        {
-            return EInputEntry::UpForward;
-        }
-
-        // Forward
-        if( Angle > forwardAngle - m_DirectionalChangeRotationEpsilon && Angle < forwardAngle + m_DirectionalChangeRotationEpsilon )
-        {
-            return EInputEntry::Forward;
-        }
-
-        // Forward-down
-        if( Angle >= forwardAngle + m_DirectionalChangeRotationEpsilon && Angle < downAngle - m_DirectionalChangeRotationEpsilon )
-        {
-            return EInputEntry::ForwardDown;
-        }
-
-        // Down
-        if( (Angle >= downAngle && Angle >= downAngle - m_DirectionalChangeRotationEpsilon) ||
-            (Angle > -downAngle && Angle < -downAngle + m_DirectionalChangeRotationEpsilon) )
-        {
-            return EInputEntry::Down;
-        }
-
-        // Down-back
-        if( Angle > -downAngle + m_DirectionalChangeRotationEpsilon && Angle < backAngle - m_DirectionalChangeRotationEpsilon )
-        {
-            return EInputEntry::DownBackward;
-        }
-
-        // Back
-        if( Angle > backAngle - m_DirectionalChangeRotationEpsilon && Angle < backAngle + m_DirectionalChangeRotationEpsilon )
-        {
-            return EInputEntry::Backward;
-        }
-
-        // Back-Up
-        if( Angle >= backAngle + m_DirectionalChangeRotationEpsilon && Angle < upAngle - m_DirectionalChangeRotationEpsilon )
-        {
-            return EInputEntry::BackwardUp;
-        }
-
-        return EInputEntry::None;
-    }
 
     void AddMoveToBuffer( EInputEntry MoveType );
     bool BufferContainsConsumableInput( EInputEntry MoveType ) const;
@@ -164,4 +116,5 @@ private:
 
     void UpdateMovementDirection();
     void UpdateDirectionalInputs( UInputComponent* InputComponent );
+    EInputEntry GetDirectionalInputEntryFromAngle( float Angle ) const;
 };

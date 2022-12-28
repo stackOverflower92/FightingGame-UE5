@@ -17,4 +17,9 @@ struct FIGHTINGGAME_API FMoveInputState
 
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Event" )
     TEnumAsByte<EInputEvent> m_InputEvent;
+
+    bool operator==( const FMoveInputState& Other ) const
+    {
+        return m_InputEntry == Other.m_InputEntry && m_InputEvent == Other.m_InputEvent;
+    }
 };

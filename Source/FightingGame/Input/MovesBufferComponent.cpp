@@ -3,6 +3,7 @@
 #include "MovesBufferComponent.h"
 #include "Components/InputComponent.h"
 #include "FightingGame/Character/FightingCharacter.h"
+#include "FightingGame/Combat/InputSequenceResolver.h"
 #include "FightingGame/Common/MathStatics.h"
 #include "FightingGame/Debugging/Debug.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -21,13 +22,22 @@ UMovesBufferComponent::UMovesBufferComponent()
     PrimaryComponentTick.bCanEverTick = true;
 }
 
+void UMovesBufferComponent::BeginPlay()
+{
+    Super::BeginPlay();
+
+    m_InputSequenceResolver = NewObject<UInputSequenceResolver>( GetOwner() );
+    m_InputSequenceResolver->Init( m_MovesList );
+}
+
 void UMovesBufferComponent::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
 {
     Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
 
     m_ElapsedFrameTime += DeltaTime;
 
-    if( m_ElapsedFrameTime >= m_BufferFrameLength )
+    static float bufferFrameDuration = 1.f / m_BufferFrameRate;
+    if( m_ElapsedFrameTime >= bufferFrameDuration )
     {
         m_ElapsedFrameTime = 0.f;
 
@@ -43,12 +53,13 @@ void UMovesBufferComponent::TickComponent( float DeltaTime, ELevelTick TickType,
         {
             for( int i = 0; i < m_Buffer.size(); ++i )
             {
-                FInputBufferEntry& Entry = m_Buffer.at( i );
-                const bool IsEmpty       = Entry.m_MoveType == EInputEntry::None;
-                auto Message             = IsEmpty ? TEXT( "Empty" ) : InputEntryToString( Entry.m_MoveType );
+                FInputBufferEntry& bufferEntry = m_Buffer.at( i );
+                const bool isEmpty             = bufferEntry.m_MoveType == EInputEntry::None;
+                FString message                = isEmpty ? TEXT( "Empty" ) : InputEntryToString( bufferEntry.m_MoveType );
 
-                FColor Color = Entry.m_Used ? FColor::Red : FColor::Green;
-                GEngine->AddOnScreenDebugMessage( i, 1.f, Color, FString::Printf( TEXT( "%s" ), *Message ) );
+                FColor Color = bufferEntry.m_Used ? FColor::Red : FColor::Green;
+
+                GEngine->AddOnScreenDebugMessage( i, 1.f, Color, FString::Printf( TEXT( "%s" ), *message ) );
             }
         }
     }
@@ -122,6 +133,65 @@ TArray<EInputEntry> UMovesBufferComponent::GetBufferedInputs() const
 float UMovesBufferComponent::GetMovementDirection() const
 {
     return m_MovementDirection;
+}
+
+EInputEntry UMovesBufferComponent::GetDirectionalInputEntryFromAngle( float Angle ) const
+{
+    static float forwardAngle = 90.f;
+    static float downAngle    = 180.f;
+    static float backAngle    = -90.f;
+    static float upAngle      = 0.f;
+
+    // Up
+    if( Angle > upAngle - m_DirectionalChangeRotationEpsilon && Angle < upAngle + m_DirectionalChangeRotationEpsilon )
+    {
+        return EInputEntry::Up;
+    }
+
+    // Up-forward
+    if( Angle >= upAngle + m_DirectionalChangeRotationEpsilon && Angle < forwardAngle - m_DirectionalChangeRotationEpsilon )
+    {
+        return EInputEntry::UpForward;
+    }
+
+    // Forward
+    if( Angle > forwardAngle - m_DirectionalChangeRotationEpsilon && Angle < forwardAngle + m_DirectionalChangeRotationEpsilon )
+    {
+        return EInputEntry::Forward;
+    }
+
+    // Forward-down
+    if( Angle >= forwardAngle + m_DirectionalChangeRotationEpsilon && Angle < downAngle - m_DirectionalChangeRotationEpsilon )
+    {
+        return EInputEntry::ForwardDown;
+    }
+
+    // Down
+    if( (Angle >= downAngle && Angle >= downAngle - m_DirectionalChangeRotationEpsilon) ||
+        (Angle > -downAngle && Angle < -downAngle + m_DirectionalChangeRotationEpsilon) )
+    {
+        return EInputEntry::Down;
+    }
+
+    // Down-back
+    if( Angle > -downAngle + m_DirectionalChangeRotationEpsilon && Angle < backAngle - m_DirectionalChangeRotationEpsilon )
+    {
+        return EInputEntry::DownBackward;
+    }
+
+    // Back
+    if( Angle > backAngle - m_DirectionalChangeRotationEpsilon && Angle < backAngle + m_DirectionalChangeRotationEpsilon )
+    {
+        return EInputEntry::Backward;
+    }
+
+    // Back-Up
+    if( Angle >= backAngle + m_DirectionalChangeRotationEpsilon && Angle < upAngle - m_DirectionalChangeRotationEpsilon )
+    {
+        return EInputEntry::BackwardUp;
+    }
+
+    return EInputEntry::None;
 }
 
 void UMovesBufferComponent::AddMoveToBuffer( EInputEntry MoveType )
