@@ -62,11 +62,11 @@ void UMovesBufferComponent::TickComponent( float DeltaTime, ELevelTick TickType,
         {
             for( int i = 0; i < m_Buffer.size(); ++i )
             {
-                FInputBufferEntry& bufferEntry = m_Buffer.at( i );
-                const bool isEmpty             = bufferEntry.m_MoveType == EInputEntry::None;
-                FString message                = isEmpty ? TEXT( "Empty" ) : InputEntryToString( bufferEntry.m_MoveType );
+                FInputBufferEntry& entry = m_Buffer.at( i );
+                const bool isEmpty       = entry.m_MoveType == EInputEntry::None;
+                FString message          = isEmpty ? TEXT( "Empty" ) : InputEntryToString( entry.m_MoveType );
 
-                FColor Color = bufferEntry.m_Used ? FColor::Red : FColor::Green;
+                FColor Color = entry.m_Used ? FColor::Red : FColor::Green;
 
                 GEngine->AddOnScreenDebugMessage( i, 1.f, Color, FString::Printf( TEXT( "%s" ), *message ) );
             }
@@ -111,12 +111,12 @@ bool UMovesBufferComponent::IsInputBuffered( EInputEntry Input, bool ConsumeEntr
 {
     for( int i = 0; i < m_Buffer.size(); ++i )
     {
-        FInputBufferEntry& Entry = m_Buffer.at( i );
-        if( Entry.m_MoveType != EInputEntry::None && Entry.m_MoveType == Input && !Entry.m_Used )
+        FInputBufferEntry& entry = m_Buffer.at( i );
+        if( entry.m_MoveType != EInputEntry::None && entry.m_MoveType == Input && !entry.m_Used )
         {
             if( ConsumeEntry )
             {
-                Entry.m_Used = true;
+                entry.m_Used = true;
             }
             return true;
         }
@@ -128,11 +128,11 @@ bool UMovesBufferComponent::IsInputBuffered( EInputEntry Input, bool ConsumeEntr
 TArray<EInputEntry> UMovesBufferComponent::GetBufferedInputs() const
 {
     TArray<EInputEntry> BufferedInputs;
-    for( const FInputBufferEntry& Input : m_Buffer )
+    for( const FInputBufferEntry& entry : m_Buffer )
     {
-        if( Input.m_MoveType != EInputEntry::None && !Input.m_Used )
+        if( entry.m_MoveType != EInputEntry::None && !entry.m_Used )
         {
-            BufferedInputs.Emplace( Input.m_MoveType );
+            BufferedInputs.Emplace( entry.m_MoveType );
         }
     }
 
@@ -233,9 +233,9 @@ void UMovesBufferComponent::AddMoveToBuffer( EInputEntry InputEntry )
 
 bool UMovesBufferComponent::BufferContainsConsumableInput( EInputEntry MoveType ) const
 {
-    for( const FInputBufferEntry& CurrentInput : m_Buffer )
+    for( const FInputBufferEntry& entry : m_Buffer )
     {
-        if( CurrentInput.m_MoveType == MoveType && !CurrentInput.m_Used )
+        if( entry.m_MoveType == MoveType && !entry.m_Used )
         {
             return true;
         }
@@ -341,11 +341,11 @@ void UMovesBufferComponent::UseBufferedInput( EInputEntry Input )
 {
     verify( BufferContainsConsumableInput( Input ) );
 
-    for( FInputBufferEntry& currentInput : m_Buffer )
+    for( FInputBufferEntry& entry : m_Buffer )
     {
-        if( currentInput.m_MoveType == Input )
+        if( entry.m_MoveType == Input )
         {
-            currentInput.m_Used = true;
+            entry.m_Used = true;
         }
     }
 }

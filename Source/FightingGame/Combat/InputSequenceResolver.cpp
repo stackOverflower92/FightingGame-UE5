@@ -19,19 +19,16 @@ void UInputSequenceResolver::Init( TArray<TObjectPtr<UMoveDataAsset>>& MovesList
         }
         else
         {
-            m_CurrentSequenceRoot                 = MakeShared<FInputResolverNode>();
-            m_CurrentSequenceRoot->m_MoveUniqueId = MovesList[moveIdx]->GetUniqueID();
-            m_CurrentSequenceRoot->m_InputState   = MovesList[moveIdx]->m_InputsSequence[0];
+            m_CurrentSequenceRoot = MakeShared<FInputResolverNode>( MovesList[moveIdx]->GetUniqueID(), MovesList[moveIdx]->m_InputsSequence[0],
+                                                                    MovesList[moveIdx]->m_AllowWhenGrounded, MovesList[moveIdx]->m_AllowWhenAirborne );
 
             m_Trees.Emplace( m_CurrentSequenceRoot );
         }
 
         for( int32 inputIdx = 1; inputIdx < MovesList[moveIdx]->m_InputsSequence.Num(); ++inputIdx )
         {
-            TSharedPtr<FInputResolverNode> node = MakeShared<FInputResolverNode>();
-            node->m_InputState                  = MovesList[moveIdx]->m_InputsSequence[inputIdx];
-            node->m_MoveUniqueId                = MovesList[moveIdx]->GetUniqueID();
-
+            TSharedPtr<FInputResolverNode> node = MakeShared<FInputResolverNode>( MovesList[moveIdx]->GetUniqueID(), MovesList[moveIdx]->m_InputsSequence[inputIdx],
+                                                                                  MovesList[moveIdx]->m_AllowWhenGrounded, MovesList[moveIdx]->m_AllowWhenAirborne );
             InsertEntry( node );
         }
     }
@@ -54,7 +51,6 @@ void UInputSequenceResolver::RegisterInput( EInputEntry InputEntry )
             m_InputRouteEndedDelegate.Broadcast( (*it)->m_MoveUniqueId );
 
             ResetRouteTimer();
-
             m_CurrentRouteNode = nullptr;
         }
         else
@@ -63,6 +59,14 @@ void UInputSequenceResolver::RegisterInput( EInputEntry InputEntry )
 
             ResetRouteTimer();
             StartRouteTimer();
+        }
+    }
+    else
+    {
+        if( m_ResetRouteOnIncorrectInput )
+        {
+            ResetRouteTimer();
+            m_CurrentRouteNode = nullptr;
         }
     }
 }
