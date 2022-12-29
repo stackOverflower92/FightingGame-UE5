@@ -10,64 +10,61 @@ void UInputSequenceResolver::Init( TArray<TObjectPtr<UMoveDataAsset>>& MovesList
     {
         auto it = m_Trees.FindByPredicate( [&]( TSharedPtr<FInputResolverNode> _root )
         {
-            if( MovesList[moveIdx]->m_InputsSequence.IsEmpty() )
-            {
-                FG_SLOG_ERR( FString::Printf(TEXT("Move [%s] has no inputs"), *MovesList[moveIdx]->m_Id) );
-                return false;
-            }
+            ensureMsgf( !MovesList[moveIdx]->m_InputsSequence.IsEmpty(), TEXT("Move [%s] has no inputs"), *MovesList[moveIdx]->m_Id );
 
             return _root->m_InputState == MovesList[moveIdx]->m_InputsSequence[0];
         } );
 
-        TSharedPtr<FInputResolverNode> node;
         if( it )
         {
-            node = *it;
+            m_CurrentSequenceRoot = *it;
         }
         else
         {
-            node                 = MakeShared<FInputResolverNode>();
-            node->m_MoveUniqueId = MovesList[moveIdx]->GetUniqueID();
-            node->m_InputState   = MovesList[moveIdx]->m_InputsSequence[0];
+            m_CurrentSequenceRoot                 = MakeShared<FInputResolverNode>();
+            m_CurrentSequenceRoot->m_MoveUniqueId = MovesList[moveIdx]->GetUniqueID();
+            m_CurrentSequenceRoot->m_InputState   = MovesList[moveIdx]->m_InputsSequence[0];
 
-            m_Trees.Emplace( node );
+            m_Trees.Emplace( m_CurrentSequenceRoot );
         }
 
         for( int32 inputIdx = 1; inputIdx < MovesList[moveIdx]->m_InputsSequence.Num(); ++inputIdx )
         {
-            TSharedPtr<FInputResolverNode> newNode = MakeShared<FInputResolverNode>();
-            newNode->m_InputState                  = MovesList[moveIdx]->m_InputsSequence[inputIdx];
-            newNode->m_MoveUniqueId                = MovesList[moveIdx]->GetUniqueID();
+            TSharedPtr<FInputResolverNode> node = MakeShared<FInputResolverNode>();
+            node->m_InputState                  = MovesList[moveIdx]->m_InputsSequence[inputIdx];
+            node->m_MoveUniqueId                = MovesList[moveIdx]->GetUniqueID();
 
-            InsertEntry( node, newNode );
+            InsertEntry( node );
         }
     }
 
     FG_SLOG_INFO( TEXT("Bla") );
 }
 
-void UInputSequenceResolver::InsertEntry( TSharedPtr<FInputResolverNode> Root, TSharedPtr<FInputResolverNode> Node )
+void UInputSequenceResolver::InsertEntry( TSharedPtr<FInputResolverNode> Node )
 {
-    if( !Root )
+    if( !m_CurrentSequenceRoot )
     {
-        Root = Node;
+        m_CurrentSequenceRoot = Node;
     }
     else
     {
-        auto* it = Root->m_Children.FindByPredicate( [&]( TSharedPtr<FInputResolverNode> _child )
+        auto* it = m_CurrentSequenceRoot->m_Children.FindByPredicate( [&]( TSharedPtr<FInputResolverNode> _child )
         {
             return _child->m_InputState == Node->m_InputState;
         } );
 
         if( it )
         {
-            TSharedPtr<FInputResolverNode> targetNode = *it;
-            InsertEntry( targetNode, Node );
+            m_CurrentSequenceRoot = *it;
+            InsertEntry( Node );
         }
         else
         {
-            Node->m_Parent = Root;
-            Root->m_Children.Emplace( Node );
+            Node->m_Parent = m_CurrentSequenceRoot;
+            m_CurrentSequenceRoot->m_Children.Emplace( Node );
+
+            m_CurrentSequenceRoot = Node;
         }
     }
 }

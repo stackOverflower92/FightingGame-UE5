@@ -31,10 +31,7 @@ protected:
 
 private:
     TArray<TSharedPtr<FInputResolverNode>> m_Trees;
+    TSharedPtr<FInputResolverNode> m_CurrentSequenceRoot = nullptr;
 
-    bool m_RoutingStarted     = false;
-    int32 m_CurrentMoveIndex  = 0;
-    int32 m_CurrentInputIndex = 0;
-
-    void InsertEntry( TSharedPtr<FInputResolverNode> Root, TSharedPtr<FInputResolverNode> Node );
+    void InsertEntry( TSharedPtr<FInputResolverNode> Node );
 };
