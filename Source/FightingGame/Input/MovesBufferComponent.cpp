@@ -216,16 +216,17 @@ void UMovesBufferComponent::OnInputRouteEnded( uint32 MoveUniqueId )
     }
 }
 
-void UMovesBufferComponent::AddMoveToBuffer( EInputEntry MoveType )
+void UMovesBufferComponent::AddMoveToBuffer( EInputEntry InputEntry )
 {
-    m_Buffer.emplace_back( FInputBufferEntry{MoveType, false} );
+    EInputEntry targetEntry = m_OwnerCharacter->IsFacingRight() ? InputEntry : GetMirrored( InputEntry );
+
+    m_Buffer.emplace_back( FInputBufferEntry{targetEntry, false} );
     m_Buffer.pop_front();
 
     m_BufferChanged = true;
 
-    if( MoveType != EInputEntry::None )
+    if( InputEntry != EInputEntry::None )
     {
-        EInputEntry targetEntry = m_OwnerCharacter->IsFacingRight() ? MoveType : GetMirrored( MoveType );
         m_InputSequenceResolver->RegisterInput( targetEntry );
     }
 }

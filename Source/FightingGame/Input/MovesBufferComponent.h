@@ -103,7 +103,7 @@ private:
     FVector2D m_DirectionalInputVector;
     EInputEntry m_LastDirectionalInputEntry = EInputEntry::None;
 
-    void AddMoveToBuffer( EInputEntry MoveType );
+    void AddMoveToBuffer( EInputEntry InputEntry );
     bool BufferContainsConsumableInput( EInputEntry MoveType ) const;
 
     void OnMoveHorizontal( float Value );

@@ -40,6 +40,7 @@ FORCEINLINE FString InputEntryToString( EInputEntry InputEntry )
         case EInputEntry::UpForward: return TEXT( "UpForward" );
         case EInputEntry::COUNT: return TEXT( "COUNT" );
         case EInputEntry::INVALID: return TEXT( "INVALID" );
+
         default: break;
     }
 
@@ -50,12 +51,16 @@ FORCEINLINE EInputEntry GetMirrored( EInputEntry InputEntry )
 {
     switch( InputEntry )
     {
-        case EInputEntry::None: return EInputEntry::None;
-        case EInputEntry::StartJump: return EInputEntry::StartJump;
-        case EInputEntry::StopJump: return EInputEntry::StopJump;
-        case EInputEntry::Attack: return EInputEntry::Attack;
-        case EInputEntry::Special: return EInputEntry::Special;
-        case EInputEntry::Forward: return EInputEntry::Backward;
+        case EInputEntry::None:
+        case EInputEntry::StartJump:
+        case EInputEntry::StopJump:
+        case EInputEntry::Attack:
+        case EInputEntry::Special:
+        case EInputEntry::Forward:
+            {
+                return InputEntry;
+            }
+
         case EInputEntry::ForwardDown: return EInputEntry::DownBackward;
         case EInputEntry::Down: return EInputEntry::Down;
         case EInputEntry::DownBackward: return EInputEntry::ForwardDown;
@@ -65,6 +70,7 @@ FORCEINLINE EInputEntry GetMirrored( EInputEntry InputEntry )
         case EInputEntry::UpForward: return EInputEntry::BackwardUp;
         case EInputEntry::COUNT: return EInputEntry::COUNT;
         case EInputEntry::INVALID: return EInputEntry::INVALID;
+
         default: break;
     }
 
