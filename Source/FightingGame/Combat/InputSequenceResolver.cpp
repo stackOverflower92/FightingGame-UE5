@@ -2,8 +2,6 @@
 
 #include "InputSequenceResolver.h"
 
-#include "FightingGame/Debugging/Debug.h"
-
 void UInputSequenceResolver::Init( TArray<TObjectPtr<UMoveDataAsset>>& MovesList )
 {
     for( int32 moveIdx = 0; moveIdx < MovesList.Num(); ++moveIdx )
@@ -41,15 +39,7 @@ void UInputSequenceResolver::Init( TArray<TObjectPtr<UMoveDataAsset>>& MovesList
 
 void UInputSequenceResolver::RegisterInput( EInputEntry InputEntry )
 {
-    TArray<TSharedPtr<FInputResolverNode>> nodesArray;
-    if( m_CurrentRouteNode )
-    {
-        nodesArray = m_CurrentRouteNode->m_Children;
-    }
-    else
-    {
-        nodesArray = m_Trees;
-    }
+    TArray<TSharedPtr<FInputResolverNode>> nodesArray = m_CurrentRouteNode ? m_CurrentRouteNode->m_Children : m_Trees;
 
     auto* it = nodesArray.FindByPredicate( [&InputEntry]( TSharedPtr<FInputResolverNode> _node )
     {
@@ -61,7 +51,6 @@ void UInputSequenceResolver::RegisterInput( EInputEntry InputEntry )
     {
         if( (*it)->m_Children.IsEmpty() )
         {
-            // End of the route reached
             m_InputRouteEndedDelegate.Broadcast( (*it)->m_MoveUniqueId );
 
             ResetRouteTimer();
@@ -76,50 +65,6 @@ void UInputSequenceResolver::RegisterInput( EInputEntry InputEntry )
             StartRouteTimer();
         }
     }
-
-    /*if( m_RoutingStarted )
-    {
-        auto* it = m_CurrentRouteNode->m_Children.FindByPredicate( [&InputEntry]( TSharedPtr<FInputResolverNode> _node )
-        {
-            // #TODO check state too
-            return _node->m_InputState.m_InputEntry == InputEntry;
-        } );
-
-        if( it )
-        {
-            m_CurrentRouteNode = *it;
-
-            // #TODO handle timer
-
-            if( m_CurrentRouteNode->m_Children.IsEmpty() )
-            {
-                // End of the route reached
-                m_InputRouteEndedDelegate.Broadcast( m_CurrentRouteNode->m_MoveUniqueId );
-            }
-        }
-    }
-    else
-    {
-        auto* it = m_Trees.FindByPredicate( [&InputEntry]( TSharedPtr<FInputResolverNode> _node )
-        {
-            // #TODO check state too
-            return _node->m_InputState.m_InputEntry == InputEntry;
-        } );
-
-        if( it )
-        {
-            m_RoutingStarted   = true;
-            m_CurrentRouteNode = *it;
-
-            // #TODO handle timer
-
-            if( m_CurrentRouteNode->m_Children.IsEmpty() )
-            {
-                // End of the route reached
-                m_InputRouteEndedDelegate.Broadcast( m_CurrentRouteNode->m_MoveUniqueId );
-            }
-        }
-    }*/
 }
 
 void UInputSequenceResolver::InsertEntry( TSharedPtr<FInputResolverNode> Node )

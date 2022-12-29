@@ -225,7 +225,8 @@ void UMovesBufferComponent::AddMoveToBuffer( EInputEntry MoveType )
 
     if( MoveType != EInputEntry::None )
     {
-        m_InputSequenceResolver->RegisterInput( MoveType );
+        EInputEntry targetEntry = m_OwnerCharacter->IsFacingRight() ? MoveType : GetMirrored( MoveType );
+        m_InputSequenceResolver->RegisterInput( targetEntry );
     }
 }
 

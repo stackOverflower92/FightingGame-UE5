@@ -45,3 +45,28 @@ FORCEINLINE FString InputEntryToString( EInputEntry InputEntry )
 
     return TEXT( "" );
 }
+
+FORCEINLINE EInputEntry GetMirrored( EInputEntry InputEntry )
+{
+    switch( InputEntry )
+    {
+        case EInputEntry::None: return EInputEntry::None;
+        case EInputEntry::StartJump: return EInputEntry::StartJump;
+        case EInputEntry::StopJump: return EInputEntry::StopJump;
+        case EInputEntry::Attack: return EInputEntry::Attack;
+        case EInputEntry::Special: return EInputEntry::Special;
+        case EInputEntry::Forward: return EInputEntry::Backward;
+        case EInputEntry::ForwardDown: return EInputEntry::DownBackward;
+        case EInputEntry::Down: return EInputEntry::Down;
+        case EInputEntry::DownBackward: return EInputEntry::ForwardDown;
+        case EInputEntry::Backward: return EInputEntry::Forward;
+        case EInputEntry::BackwardUp: return EInputEntry::UpForward;
+        case EInputEntry::Up: return EInputEntry::Up;
+        case EInputEntry::UpForward: return EInputEntry::BackwardUp;
+        case EInputEntry::COUNT: return EInputEntry::COUNT;
+        case EInputEntry::INVALID: return EInputEntry::INVALID;
+        default: break;
+    }
+
+    return EInputEntry::None;
+}
