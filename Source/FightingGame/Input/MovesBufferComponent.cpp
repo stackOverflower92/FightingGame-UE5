@@ -26,7 +26,16 @@ void UMovesBufferComponent::BeginPlay()
 {
     Super::BeginPlay();
 
-    m_InputSequenceResolver = NewObject<UInputSequenceResolver>( GetOwner() );
+    if( !m_InputSequenceResolverClass )
+    {
+        m_InputSequenceResolver = NewObject<UInputSequenceResolver>( GetOwner() );
+    }
+    else
+    {
+        m_InputSequenceResolver = NewObject<UInputSequenceResolver>( GetOwner(), m_InputSequenceResolverClass );
+    }
+
+    m_InputSequenceResolver->m_InputRouteEndedDelegate.AddUObject( this, &UMovesBufferComponent::OnInputRouteEnded );
     m_InputSequenceResolver->Init( m_MovesList );
 }
 
@@ -194,12 +203,30 @@ EInputEntry UMovesBufferComponent::GetDirectionalInputEntryFromAngle( float Angl
     return EInputEntry::None;
 }
 
+void UMovesBufferComponent::OnInputRouteEnded( uint32 MoveUniqueId )
+{
+    auto* it = m_MovesList.FindByPredicate( [&MoveUniqueId]( TObjectPtr<UMoveDataAsset> _move )
+    {
+        return _move->GetUniqueID() == MoveUniqueId;
+    } );
+
+    if( it )
+    {
+        FG_SLOG_INFO( FString::Printf(TEXT("Route: %s"), *((*it)->m_Id)) );
+    }
+}
+
 void UMovesBufferComponent::AddMoveToBuffer( EInputEntry MoveType )
 {
     m_Buffer.emplace_back( FInputBufferEntry{MoveType, false} );
     m_Buffer.pop_front();
 
     m_BufferChanged = true;
+
+    if( MoveType != EInputEntry::None )
+    {
+        m_InputSequenceResolver->RegisterInput( MoveType );
+    }
 }
 
 bool UMovesBufferComponent::BufferContainsConsumableInput( EInputEntry MoveType ) const

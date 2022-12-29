@@ -20,8 +20,6 @@ struct FInputBufferEntry
     bool m_Used;
 };
 
-DECLARE_MULTICAST_DELEGATE_OneParam( FMoveRouteEnded, TObjectPtr<UMoveDataAsset> )
-
 UCLASS( ClassGroup = ( Custom ), meta = ( BlueprintSpawnableComponent ) )
 class FIGHTINGGAME_API UMovesBufferComponent : public UActorComponent
 {
@@ -31,8 +29,6 @@ public:
     UMovesBufferComponent();
 
     TObjectPtr<AFightingCharacter> m_OwnerCharacter = nullptr;
-
-    FMoveRouteEnded m_MoveRouteEndedDelegate;
 
     UFUNCTION( BlueprintCallable )
     void UseBufferedInput( EInputEntry Input );
@@ -77,6 +73,9 @@ protected:
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Moves List" )
     TArray<TObjectPtr<UMoveDataAsset>> m_MovesList;
 
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Input Sequence Resolver" )
+    TSubclassOf<UInputSequenceResolver> m_InputSequenceResolverClass = nullptr;
+
     virtual void BeginPlay() override;
 
 public:
@@ -117,4 +116,6 @@ private:
     void UpdateMovementDirection();
     void UpdateDirectionalInputs( UInputComponent* InputComponent );
     EInputEntry GetDirectionalInputEntryFromAngle( float Angle ) const;
+
+    void OnInputRouteEnded( uint32 MoveUniqueId );
 };

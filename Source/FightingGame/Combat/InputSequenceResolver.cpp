@@ -37,8 +37,89 @@ void UInputSequenceResolver::Init( TArray<TObjectPtr<UMoveDataAsset>>& MovesList
             InsertEntry( node );
         }
     }
+}
 
-    FG_SLOG_INFO( TEXT("Bla") );
+void UInputSequenceResolver::RegisterInput( EInputEntry InputEntry )
+{
+    TArray<TSharedPtr<FInputResolverNode>> nodesArray;
+    if( m_CurrentRouteNode )
+    {
+        nodesArray = m_CurrentRouteNode->m_Children;
+    }
+    else
+    {
+        nodesArray = m_Trees;
+    }
+
+    auto* it = nodesArray.FindByPredicate( [&InputEntry]( TSharedPtr<FInputResolverNode> _node )
+    {
+        // #TODO check state too
+        return _node->m_InputState.m_InputEntry == InputEntry;
+    } );
+
+    if( it )
+    {
+        if( (*it)->m_Children.IsEmpty() )
+        {
+            // End of the route reached
+            m_InputRouteEndedDelegate.Broadcast( (*it)->m_MoveUniqueId );
+
+            ResetRouteTimer();
+
+            m_CurrentRouteNode = nullptr;
+        }
+        else
+        {
+            m_CurrentRouteNode = *it;
+
+            ResetRouteTimer();
+            StartRouteTimer();
+        }
+    }
+
+    /*if( m_RoutingStarted )
+    {
+        auto* it = m_CurrentRouteNode->m_Children.FindByPredicate( [&InputEntry]( TSharedPtr<FInputResolverNode> _node )
+        {
+            // #TODO check state too
+            return _node->m_InputState.m_InputEntry == InputEntry;
+        } );
+
+        if( it )
+        {
+            m_CurrentRouteNode = *it;
+
+            // #TODO handle timer
+
+            if( m_CurrentRouteNode->m_Children.IsEmpty() )
+            {
+                // End of the route reached
+                m_InputRouteEndedDelegate.Broadcast( m_CurrentRouteNode->m_MoveUniqueId );
+            }
+        }
+    }
+    else
+    {
+        auto* it = m_Trees.FindByPredicate( [&InputEntry]( TSharedPtr<FInputResolverNode> _node )
+        {
+            // #TODO check state too
+            return _node->m_InputState.m_InputEntry == InputEntry;
+        } );
+
+        if( it )
+        {
+            m_RoutingStarted   = true;
+            m_CurrentRouteNode = *it;
+
+            // #TODO handle timer
+
+            if( m_CurrentRouteNode->m_Children.IsEmpty() )
+            {
+                // End of the route reached
+                m_InputRouteEndedDelegate.Broadcast( m_CurrentRouteNode->m_MoveUniqueId );
+            }
+        }
+    }*/
 }
 
 void UInputSequenceResolver::InsertEntry( TSharedPtr<FInputResolverNode> Node )
@@ -67,4 +148,24 @@ void UInputSequenceResolver::InsertEntry( TSharedPtr<FInputResolverNode> Node )
             m_CurrentSequenceRoot = Node;
         }
     }
+}
+
+void UInputSequenceResolver::StartRouteTimer()
+{
+    FTimerManager& timerManager = GetWorld()->GetTimerManager();
+    timerManager.SetTimer( m_RouteTimerHandle, this, &UInputSequenceResolver::OnRouteTimerEnded, m_RouteAutoResetTime );
+}
+
+void UInputSequenceResolver::ResetRouteTimer()
+{
+    FTimerManager& timerManager = GetWorld()->GetTimerManager();
+    if( timerManager.IsTimerActive( m_RouteTimerHandle ) )
+    {
+        timerManager.ClearTimer( m_RouteTimerHandle );
+    }
+}
+
+void UInputSequenceResolver::OnRouteTimerEnded()
+{
+    m_CurrentRouteNode = nullptr;
 }
