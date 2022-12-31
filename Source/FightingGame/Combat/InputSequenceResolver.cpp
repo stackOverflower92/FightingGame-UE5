@@ -2,7 +2,7 @@
 
 #include "InputSequenceResolver.h"
 
-void UInputSequenceResolver::Init( TArray<TObjectPtr<UMoveDataAsset>>& MovesList )
+void UInputSequenceResolver::Init( const TArray<TObjectPtr<UMoveDataAsset>>& MovesList )
 {
     for( int32 moveIdx = 0; moveIdx < MovesList.Num(); ++moveIdx )
     {
@@ -11,9 +11,9 @@ void UInputSequenceResolver::Init( TArray<TObjectPtr<UMoveDataAsset>>& MovesList
 
         auto startsWithSameInput = [&]( TSharedPtr<FInputResolverNode> _root )
         {
-            ensureMsgf( !move->m_InputsSequence->m_Inputs.IsEmpty(), TEXT("Move [%s] has no inputs"), *move->m_Id.ToString() );
+            ensureMsgf( !inputs.IsEmpty(), TEXT("Move [%s] has no inputs"), *move->m_Id.ToString() );
 
-            return _root->m_InputState == move->m_InputsSequence->m_Inputs[0];
+            return _root->m_InputState == inputs[0];
         };
 
         if( auto it = m_Trees.FindByPredicate( startsWithSameInput ) )

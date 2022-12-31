@@ -34,7 +34,7 @@ class FIGHTINGGAME_API UInputSequenceResolver : public UObject
 public:
     FInputRouteEnded m_InputRouteEndedDelegate;
 
-    void Init( TArray<TObjectPtr<UMoveDataAsset>>& MovesList );
+    void Init( const TArray<TObjectPtr<UMoveDataAsset>>& MovesList );
     void RegisterInput( EInputEntry InputEntry );
 
 protected:
