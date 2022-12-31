@@ -8,9 +8,9 @@ void UInputSequenceResolver::Init( TArray<TObjectPtr<UMoveDataAsset>>& MovesList
     {
         auto it = m_Trees.FindByPredicate( [&]( TSharedPtr<FInputResolverNode> _root )
         {
-            ensureMsgf( !MovesList[moveIdx]->m_InputsSequence.IsEmpty(), TEXT("Move [%s] has no inputs"), *MovesList[moveIdx]->m_Id.ToString() );
+            ensureMsgf( !MovesList[moveIdx]->m_InputsSequence->m_Inputs.IsEmpty(), TEXT("Move [%s] has no inputs"), *MovesList[moveIdx]->m_Id.ToString() );
 
-            return _root->m_InputState == MovesList[moveIdx]->m_InputsSequence[0];
+            return _root->m_InputState == MovesList[moveIdx]->m_InputsSequence->m_Inputs[0];
         } );
 
         if( it )
@@ -19,15 +19,16 @@ void UInputSequenceResolver::Init( TArray<TObjectPtr<UMoveDataAsset>>& MovesList
         }
         else
         {
-            m_CurrentSequenceRoot = MakeShared<FInputResolverNode>( MovesList[moveIdx]->GetUniqueID(), MovesList[moveIdx]->m_InputsSequence[0],
+            m_CurrentSequenceRoot = MakeShared<FInputResolverNode>( MovesList[moveIdx]->GetUniqueID(), MovesList[moveIdx]->m_InputsSequence->m_Inputs[0],
                                                                     MovesList[moveIdx]->m_AllowWhenGrounded, MovesList[moveIdx]->m_AllowWhenAirborne );
 
             m_Trees.Emplace( m_CurrentSequenceRoot );
         }
 
-        for( int32 inputIdx = 1; inputIdx < MovesList[moveIdx]->m_InputsSequence.Num(); ++inputIdx )
+        for( int32 inputIdx = 1; inputIdx < MovesList[moveIdx]->m_InputsSequence->m_Inputs.Num(); ++inputIdx )
         {
-            TSharedPtr<FInputResolverNode> node = MakeShared<FInputResolverNode>( MovesList[moveIdx]->GetUniqueID(), MovesList[moveIdx]->m_InputsSequence[inputIdx],
+            TSharedPtr<FInputResolverNode> node = MakeShared<FInputResolverNode>( MovesList[moveIdx]->GetUniqueID(),
+                                                                                  MovesList[moveIdx]->m_InputsSequence->m_Inputs[inputIdx],
                                                                                   MovesList[moveIdx]->m_AllowWhenGrounded, MovesList[moveIdx]->m_AllowWhenAirborne );
             InsertNode( node );
         }

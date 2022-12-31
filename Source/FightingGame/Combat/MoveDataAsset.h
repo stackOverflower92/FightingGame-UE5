@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "FightingGame/Combat/MoveInputState.h"
+#include "FightingGame/Input/InputsSequence.h"
 #include "MoveDataAsset.generated.h"
 
 enum class EInputEntry : uint8;
@@ -23,7 +24,7 @@ public:
     TObjectPtr<UAnimMontage> m_AnimationMontageAsset = nullptr;
 
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Inputs Sequence" )
-    TArray<FMoveInputState> m_InputsSequence;
+    TObjectPtr<UInputsSequence> m_InputsSequence;
 
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Allow When Grounded" )
     bool m_AllowWhenGrounded = true;
