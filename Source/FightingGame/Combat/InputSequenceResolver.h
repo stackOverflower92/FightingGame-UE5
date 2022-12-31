@@ -52,7 +52,7 @@ private:
 
     FTimerHandle m_RouteTimerHandle;
 
-    void InsertEntry( TSharedPtr<FInputResolverNode> Node );
+    void InsertNode( TSharedPtr<FInputResolverNode> Node );
     void StartRouteTimer();
     void ResetRouteTimer();
     void OnRouteTimerEnded();

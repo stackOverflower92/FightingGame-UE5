@@ -16,8 +16,16 @@ class UInputSequenceResolver;
 
 struct FInputBufferEntry
 {
-    EInputEntry m_MoveType;
+    EInputEntry m_InputEntry;
     bool m_Used;
+};
+
+struct FMoveBufferEntry
+{
+    FName m_MoveName;
+    bool m_Used;
+
+    inline static FName s_MoveNone = FName( TEXT( "" ) );
 };
 
 UCLASS( ClassGroup = ( Custom ), meta = ( BlueprintSpawnableComponent ) )
@@ -30,6 +38,7 @@ public:
 
     TObjectPtr<AFightingCharacter> m_OwnerCharacter = nullptr;
 
+    // INPUT BUFFER [BEGIN]
     UFUNCTION( BlueprintCallable )
     void UseBufferedInput( EInputEntry Input );
 
@@ -37,13 +46,26 @@ public:
     bool IsInputBuffered( EInputEntry Input, bool ConsumeEntry = true );
 
     UFUNCTION( BlueprintCallable )
-    TArray<EInputEntry> GetBufferedInputs() const;
+    void ClearInputsBuffer();
 
     UFUNCTION( BlueprintCallable )
-    void ClearBuffer();
+    void InitInputBuffer();
+    // INPUT BUFER [END]
+
+    // MOVES BUFFER [BEGIN]
+    UFUNCTION( BlueprintCallable )
+    void UseBufferedMove( const FName& MoveName );
 
     UFUNCTION( BlueprintCallable )
-    void InitBuffer();
+    bool IsMoveBuffered( const FName& MoveName, bool ConsumeEntry = true );
+
+    UFUNCTION( BlueprintCallable )
+    void ClearMovesBuffer();
+
+    UFUNCTION( BlueprintCallable )
+    void InitMovesBuffer();
+
+    // MOVES BUFFER [END]
 
     UPROPERTY( BlueprintReadOnly, DisplayName = "Input Movement" )
     float m_InputMovement = 0.f;
@@ -55,8 +77,8 @@ public:
     bool m_MovingLeft = false;
 
 protected:
-    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Buffer Size Frames" )
-    int m_BufferSizeFrames = 6;
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Inputs Buffer Size Frames" )
+    int m_InputBufferSizeFrames = 6;
 
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Buffer Frame Rate (FPS)" )
     float m_BufferFrameRate = 30;
@@ -93,9 +115,13 @@ private:
     UPROPERTY()
     TObjectPtr<UInputSequenceResolver> m_InputSequenceResolver = nullptr;
 
-    std::deque<FInputBufferEntry> m_Buffer;
-    float m_ElapsedFrameTime = 0.f;
-    bool m_BufferChanged     = false;
+    std::deque<FInputBufferEntry> m_InputsBuffer;
+    float m_IBElapsedFrameTime = 0.f;
+    bool m_IBBufferChanged     = false;
+
+    std::deque<FMoveBufferEntry> m_MovesBuffer;
+    float m_MBElapsedFrameTime = 0.f;
+    bool m_MBBufferChanged     = false;
 
     float m_MovementDirection = 0.f;
 
@@ -103,8 +129,11 @@ private:
     FVector2D m_DirectionalInputVector;
     EInputEntry m_LastDirectionalInputEntry = EInputEntry::None;
 
-    void AddMoveToBuffer( EInputEntry InputEntry );
-    bool BufferContainsConsumableInput( EInputEntry MoveType ) const;
+    void AddToInputBuffer( EInputEntry InputEntry );
+    bool InputBufferContainsConsumable( EInputEntry InputEntry ) const;
+
+    void AddToMovesBuffer( const FName& MoveName );
+    bool MovesBufferContainsConsumable( const FName& MoveName );
 
     void OnMoveHorizontal( float Value );
 

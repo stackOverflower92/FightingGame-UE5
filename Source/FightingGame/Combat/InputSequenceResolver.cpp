@@ -8,7 +8,7 @@ void UInputSequenceResolver::Init( TArray<TObjectPtr<UMoveDataAsset>>& MovesList
     {
         auto it = m_Trees.FindByPredicate( [&]( TSharedPtr<FInputResolverNode> _root )
         {
-            ensureMsgf( !MovesList[moveIdx]->m_InputsSequence.IsEmpty(), TEXT("Move [%s] has no inputs"), *MovesList[moveIdx]->m_Id );
+            ensureMsgf( !MovesList[moveIdx]->m_InputsSequence.IsEmpty(), TEXT("Move [%s] has no inputs"), *MovesList[moveIdx]->m_Id.ToString() );
 
             return _root->m_InputState == MovesList[moveIdx]->m_InputsSequence[0];
         } );
@@ -29,7 +29,7 @@ void UInputSequenceResolver::Init( TArray<TObjectPtr<UMoveDataAsset>>& MovesList
         {
             TSharedPtr<FInputResolverNode> node = MakeShared<FInputResolverNode>( MovesList[moveIdx]->GetUniqueID(), MovesList[moveIdx]->m_InputsSequence[inputIdx],
                                                                                   MovesList[moveIdx]->m_AllowWhenGrounded, MovesList[moveIdx]->m_AllowWhenAirborne );
-            InsertEntry( node );
+            InsertNode( node );
         }
     }
 }
@@ -38,13 +38,13 @@ void UInputSequenceResolver::RegisterInput( EInputEntry InputEntry )
 {
     TArray<TSharedPtr<FInputResolverNode>> nodesArray = m_CurrentRouteNode ? m_CurrentRouteNode->m_Children : m_Trees;
 
-    auto* it = nodesArray.FindByPredicate( [&InputEntry]( TSharedPtr<FInputResolverNode> _node )
+    auto sameInputEntryLambda = [&InputEntry]( TSharedPtr<FInputResolverNode> _node )
     {
         // #TODO check state too
         return _node->m_InputState.m_InputEntry == InputEntry;
-    } );
+    };
 
-    if( it )
+    if( auto* it = nodesArray.FindByPredicate( sameInputEntryLambda ) )
     {
         if( (*it)->m_Children.IsEmpty() )
         {
@@ -71,7 +71,7 @@ void UInputSequenceResolver::RegisterInput( EInputEntry InputEntry )
     }
 }
 
-void UInputSequenceResolver::InsertEntry( TSharedPtr<FInputResolverNode> Node )
+void UInputSequenceResolver::InsertNode( TSharedPtr<FInputResolverNode> Node )
 {
     if( !m_CurrentSequenceRoot )
     {
@@ -79,15 +79,15 @@ void UInputSequenceResolver::InsertEntry( TSharedPtr<FInputResolverNode> Node )
     }
     else
     {
-        auto* it = m_CurrentSequenceRoot->m_Children.FindByPredicate( [&]( TSharedPtr<FInputResolverNode> _child )
+        auto sameInputStateLambda = [&]( TSharedPtr<FInputResolverNode> _child )
         {
             return _child->m_InputState == Node->m_InputState;
-        } );
+        };
 
-        if( it )
+        if( auto* it = m_CurrentSequenceRoot->m_Children.FindByPredicate( sameInputStateLambda ) )
         {
             m_CurrentSequenceRoot = *it;
-            InsertEntry( Node );
+            InsertNode( Node );
         }
         else
         {

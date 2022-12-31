@@ -17,7 +17,7 @@ class FIGHTINGGAME_API UMoveDataAsset : public UDataAsset
 
 public:
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Id" )
-    FString m_Id;
+    FName m_Id;
 
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Animation Montage" )
     TObjectPtr<UAnimMontage> m_AnimationMontageAsset = nullptr;
