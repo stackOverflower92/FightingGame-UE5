@@ -6,30 +6,31 @@ void UInputSequenceResolver::Init( TArray<TObjectPtr<UMoveDataAsset>>& MovesList
 {
     for( int32 moveIdx = 0; moveIdx < MovesList.Num(); ++moveIdx )
     {
-        auto it = m_Trees.FindByPredicate( [&]( TSharedPtr<FInputResolverNode> _root )
+        TObjectPtr<UMoveDataAsset> move = MovesList[moveIdx];
+        TArray<FMoveInputState>& inputs = move->m_InputsSequence->m_Inputs;
+
+        auto startsWithSameInput = [&]( TSharedPtr<FInputResolverNode> _root )
         {
-            ensureMsgf( !MovesList[moveIdx]->m_InputsSequence->m_Inputs.IsEmpty(), TEXT("Move [%s] has no inputs"), *MovesList[moveIdx]->m_Id.ToString() );
+            ensureMsgf( !move->m_InputsSequence->m_Inputs.IsEmpty(), TEXT("Move [%s] has no inputs"), *move->m_Id.ToString() );
 
-            return _root->m_InputState == MovesList[moveIdx]->m_InputsSequence->m_Inputs[0];
-        } );
+            return _root->m_InputState == move->m_InputsSequence->m_Inputs[0];
+        };
 
-        if( it )
+        if( auto it = m_Trees.FindByPredicate( startsWithSameInput ) )
         {
             m_CurrentSequenceRoot = *it;
         }
         else
         {
-            m_CurrentSequenceRoot = MakeShared<FInputResolverNode>( MovesList[moveIdx]->GetUniqueID(), MovesList[moveIdx]->m_InputsSequence->m_Inputs[0],
-                                                                    MovesList[moveIdx]->m_AllowWhenGrounded, MovesList[moveIdx]->m_AllowWhenAirborne );
+            m_CurrentSequenceRoot = MakeShared<FInputResolverNode>( move->GetUniqueID(), inputs[0], move->m_AllowWhenGrounded, move->m_AllowWhenAirborne );
 
             m_Trees.Emplace( m_CurrentSequenceRoot );
         }
 
-        for( int32 inputIdx = 1; inputIdx < MovesList[moveIdx]->m_InputsSequence->m_Inputs.Num(); ++inputIdx )
+        for( int32 inputIdx = 1; inputIdx < inputs.Num(); ++inputIdx )
         {
-            TSharedPtr<FInputResolverNode> node = MakeShared<FInputResolverNode>( MovesList[moveIdx]->GetUniqueID(),
-                                                                                  MovesList[moveIdx]->m_InputsSequence->m_Inputs[inputIdx],
-                                                                                  MovesList[moveIdx]->m_AllowWhenGrounded, MovesList[moveIdx]->m_AllowWhenAirborne );
+            auto node = MakeShared<FInputResolverNode>( move->GetUniqueID(), inputs[inputIdx], move->m_AllowWhenGrounded, move->m_AllowWhenAirborne );
+
             InsertNode( node );
         }
     }
