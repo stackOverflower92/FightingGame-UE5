@@ -4,9 +4,9 @@
 #include "FightingGame/FightingGameGameModeBase.h"
 #include "FreeForAllGameMode.generated.h"
 
+class AIndexedPlayerStart;
 class ACameraManager;
 class AFightingCharacter;
-class APlayerStart;
 
 // #TODO check which part of this class can be moved to GameState
 
@@ -31,7 +31,7 @@ protected:
     bool m_EnableCharactersAutoFacing = false;
 
 private:
-    TArray<TObjectPtr<APlayerStart>> m_PlayerStarts;
+    TArray<TObjectPtr<AIndexedPlayerStart>> m_PlayerStarts;
     TArray<TObjectPtr<APlayerController>> m_PlayerControllers;
     TArray<TObjectPtr<AFightingCharacter>> m_Characters;
 

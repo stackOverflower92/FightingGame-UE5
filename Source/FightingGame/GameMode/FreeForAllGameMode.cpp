@@ -1,12 +1,11 @@
 #include "FreeForAllGameMode.h"
 
 #include "EngineUtils.h"
+#include "IndexedPlayerStart.h"
 #include "FightingGame/Character/FightingCharacter.h"
 #include "FightingGame/Common/CombatStatics.h"
 #include "FightingGame/Debugging/Debug.h"
-#include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetStringLibrary.h"
 
 void AFreeForAllGameMode::BeginPlay()
 {
@@ -19,18 +18,15 @@ void AFreeForAllGameMode::BeginPlay()
 void AFreeForAllGameMode::SpawnCharacters()
 {
     UWorld* world = GetWorld();
-    for( TActorIterator<APlayerStart> it( world ); it; ++it )
+    for( TActorIterator<AIndexedPlayerStart> it( world ); it; ++it )
     {
         // TODO: missing checks
         m_PlayerStarts.Emplace( *it );
     }
 
-    m_PlayerStarts.Sort( []( const APlayerStart& A, const APlayerStart& B )
+    m_PlayerStarts.Sort( []( const AIndexedPlayerStart& A, const AIndexedPlayerStart& B )
     {
-        int32 AStartTag = UKismetStringLibrary::Conv_StringToInt( A.PlayerStartTag.ToString().TrimStartAndEnd() );
-        int32 BStartTag = UKismetStringLibrary::Conv_StringToInt( B.PlayerStartTag.ToString().TrimStartAndEnd() );
-
-        return AStartTag < BStartTag;
+        return A.m_Index < B.m_Index;
     } );
 
     for( int32 i = 0; i < m_AdditionalPlayers + 1; ++i )
@@ -41,7 +37,7 @@ void AFreeForAllGameMode::SpawnCharacters()
 
         m_PlayerControllers.Emplace( player );
 
-        TObjectPtr<APlayerStart> start           = m_PlayerStarts[i];
+        TObjectPtr<AIndexedPlayerStart> start    = m_PlayerStarts[i];
         TObjectPtr<AFightingCharacter> character = GetWorld()->SpawnActor<AFightingCharacter>( m_CharacterClass, start->GetTransform() );
         character->m_PlayerIndex                 = i;
 
