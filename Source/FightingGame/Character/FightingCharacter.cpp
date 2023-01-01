@@ -51,10 +51,13 @@ bool AFightingCharacter::IsGrounded() const
 
 void AFightingCharacter::UpdateHorizontalMovement( float value )
 {
-    float lastHorizontalMovement = GetLastMovementInputVector().Y;
-
     m_CurrentHorizontalMovement = value;
     AddMovementInput( FVector( 0.f, 1.f, 0.f ), m_CurrentHorizontalMovement );
+}
+
+void AFightingCharacter::UpdateFacing()
+{
+    float lastHorizontalMovement = GetLastMovementInputVector().Y;
 
     float lastHorizontalMovementSign    = FMath::Sign( lastHorizontalMovement );
     float currentHorizontalMovementSign = FMath::Sign( m_CurrentHorizontalMovement );

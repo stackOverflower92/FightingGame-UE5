@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "FightingGame/Combat/MoveInputState.h"
-#include "UObject/Object.h"
 #include "InputsSequence.generated.h"
 
 UCLASS()

@@ -52,8 +52,8 @@ public:
     UFUNCTION( BlueprintCallable )
     virtual bool IsGrounded() const override;
 
-    UFUNCTION( BlueprintCallable )
     void UpdateHorizontalMovement( float value );
+    void UpdateFacing();
 
     UFUNCTION( BlueprintCallable )
     virtual bool IsFacingRight() override;
@@ -66,13 +66,8 @@ public:
     UFUNCTION( BlueprintCallable )
     UHitboxHandlerComponent* GetHitboxHandler() const { return m_HitboxHandler; }
 
-    UFUNCTION( BlueprintCallable )
     float GetKnockbackMultiplier() const;
-
-    UFUNCTION( BlueprintCallable )
     float GetDamagePercent() const;
-
-    UFUNCTION( BlueprintCallable )
     void SetDamagePercent( float Percent );
 
     UFUNCTION( BlueprintCallable )
@@ -81,10 +76,7 @@ public:
     UFUNCTION( BlueprintCallable )
     void SetAirKnockbackHappening( bool Value );
 
-    UFUNCTION( BlueprintCallable )
     void PushTimeDilation( float Value );
-
-    UFUNCTION( BlueprintCallable )
     void PopTimeDilation();
 
     virtual void Tick( float DeltaTime ) override;
