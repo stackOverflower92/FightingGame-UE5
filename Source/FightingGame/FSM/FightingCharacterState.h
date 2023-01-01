@@ -44,7 +44,7 @@ protected:
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Update Movement" )
     bool m_UpdateMovement = false;
 
-    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Update Rotation" )
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Update Facing" )
     bool m_UpdateFacing = false;
 
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Pretend is Grounded" )
