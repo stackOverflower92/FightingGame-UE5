@@ -39,7 +39,16 @@ void UMovesBufferComponent::BeginPlay()
     }
 
     m_InputSequenceResolver->m_InputRouteEndedDelegate.AddUObject( this, &UMovesBufferComponent::OnInputRouteEnded );
-    m_InputSequenceResolver->Init( m_MovesList );
+
+    TArray<TObjectPtr<UInputsSequence>> inputs;
+    TArray<TTuple<bool, bool>> groundedAirborneFlags;
+    for( int i = 0; i < m_MovesList.Num(); ++i )
+    {
+        inputs.Emplace( m_MovesList[i]->m_InputsSequence );
+        groundedAirborneFlags.Emplace( TTuple<bool, bool>( m_MovesList[i]->m_AllowWhenGrounded, m_MovesList[i]->m_AllowWhenAirborne ) );
+    }
+
+    m_InputSequenceResolver->Init( inputs, groundedAirborneFlags );
 }
 
 void UMovesBufferComponent::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )

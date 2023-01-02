@@ -2,16 +2,20 @@
 
 #include "InputSequenceResolver.h"
 
-void UInputSequenceResolver::Init( const TArray<TObjectPtr<UMoveDataAsset>>& MovesList )
+void UInputSequenceResolver::Init( const TArray<TObjectPtr<UInputsSequence>>& InputsList, const TArray<TTuple<bool, bool>>& GroundedAirborneStates )
 {
-    for( int32 moveIdx = 0; moveIdx < MovesList.Num(); ++moveIdx )
+    ensureMsgf( InputsList.Num() == GroundedAirborneStates.Num(), TEXT("Inputs list size differs from grounded airborne states size") );
+
+    for( int32 i = 0; i < InputsList.Num(); ++i )
     {
-        TObjectPtr<UMoveDataAsset> move = MovesList[moveIdx];
-        TArray<FMoveInputState>& inputs = move->m_InputsSequence->m_Inputs;
+        TObjectPtr<UInputsSequence> sequence = InputsList[i];
+        TArray<FMoveInputState>& inputs      = sequence->m_Inputs;
+        bool allowWhenGrounded               = GroundedAirborneStates[i].Key;
+        bool allowWhenAirborne               = GroundedAirborneStates[i].Value;
 
         auto startsWithSameInput = [&]( TSharedPtr<FInputResolverNode> _root )
         {
-            ensureMsgf( !inputs.IsEmpty(), TEXT("Move [%s] has no inputs"), *move->m_Id.ToString() );
+            ensureMsgf( !inputs.IsEmpty(), TEXT("Sequence [%s] has no inputs"), *sequence->m_Name.ToString() );
 
             return _root->m_InputState == inputs[0];
         };
@@ -22,14 +26,15 @@ void UInputSequenceResolver::Init( const TArray<TObjectPtr<UMoveDataAsset>>& Mov
         }
         else
         {
-            m_CurrentSequenceRoot = MakeShared<FInputResolverNode>( move->GetUniqueID(), inputs[0], move->m_AllowWhenGrounded, move->m_AllowWhenAirborne );
+            m_CurrentSequenceRoot = MakeShared<FInputResolverNode>( sequence->GetUniqueID(), inputs[0],
+                                                                    GroundedAirborneStates[0].Key, GroundedAirborneStates[0].Value );
 
             m_Trees.Emplace( m_CurrentSequenceRoot );
         }
 
-        for( int32 inputIdx = 1; inputIdx < inputs.Num(); ++inputIdx )
+        for( int32 j = 1; j < inputs.Num(); ++j )
         {
-            auto node = MakeShared<FInputResolverNode>( move->GetUniqueID(), inputs[inputIdx], move->m_AllowWhenGrounded, move->m_AllowWhenAirborne );
+            auto node = MakeShared<FInputResolverNode>( sequence->GetUniqueID(), inputs[j], allowWhenGrounded, allowWhenAirborne );
 
             InsertNode( node );
         }
@@ -50,7 +55,7 @@ void UInputSequenceResolver::RegisterInput( EInputEntry InputEntry )
     {
         if( (*it)->m_Children.IsEmpty() )
         {
-            m_InputRouteEndedDelegate.Broadcast( (*it)->m_MoveUniqueId );
+            m_InputRouteEndedDelegate.Broadcast( (*it)->m_UniqueId );
 
             ResetRouteTimer();
             m_CurrentRouteNode = nullptr;
