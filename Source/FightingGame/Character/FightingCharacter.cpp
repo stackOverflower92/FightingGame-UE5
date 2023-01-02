@@ -251,6 +251,7 @@ void AFightingCharacter::Tick( float DeltaTime )
     UpdatePushbox( DeltaTime );
 
     UpdateGravityScale();
+    UpdateWalkingSpeed();
 }
 
 void AFightingCharacter::SetupPlayerInputComponent( UInputComponent* PlayerInputComponent )
@@ -478,6 +479,11 @@ void AFightingCharacter::UpdateGravityScale()
     float verticalVelocity = GetVelocity().Z;
 
     GetCharacterMovement()->GravityScale = verticalVelocity < 0.f ? m_FallingGravityScale : m_RegularGravityScale;
+}
+
+void AFightingCharacter::UpdateWalkingSpeed()
+{
+    GetCharacterMovement()->MaxWalkSpeed = m_IsMovingBackward ? m_BackwardWalkingSpeed : m_ForwardWalkingSpeed;
 }
 
 void AFightingCharacter::UpdateMeshShake()

@@ -172,6 +172,12 @@ protected:
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Auto-face Opponent" )
     bool m_AutoFaceOpponent = false;
 
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Forward Walking Speed" )
+    float m_ForwardWalkingSpeed = 600.f;
+
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Backward Walking Speed" )
+    float m_BackwardWalkingSpeed = 400.f;
+
     UPROPERTY()
     TObjectPtr<AFightingCharacter> m_OpponentToFace = nullptr;
 
@@ -214,4 +220,5 @@ private:
     void UpdateWallBoxes();
 
     void UpdateGravityScale();
+    void UpdateWalkingSpeed();
 };
