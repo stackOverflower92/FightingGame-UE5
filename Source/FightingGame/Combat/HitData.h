@@ -10,7 +10,7 @@ struct HitData
     bool m_IgnoreKnockbackMultiplier;
     float m_HitStopDuration;
     bool m_Shake;
-    const UWorld* m_World;
+    UWorld* m_World;
     AActor* m_Owner;
     USkeletalMeshComponent* m_SkeletalMesh;
     FName m_SocketToFollow;
@@ -22,7 +22,7 @@ struct HitData
     bool m_PendingRemoval;
 
     explicit HitData( bool InForceOpponentFacing, float InDamagePercent, float InRadius, const FVector& InProcessedKnockback, bool InIgnoreKnockbackMultiplier,
-                      float InHitStunDuration, bool InShake, const UWorld* InWorld, AActor* InOwner, USkeletalMeshComponent* InSkeletalMesh,
+                      float InHitStunDuration, bool InShake, UWorld* InWorld, AActor* InOwner, USkeletalMeshComponent* InSkeletalMesh,
                       const FName& InSocketToFollow,
                       FVector InLocation, uint32 InId, int32 InGroupId, int32 InPriority, const TArray<TObjectPtr<AActor>>& InAdditionalActorsToIgnore );
 
