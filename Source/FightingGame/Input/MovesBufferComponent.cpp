@@ -233,11 +233,11 @@ EInputEntry UMovesBufferComponent::GetDirectionalInputEntryFromAngle( float Angl
     return EInputEntry::None;
 }
 
-void UMovesBufferComponent::OnInputRouteEnded( uint32 MoveUniqueId )
+void UMovesBufferComponent::OnInputRouteEnded( uint32 InputsSequenceUniqueId )
 {
-    auto* it = m_MovesList.FindByPredicate( [&MoveUniqueId]( TObjectPtr<UMoveDataAsset> _move )
+    auto* it = m_MovesList.FindByPredicate( [&InputsSequenceUniqueId]( TObjectPtr<UMoveDataAsset> _move )
     {
-        return _move->GetUniqueID() == MoveUniqueId;
+        return _move->m_InputsSequence->GetUniqueID() == InputsSequenceUniqueId;
     } );
 
     if( it )

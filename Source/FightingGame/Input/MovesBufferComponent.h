@@ -146,5 +146,5 @@ private:
     void UpdateDirectionalInputs( UInputComponent* InputComponent );
     EInputEntry GetDirectionalInputEntryFromAngle( float Angle ) const;
 
-    void OnInputRouteEnded( uint32 MoveUniqueId );
+    void OnInputRouteEnded( uint32 InputsSequenceUniqueId );
 };
