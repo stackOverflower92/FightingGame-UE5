@@ -13,8 +13,6 @@ class FIGHTINGGAME_API AIndexedPlayerStart : public APlayerStart
     GENERATED_BODY()
 
 public:
-    AIndexedPlayerStart( const FObjectInitializer& ObjectInitializer );
-
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Index" )
     int32 m_Index = 0;
 };
