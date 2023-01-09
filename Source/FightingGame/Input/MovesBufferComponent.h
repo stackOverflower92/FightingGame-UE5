@@ -8,6 +8,7 @@
 
 #include "InputEntry.h"
 #include "FightingGame/Combat/MoveDataAsset.h"
+#include "FightingGame/FSM/FightingCharacterState.h"
 #include "MovesBufferComponent.generated.h"
 
 class AFightingCharacter;
@@ -20,12 +21,13 @@ struct FInputBufferEntry
     bool m_Used;
 };
 
-struct FMoveBufferEntry
+struct FInputsSequenceBufferEntry
 {
-    FName m_MoveName;
+    FName m_InputsSequenceName;
+    int32 m_Priority;
     bool m_Used;
 
-    inline static FName s_MoveNone = FName( TEXT( "" ) );
+    inline static FName s_SequenceNone = FName( TEXT( "" ) );
 };
 
 UCLASS( ClassGroup = ( Custom ), meta = ( BlueprintSpawnableComponent ) )
@@ -54,16 +56,18 @@ public:
 
     // MOVES BUFFER [BEGIN]
     UFUNCTION( BlueprintCallable )
-    void UseBufferedMove( const FName& MoveName );
+    void UseBufferedInputsSequence( const FName& InputsSequenceName );
 
     UFUNCTION( BlueprintCallable )
-    bool IsMoveBuffered( const FName& MoveName, bool ConsumeEntry = true );
+    bool IsInputsSequenceBuffered( const FName& InputsSequenceName, bool ConsumeEntry = true );
 
     UFUNCTION( BlueprintCallable )
-    void ClearMovesBuffer();
+    void ClearInputsSequenceBuffer();
 
     UFUNCTION( BlueprintCallable )
-    void InitMovesBuffer();
+    void InitInputsSequenceBuffer();
+
+    void GetInputsSequenceBufferSnapshot( TArray<FInputsSequenceBufferEntry>& OutEntries, bool SkipEmptyEntries );
 
     // MOVES BUFFER [END]
 
@@ -78,10 +82,16 @@ public:
 
 protected:
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Inputs Buffer Size Frames" )
-    int m_InputBufferSizeFrames = 6;
+    int32 m_InputBufferSizeFrames = 6;
 
-    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Buffer Frame Rate (FPS)" )
-    float m_BufferFrameRate = 30;
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Inputs Sequence Buffer Size Frames" )
+    int32 m_InputsSequencesBufferSizeFrames = 10;
+
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Input Buffer Frame Rate (FPS)" )
+    float m_InputBufferFrameRate = 30;
+
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Inputs Sequence Buffer Frame Rate (FPS)" )
+    float m_InputsSequencesBufferFrameRate = 30;
 
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Analog Movement Deadzone" )
     float m_AnalogMovementDeadzone = 0.1f;
@@ -92,8 +102,8 @@ protected:
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Directional Change Rotation Epsilon" )
     float m_DirectionalChangeRotationEpsilon = 15.f;
 
-    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Moves List" )
-    TArray<TObjectPtr<UMoveDataAsset>> m_MovesList;
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Inputs List" )
+    TArray<TObjectPtr<UInputsSequence>> m_InputsList;
 
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Input Sequence Resolver" )
     TSubclassOf<UInputSequenceResolver> m_InputSequenceResolverClass = nullptr;
@@ -119,9 +129,9 @@ private:
     float m_IBElapsedFrameTime = 0.f;
     bool m_IBBufferChanged     = false;
 
-    std::deque<FMoveBufferEntry> m_MovesBuffer;
-    float m_MBElapsedFrameTime = 0.f;
-    bool m_MBBufferChanged     = false;
+    std::deque<FInputsSequenceBufferEntry> m_InputsSequenceBuffer;
+    float m_ISBElapsedFrameTime = 0.f;
+    bool m_ISBBufferChanged     = false;
 
     float m_MovementDirection = 0.f;
 
@@ -132,8 +142,8 @@ private:
     void AddToInputBuffer( EInputEntry InputEntry );
     bool InputBufferContainsConsumable( EInputEntry InputEntry ) const;
 
-    void AddToMovesBuffer( const FName& MoveName );
-    bool MovesBufferContainsConsumable( const FName& MoveName );
+    void AddToInputsSequenceBuffer( const FName& InputsSequenceName, int32 Priority );
+    bool InputsSequenceBufferContainsConsumable( const FName& MoveName );
 
     void OnMoveHorizontal( float Value );
 
@@ -146,5 +156,5 @@ private:
     void UpdateDirectionalInputs( UInputComponent* InputComponent );
     EInputEntry GetDirectionalInputEntryFromAngle( float Angle ) const;
 
-    void OnInputRouteEnded( uint32 InputsSequenceUniqueId );
+    void OnInputRouteEnded( TObjectPtr<UInputsSequence> InputsSequence );
 };

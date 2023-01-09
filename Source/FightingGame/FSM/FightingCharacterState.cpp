@@ -99,6 +99,14 @@ void UFightingCharacterState::Update_Implementation( float DeltaTime )
 {
     Super::Update_Implementation( DeltaTime );
 
+    if( m_OwnerCharacter->HasJustLandedHit() )
+    {
+        if( TryExecuteBufferedInputsSequences() )
+        {
+            return;
+        }
+    }
+
     for( auto Pair : m_InstancedTransitions )
     {
         if( Pair.Value->CanPerformTransition() )
@@ -118,8 +126,23 @@ void UFightingCharacterState::Update_Implementation( float DeltaTime )
     }
 }
 
+FName UFightingCharacterState::GetDesiredFSMStateFromInputsSequence( const FName& InputsSequenceName )
+{
+    if( m_InputsSequenceNameToStateMap.Contains( InputsSequenceName ) )
+    {
+        return m_InputsSequenceNameToStateMap[InputsSequenceName];
+    }
+
+    return FName( NAME_None );
+}
+
 void UFightingCharacterState::OnMontageEvent( UAnimMontage* Montage, EMontageEventType EventType )
 {
+    if( TryExecuteBufferedInputsSequences() )
+    {
+        return;
+    }
+
     for( auto Pair : m_InstancedTransitions )
     {
         Pair.Value->OnMontageEvent( Montage, EventType );
@@ -134,6 +157,40 @@ void UFightingCharacterState::OnMontageEvent( UAnimMontage* Montage, EMontageEve
                 break;
             }
     }
+}
+
+bool UFightingCharacterState::TryExecuteBufferedInputsSequences()
+{
+    // #TODO this may become a flag on the exposed properties of this state?
+    bool canExecuteBufferedMoves = m_MoveToExecute != nullptr;
+    if( canExecuteBufferedMoves )
+    {
+        TArray<FInputsSequenceBufferEntry> inputsSequenceSnapshot;
+        m_OwnerCharacter->GetMovesBufferComponent()->GetInputsSequenceBufferSnapshot( inputsSequenceSnapshot, true );
+
+        if( !inputsSequenceSnapshot.IsEmpty() )
+        {
+            inputsSequenceSnapshot.Sort( []( const FInputsSequenceBufferEntry& A, const FInputsSequenceBufferEntry& B )
+            {
+                return A.m_Priority < B.m_Priority;
+            } );
+
+            FName selectedInputsSequence = inputsSequenceSnapshot[0].m_InputsSequenceName;
+            FName targetState            = GetDesiredFSMStateFromInputsSequence( selectedInputsSequence );
+
+            if( !targetState.IsNone() )
+            {
+                // #TODO this does weird things!
+                m_OwnerCharacter->GetMovesBufferComponent()->InitInputsSequenceBuffer();
+
+                UFSMStatics::SetState( m_OwnerCharacter->GetFSM(), targetState );
+
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 void UFightingCharacterState::OnCharacterAirborne_Implementation()

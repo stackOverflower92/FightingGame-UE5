@@ -10,12 +10,12 @@
 
 struct FInputResolverNode
 {
-    FInputResolverNode( uint32 UniqueId, FMoveInputState InputState, bool AllowWhenGrounded, bool AllowWhenAirborne )
-        : m_UniqueId( UniqueId ), m_InputState( InputState ), m_AllowWhenGrounded( AllowWhenGrounded ), m_AllowWhenAirborne( AllowWhenAirborne )
+    FInputResolverNode( TObjectPtr<UInputsSequence> InputsSequence, FMoveInputState InputState, bool AllowWhenGrounded, bool AllowWhenAirborne )
+        : m_InputsSequence( InputsSequence ), m_InputState( InputState ), m_AllowWhenGrounded( AllowWhenGrounded ), m_AllowWhenAirborne( AllowWhenAirborne )
     {
     }
 
-    uint32 m_UniqueId;
+    TObjectPtr<UInputsSequence> m_InputsSequence;
     FMoveInputState m_InputState;
     bool m_AllowWhenGrounded;
     bool m_AllowWhenAirborne;
@@ -24,7 +24,7 @@ struct FInputResolverNode
     TArray<TSharedPtr<FInputResolverNode>> m_Children;
 };
 
-DECLARE_MULTICAST_DELEGATE_OneParam( FInputRouteEnded, uint32 )
+DECLARE_MULTICAST_DELEGATE_OneParam( FInputRouteEnded, TObjectPtr<UInputsSequence> )
 
 UCLASS( Abstract, Blueprintable, BlueprintType, HideCategories = ("Cooking", "LOD", "Physics", "Activation", "Tags", "Rendering") )
 class FIGHTINGGAME_API UInputSequenceResolver : public UObject

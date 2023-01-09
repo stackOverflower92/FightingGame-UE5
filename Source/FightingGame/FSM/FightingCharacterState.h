@@ -50,6 +50,11 @@ protected:
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Pretend is Grounded" )
     bool m_PretendIsGrounded = false;
 
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Inputs Sequence Name To State Map" )
+    TMap<FName, FName> m_InputsSequenceNameToStateMap;
+
+    FName GetDesiredFSMStateFromInputsSequence( const FName& InputsSequenceName );
+
     UFUNCTION()
     void OnMontageEvent( UAnimMontage* Montage, EMontageEventType EventType );
 
@@ -72,4 +77,6 @@ private:
     FDelegateHandle m_CharacterHitLandedHandle;
     FDelegateHandle m_CharacterGroundedHandle;
     FDelegateHandle m_CharacterAirborneHandle;
+
+    bool TryExecuteBufferedInputsSequences();
 };

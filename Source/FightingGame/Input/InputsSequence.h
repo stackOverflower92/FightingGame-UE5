@@ -17,4 +17,7 @@ public:
 
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Sequence" )
     TArray<FMoveInputState> m_Inputs;
+
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Sequence" )
+    int32 m_Priority = 0;
 };

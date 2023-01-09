@@ -26,15 +26,15 @@ void UInputSequenceResolver::Init( const TArray<TObjectPtr<UInputsSequence>>& In
         }
         else
         {
-            m_CurrentSequenceRoot = MakeShared<FInputResolverNode>( sequence->GetUniqueID(), inputs[0],
-                                                                    GroundedAirborneStates[0].Key, GroundedAirborneStates[0].Value );
+            m_CurrentSequenceRoot = MakeShared<FInputResolverNode>( sequence, inputs[0], GroundedAirborneStates[0].Key,
+                                                                    GroundedAirborneStates[0].Value );
 
             m_Trees.Emplace( m_CurrentSequenceRoot );
         }
 
         for( int32 j = 1; j < inputs.Num(); ++j )
         {
-            auto node = MakeShared<FInputResolverNode>( sequence->GetUniqueID(), inputs[j], allowWhenGrounded, allowWhenAirborne );
+            auto node = MakeShared<FInputResolverNode>( sequence, inputs[j], allowWhenGrounded, allowWhenAirborne );
 
             InsertNode( node );
         }
@@ -45,17 +45,17 @@ void UInputSequenceResolver::RegisterInput( EInputEntry InputEntry )
 {
     TArray<TSharedPtr<FInputResolverNode>> nodesArray = m_CurrentRouteNode ? m_CurrentRouteNode->m_Children : m_Trees;
 
-    auto sameInputEntryLambda = [&InputEntry]( TSharedPtr<FInputResolverNode> _node )
+    auto predSameInputEntry = [&InputEntry]( TSharedPtr<FInputResolverNode> _node )
     {
         // #TODO check state too
         return _node->m_InputState.m_InputEntry == InputEntry;
     };
 
-    if( auto* it = nodesArray.FindByPredicate( sameInputEntryLambda ) )
+    if( auto* it = nodesArray.FindByPredicate( predSameInputEntry ) )
     {
         if( (*it)->m_Children.IsEmpty() )
         {
-            m_InputRouteEndedDelegate.Broadcast( (*it)->m_UniqueId );
+            m_InputRouteEndedDelegate.Broadcast( (*it)->m_InputsSequence );
 
             ResetRouteTimer();
             m_CurrentRouteNode = nullptr;
@@ -86,12 +86,12 @@ void UInputSequenceResolver::InsertNode( TSharedPtr<FInputResolverNode> Node )
     }
     else
     {
-        auto sameInputStateLambda = [&]( TSharedPtr<FInputResolverNode> _child )
+        auto predIsSameInputState = [&]( TSharedPtr<FInputResolverNode> _child )
         {
             return _child->m_InputState == Node->m_InputState;
         };
 
-        if( auto* it = m_CurrentSequenceRoot->m_Children.FindByPredicate( sameInputStateLambda ) )
+        if( auto* it = m_CurrentSequenceRoot->m_Children.FindByPredicate( predIsSameInputState ) )
         {
             m_CurrentSequenceRoot = *it;
             InsertNode( Node );
