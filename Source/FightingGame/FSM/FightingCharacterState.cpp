@@ -99,7 +99,7 @@ void UFightingCharacterState::Update_Implementation( float DeltaTime )
 {
     Super::Update_Implementation( DeltaTime );
 
-    if( m_OwnerCharacter->HasJustLandedHit() )
+    if( m_OwnerCharacter->HasJustLandedHit() || m_AlwaysListenForBufferedInputSequence )
     {
         if( TryExecuteBufferedInputsSequences() )
         {

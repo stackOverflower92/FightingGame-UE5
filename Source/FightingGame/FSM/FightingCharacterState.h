@@ -26,10 +26,10 @@ public:
     virtual void Update_Implementation( float DeltaTime ) override;
 
 protected:
-    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Owner Character" )
+    UPROPERTY( BlueprintReadOnly, DisplayName = "Owner Character" )
     TObjectPtr<AFightingCharacter> m_OwnerCharacter = nullptr;
 
-    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Anim Instance" )
+    UPROPERTY( BlueprintReadOnly, DisplayName = "Anim Instance" )
     TObjectPtr<UFightingCharacterAnimInstance> m_AnimInstance = nullptr;
 
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Is Reaction" )
@@ -49,6 +49,9 @@ protected:
 
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Pretend is Grounded" )
     bool m_PretendIsGrounded = false;
+
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Always Listen for Buffered Input Sequence" )
+    bool m_AlwaysListenForBufferedInputSequence = false;
 
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Inputs Sequence Name To State Map" )
     TMap<FName, FName> m_InputsSequenceNameToStateMap;

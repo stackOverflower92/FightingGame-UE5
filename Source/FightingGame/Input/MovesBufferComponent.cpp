@@ -134,11 +134,11 @@ void UMovesBufferComponent::OnSetupPlayerInputComponent( UInputComponent* Player
     m_PlayerInput = PlayerInputComponent;
     if( m_PlayerInput )
     {
-        FName jumpAction           = TEXT( "Jump" );
-        FName attackAction         = TEXT( "Attack" );
-        FName specialAction        = TEXT( "Special" );
-        FName moveHorizontalAction = TEXT( "MoveHorizontal" );
-        FName moveVerticalAction   = TEXT( "MoveVertical" );
+        static FName jumpAction           = TEXT( "Jump" );
+        static FName attackAction         = TEXT( "Attack" );
+        static FName specialAction        = TEXT( "Special" );
+        static FName moveHorizontalAction = TEXT( "MoveHorizontal" );
+        static FName moveVerticalAction   = TEXT( "MoveVertical" );
 
         m_PlayerInput->BindAction( jumpAction, IE_Pressed, this, &UMovesBufferComponent::OnStartJump );
         m_PlayerInput->BindAction( jumpAction, IE_Released, this, &UMovesBufferComponent::OnStopJump );
@@ -179,6 +179,8 @@ float UMovesBufferComponent::GetMovementDirection() const
 
 EInputEntry UMovesBufferComponent::GetDirectionalInputEntryFromAngle( float Angle ) const
 {
+    // Assuming the character is facing right
+
     static float forwardAngle = 90.f;
     static float downAngle    = 180.f;
     static float backAngle    = -90.f;

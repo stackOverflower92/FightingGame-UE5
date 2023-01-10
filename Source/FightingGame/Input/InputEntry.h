@@ -51,28 +51,15 @@ FORCEINLINE EInputEntry GetMirrored( EInputEntry InputEntry )
 {
     switch( InputEntry )
     {
-        case EInputEntry::None:
-        case EInputEntry::StartJump:
-        case EInputEntry::StopJump:
-        case EInputEntry::Attack:
-        case EInputEntry::Special:
-        case EInputEntry::Forward:
-            {
-                return InputEntry;
-            }
+        case EInputEntry::Forward: return EInputEntry::Backward;
+        case EInputEntry::Backward: return EInputEntry::Forward;
 
         case EInputEntry::ForwardDown: return EInputEntry::DownBackward;
-        case EInputEntry::Down: return EInputEntry::Down;
         case EInputEntry::DownBackward: return EInputEntry::ForwardDown;
-        case EInputEntry::Backward: return EInputEntry::Forward;
-        case EInputEntry::BackwardUp: return EInputEntry::UpForward;
-        case EInputEntry::Up: return EInputEntry::Up;
+
         case EInputEntry::UpForward: return EInputEntry::BackwardUp;
-        case EInputEntry::COUNT: return EInputEntry::COUNT;
-        case EInputEntry::INVALID: return EInputEntry::INVALID;
+        case EInputEntry::BackwardUp: return EInputEntry::UpForward;
 
-        default: break;
+        default: return InputEntry;
     }
-
-    return EInputEntry::None;
 }
