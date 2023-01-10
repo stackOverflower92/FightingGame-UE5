@@ -8,6 +8,7 @@
 
 #include "InputEntry.h"
 #include "FightingGame/Combat/MoveDataAsset.h"
+#include "FightingGame/Common/ConversionStatics.h"
 #include "FightingGame/FSM/FightingCharacterState.h"
 #include "MovesBufferComponent.generated.h"
 
@@ -19,6 +20,11 @@ struct FInputBufferEntry
 {
     EInputEntry m_InputEntry;
     bool m_Used;
+
+    FORCEINLINE FString ToString()
+    {
+        return m_InputEntry == EInputEntry::None ? TEXT( "---" ) : UConversionStatics::ConvertEnumValueToString( m_InputEntry, false );
+    }
 };
 
 struct FInputsSequenceBufferEntry
@@ -28,6 +34,11 @@ struct FInputsSequenceBufferEntry
     bool m_Used;
 
     inline static FName s_SequenceNone = FName( TEXT( "" ) );
+
+    FORCEINLINE FString ToString()
+    {
+        return m_InputsSequenceName == s_SequenceNone ? TEXT( "---" ) : m_InputsSequenceName.ToString();
+    }
 };
 
 UCLASS( ClassGroup = ( Custom ), meta = ( BlueprintSpawnableComponent ) )

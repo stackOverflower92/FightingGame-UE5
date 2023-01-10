@@ -4,6 +4,7 @@
 #include "Components/InputComponent.h"
 #include "FightingGame/Character/FightingCharacter.h"
 #include "FightingGame/Combat/InputSequenceResolver.h"
+#include "FightingGame/Common/ConversionStatics.h"
 #include "FightingGame/Common/MathStatics.h"
 #include "FightingGame/Debugging/Debug.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -84,8 +85,7 @@ void UMovesBufferComponent::TickComponent( float DeltaTime, ELevelTick TickType,
             for( int32 i = 0; i < m_InputsBuffer.size(); ++i )
             {
                 FInputBufferEntry& entry = m_InputsBuffer.at( i );
-                const bool isEmpty       = entry.m_InputEntry == EInputEntry::None;
-                FString message          = isEmpty ? TEXT( "---" ) : InputEntryToString( entry.m_InputEntry );
+                FString message          = entry.ToString();
 
                 FColor color = entry.m_Used ? FColor::Red : FColor::Green;
 
@@ -101,8 +101,7 @@ void UMovesBufferComponent::TickComponent( float DeltaTime, ELevelTick TickType,
             for( int32 i = 0; i < m_InputsSequenceBuffer.size(); ++i )
             {
                 FInputsSequenceBufferEntry& entry = m_InputsSequenceBuffer.at( i );
-                bool isEmpty                      = entry.m_InputsSequenceName == FInputsSequenceBufferEntry::s_SequenceNone;
-                FString message                   = isEmpty ? TEXT( "---" ) : entry.m_InputsSequenceName.ToString();
+                FString message                   = entry.ToString();
 
                 FColor color = entry.m_Used ? FColor::Red : FColor::Green;
 
@@ -443,7 +442,7 @@ void UMovesBufferComponent::UpdateDirectionalInputs( UInputComponent* InputCompo
         if( loc_ShowDirectionalAngle )
         {
             UKismetSystemLibrary::DrawDebugString( GetWorld(), GetOwner()->GetActorLocation(),
-                                                   FString::Printf( TEXT( "[Input: %s]" ), *InputEntryToString( entry ) ) );
+                                                   FString::Printf( TEXT( "[Input: %s]" ), *UConversionStatics::ConvertEnumValueToString( entry, false ) ) );
         }
 
         if( entry != m_LastDirectionalInputEntry )
