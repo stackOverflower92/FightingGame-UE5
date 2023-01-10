@@ -252,7 +252,11 @@ void UMovesBufferComponent::AddToInputBuffer( EInputEntry InputEntry )
 
     if( InputEntry != EInputEntry::None )
     {
-        m_InputSequenceResolver->RegisterInput( targetEntry );
+        auto result = m_InputSequenceResolver->RegisterInput( targetEntry );
+        if( result == EInputRegistrationResult::InputNotFound )
+        {
+            m_InputSequenceResolver->RegisterInput( targetEntry );
+        }
     }
 }
 

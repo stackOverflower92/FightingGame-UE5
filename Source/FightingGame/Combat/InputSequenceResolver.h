@@ -24,6 +24,17 @@ struct FInputResolverNode
     TArray<TSharedPtr<FInputResolverNode>> m_Children;
 };
 
+UENUM( BlueprintType )
+enum class EInputRegistrationResult : uint8
+{
+    RouteEnded,
+    InputFound,
+    InputNotFound,
+
+    COUNT UMETA( Hidden ),
+    INVALID UMETA( Hidden ),
+};
+
 DECLARE_MULTICAST_DELEGATE_OneParam( FInputRouteEnded, TObjectPtr<UInputsSequence> )
 
 UCLASS( Abstract, Blueprintable, BlueprintType, HideCategories = ("Cooking", "LOD", "Physics", "Activation", "Tags", "Rendering") )
@@ -35,14 +46,12 @@ public:
     FInputRouteEnded m_InputRouteEndedDelegate;
 
     void Init( const TArray<TObjectPtr<UInputsSequence>>& InputsList, const TArray<TTuple<bool, bool>>& GroundedAirborneStates );
-    void RegisterInput( EInputEntry InputEntry );
+    EInputRegistrationResult RegisterInput( EInputEntry InputEntry );
+    void Reset();
 
 protected:
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Route Auto-Reset Time (Seconds)" )
     float m_RouteAutoResetTime = 0.1f;
-
-    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Reset Route On Incorrect Input" )
-    bool m_ResetRouteOnIncorrectInput = true;
 
 private:
     TArray<TSharedPtr<FInputResolverNode>> m_Trees;

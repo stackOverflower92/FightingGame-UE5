@@ -41,7 +41,7 @@ void UInputSequenceResolver::Init( const TArray<TObjectPtr<UInputsSequence>>& In
     }
 }
 
-void UInputSequenceResolver::RegisterInput( EInputEntry InputEntry )
+EInputRegistrationResult UInputSequenceResolver::RegisterInput( EInputEntry InputEntry )
 {
     TArray<TSharedPtr<FInputResolverNode>> nodesArray = m_CurrentRouteNode ? m_CurrentRouteNode->m_Children : m_Trees;
 
@@ -59,23 +59,27 @@ void UInputSequenceResolver::RegisterInput( EInputEntry InputEntry )
 
             ResetRouteTimer();
             m_CurrentRouteNode = nullptr;
-        }
-        else
-        {
-            m_CurrentRouteNode = *it;
 
-            ResetRouteTimer();
-            StartRouteTimer();
+            return EInputRegistrationResult::RouteEnded;
         }
+
+        m_CurrentRouteNode = *it;
+
+        ResetRouteTimer();
+        StartRouteTimer();
+
+        return EInputRegistrationResult::InputFound;
     }
-    else
-    {
-        if( m_ResetRouteOnIncorrectInput )
-        {
-            ResetRouteTimer();
-            m_CurrentRouteNode = nullptr;
-        }
-    }
+
+    Reset();
+
+    return EInputRegistrationResult::InputNotFound;
+}
+
+void UInputSequenceResolver::Reset()
+{
+    ResetRouteTimer();
+    m_CurrentRouteNode = nullptr;
 }
 
 void UInputSequenceResolver::InsertNode( TSharedPtr<FInputResolverNode> Node )
