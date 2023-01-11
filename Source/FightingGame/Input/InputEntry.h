@@ -16,12 +16,13 @@ enum class EInputEntry : uint8
     BackwardUp,
     Up,
     UpForward,
+    Neutral,
 
     COUNT UMETA( Hidden ),
     INVALID UMETA( Hidden ),
 };
 
-FORCEINLINE EInputEntry GetMirrored( EInputEntry InputEntry )
+FORCEINLINE EInputEntry MirrorInputEntry( EInputEntry InputEntry )
 {
     switch( InputEntry )
     {

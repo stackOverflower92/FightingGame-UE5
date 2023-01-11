@@ -148,7 +148,7 @@ private:
 
     FVector2D m_LastDirectionalInputVector;
     FVector2D m_DirectionalInputVector;
-    EInputEntry m_LastDirectionalInputEntry = EInputEntry::None;
+    EInputEntry m_LastDirectionalInputEntry = EInputEntry::Neutral;
 
     void AddToInputBuffer( EInputEntry InputEntry );
     bool InputBufferContainsConsumable( EInputEntry InputEntry ) const;

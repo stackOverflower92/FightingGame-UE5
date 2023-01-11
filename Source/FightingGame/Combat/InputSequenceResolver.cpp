@@ -2,6 +2,8 @@
 
 #include "InputSequenceResolver.h"
 
+#include "FightingGame/Debugging/Debug.h"
+
 void UInputSequenceResolver::Init( const TArray<TObjectPtr<UInputsSequence>>& InputsList, const TArray<TTuple<bool, bool>>& GroundedAirborneStates )
 {
     ensureMsgf( InputsList.Num() == GroundedAirborneStates.Num(), TEXT("Inputs list size differs from grounded airborne states size") );
@@ -43,6 +45,11 @@ void UInputSequenceResolver::Init( const TArray<TObjectPtr<UInputsSequence>>& In
 
 EInputRegistrationResult UInputSequenceResolver::RegisterInput( EInputEntry InputEntry )
 {
+    if( !m_CurrentRouteNode && InputEntry == EInputEntry::None )
+    {
+        FG_SLOG_ERR( TEXT("A combo cannot start with a null entry") );
+    }
+
     TArray<TSharedPtr<FInputResolverNode>> nodesArray = m_CurrentRouteNode ? m_CurrentRouteNode->m_Children : m_Trees;
 
     auto predSameInputEntry = [&InputEntry]( TSharedPtr<FInputResolverNode> _node )
@@ -71,15 +78,10 @@ EInputRegistrationResult UInputSequenceResolver::RegisterInput( EInputEntry Inpu
         return EInputRegistrationResult::InputFound;
     }
 
-    Reset();
-
-    return EInputRegistrationResult::InputNotFound;
-}
-
-void UInputSequenceResolver::Reset()
-{
     ResetRouteTimer();
     m_CurrentRouteNode = nullptr;
+
+    return EInputRegistrationResult::InputNotFound;
 }
 
 void UInputSequenceResolver::InsertNode( TSharedPtr<FInputResolverNode> Node )

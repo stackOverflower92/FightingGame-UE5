@@ -244,7 +244,7 @@ void UMovesBufferComponent::OnInputRouteEnded( TObjectPtr<UInputsSequence> Input
 
 void UMovesBufferComponent::AddToInputBuffer( EInputEntry InputEntry )
 {
-    EInputEntry targetEntry = m_OwnerCharacter->IsFacingRight() ? InputEntry : GetMirrored( InputEntry );
+    EInputEntry targetEntry = m_OwnerCharacter->IsFacingRight() ? InputEntry : MirrorInputEntry( InputEntry );
 
     m_InputsBuffer.emplace_back( FInputBufferEntry{targetEntry, false} );
     m_InputsBuffer.pop_front();
@@ -450,6 +450,15 @@ void UMovesBufferComponent::UpdateDirectionalInputs( UInputComponent* InputCompo
             m_LastDirectionalInputEntry = entry;
 
             AddToInputBuffer( entry );
+        }
+    }
+    else
+    {
+        if( m_LastDirectionalInputEntry != EInputEntry::Neutral )
+        {
+            m_LastDirectionalInputEntry = EInputEntry::Neutral;
+
+            AddToInputBuffer( EInputEntry::Neutral );
         }
     }
 

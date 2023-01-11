@@ -47,7 +47,6 @@ public:
 
     void Init( const TArray<TObjectPtr<UInputsSequence>>& InputsList, const TArray<TTuple<bool, bool>>& GroundedAirborneStates );
     EInputRegistrationResult RegisterInput( EInputEntry InputEntry );
-    void Reset();
 
 protected:
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Route Auto-Reset Time (Seconds)" )
