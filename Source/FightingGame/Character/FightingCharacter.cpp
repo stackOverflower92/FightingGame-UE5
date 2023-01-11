@@ -227,7 +227,7 @@ void AFightingCharacter::Tick( float DeltaTime )
 
     if( loc_DebugDamageStats == 1 )
     {
-        UKismetSystemLibrary::DrawDebugString( GetWorld(), GetActorLocation(),
+        FG_TEXT( GetWorld(), GetActorLocation(),
                                                FString::Printf( TEXT( "[%%: %.1f][KMul: %.2f]" ), m_DamagePercent, GetKnockbackMultiplier() ) );
     }
 
@@ -236,7 +236,7 @@ void AFightingCharacter::Tick( float DeltaTime )
 
     if( loc_DebugFacing == 1 )
     {
-        UKismetSystemLibrary::DrawDebugString( GetWorld(), GetActorLocation(),
+       FG_TEXT( GetWorld(), GetActorLocation(),
                                                FString::Printf( TEXT( "[Facing Right: %s]" ), m_FacingRight ? TEXT( "TRUE" ) : TEXT( "FALSE" ) ) );
     }
 

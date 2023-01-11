@@ -48,7 +48,7 @@ void UHitStopComponent::TickComponent( float DeltaTime, ELevelTick TickType, FAc
 
 	if( loc_ShowHitStopState )
 	{
-		UKismetSystemLibrary::DrawDebugString( GetWorld(), GetOwner()->GetActorLocation(),
+		FG_TEXT( GetWorld(), GetOwner()->GetActorLocation(),
 		                                       FString::Printf( TEXT( "[Hit Stop: %s]" ), m_HitStopRunning ? TEXT( "TRUE" ) : TEXT( "FALSE" ) ) );
 	}
 }

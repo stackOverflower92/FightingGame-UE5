@@ -441,8 +441,8 @@ void UMovesBufferComponent::UpdateDirectionalInputs( UInputComponent* InputCompo
 
         if( loc_ShowDirectionalAngle )
         {
-            UKismetSystemLibrary::DrawDebugString( GetWorld(), GetOwner()->GetActorLocation(),
-                                                   FString::Printf( TEXT( "[Input: %s]" ), *UConversionStatics::ConvertEnumValueToString( entry, false ) ) );
+            FG_TEXT( GetWorld(), GetOwner()->GetActorLocation(),
+                     FString::Printf( TEXT( "[Input: %s]" ), *UConversionStatics::ConvertEnumValueToString( entry, false ) ) );
         }
 
         if( entry != m_LastDirectionalInputEntry )

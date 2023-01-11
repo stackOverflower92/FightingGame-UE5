@@ -9,7 +9,9 @@
 #define FG_SLOG(Message, Color)
 #define FG_SLOG_INFO(Message)
 #define FG_SLOG_WARN(Message)
-#deifne FG_SLOG_ERR(Message)
+#define FG_SLOG_ERR(Message)
+
+#define FG_TEXT(World, Location, Text)
 
 #else
 
@@ -21,5 +23,7 @@
 #define FG_SLOG_INFO(Message) FG_SLOG(##Message, FColor::White)
 #define FG_SLOG_WARN(Message) FG_SLOG(##Message, FColor::Yellow)
 #define FG_SLOG_ERR(Message) FG_SLOG(##Message, FColor::Red)
+
+#define FG_TEXT(World, Location, Text) UKismetSystemLibrary::DrawDebugString(##World, ##Location, ##Text)
 
 #endif
