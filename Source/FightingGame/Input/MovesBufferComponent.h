@@ -175,11 +175,9 @@ private:
 
     void AddToInputBuffer( EInputEntry InputEntry );
     bool InputBufferContainsConsumable( EInputEntry InputEntry ) const;
-    const FInputBufferEntry* GetBufferedInput( int32 UniqueId );
 
     void AddToInputsSequenceBuffer( const FName& InputsSequenceName, int32 Priority );
     bool InputsSequenceBufferContainsConsumable( const FName& MoveName );
-    const FInputsSequenceBufferEntry* GetBufferedInputEntry( int32 UniqueId );
 
     void OnMoveHorizontal( float Value );
 

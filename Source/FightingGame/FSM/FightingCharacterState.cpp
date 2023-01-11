@@ -175,13 +175,17 @@ bool UFightingCharacterState::TryExecuteBufferedInputsSequences()
                 return A.m_Priority < B.m_Priority;
             } );
 
-            FName selectedInputsSequence = inputsSequenceSnapshot[0].m_InputsSequenceName;
+            FInputsSequenceBufferEntry& targetEntry = inputsSequenceSnapshot[0];
+
+            FName selectedInputsSequence = targetEntry.m_InputsSequenceName;
             FName targetState            = GetDesiredFSMStateFromInputsSequence( selectedInputsSequence );
 
             if( !targetState.IsNone() )
             {
                 // #TODO this does weird things!
-                m_OwnerCharacter->GetMovesBufferComponent()->InitInputsSequenceBuffer();
+                //m_OwnerCharacter->GetMovesBufferComponent()->InitInputsSequenceBuffer();
+
+                m_OwnerCharacter->GetMovesBufferComponent()->UseBufferedInputsSequence( targetEntry.m_UniqueId );
 
                 UFSMStatics::SetState( m_OwnerCharacter->GetFSM(), targetState );
 

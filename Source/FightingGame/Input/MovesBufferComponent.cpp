@@ -274,19 +274,6 @@ bool UMovesBufferComponent::InputBufferContainsConsumable( EInputEntry InputEntr
     return false;
 }
 
-const FInputBufferEntry* UMovesBufferComponent::GetBufferedInput( int32 UniqueId )
-{
-    for( const FInputBufferEntry& entry : m_InputsBuffer )
-    {
-        if( entry.m_UniqueId == UniqueId && !entry.m_Used )
-        {
-            return &entry;
-        }
-    }
-
-    return nullptr;
-}
-
 void UMovesBufferComponent::AddToInputsSequenceBuffer( const FName& InputsSequenceName, int32 Priority )
 {
     m_InputsSequenceBuffer.emplace_back( FInputsSequenceBufferEntry( InputsSequenceName, Priority, false ) );
@@ -306,19 +293,6 @@ bool UMovesBufferComponent::InputsSequenceBufferContainsConsumable( const FName&
     }
 
     return false;
-}
-
-const FInputsSequenceBufferEntry* UMovesBufferComponent::GetBufferedInputEntry( int32 UniqueId )
-{
-    for( const FInputsSequenceBufferEntry& entry : m_InputsSequenceBuffer )
-    {
-        if( entry.m_UniqueId == UniqueId && !entry.m_Used )
-        {
-            return &entry;
-        }
-    }
-
-    return nullptr;
 }
 
 void UMovesBufferComponent::ClearInputsBuffer()
@@ -351,6 +325,13 @@ void UMovesBufferComponent::UseBufferedInputsSequence( const FName& InputsSequen
 
 void UMovesBufferComponent::UseBufferedInputsSequence( int32 UniqueId )
 {
+    for( FInputsSequenceBufferEntry& entry : m_InputsSequenceBuffer )
+    {
+        if( entry.m_UniqueId == UniqueId )
+        {
+            entry.m_Used = true;
+        }
+    }
 }
 
 void UMovesBufferComponent::ClearInputsSequenceBuffer()
