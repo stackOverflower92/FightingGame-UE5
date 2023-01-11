@@ -19,6 +19,12 @@ namespace
 
     int32 loc_ShowDirectionalAngle = 0;
     FG_CVAR_FLAG_DESC( CVarShowDirectionalAngle, TEXT("MovesBufferComponent.ShowDirectionalAngle"), loc_ShowDirectionalAngle );
+
+    FName loc_JumpAction           = TEXT( "Jump" );
+    FName loc_AttackAction         = TEXT( "Attack" );
+    FName loc_SpecialAction        = TEXT( "Special" );
+    FName loc_MoveHorizontalAction = TEXT( "MoveHorizontal" );
+    FName loc_MoveVerticalAction   = TEXT( "MoveVertical" );
 }
 
 UMovesBufferComponent::UMovesBufferComponent()
@@ -117,7 +123,7 @@ void UMovesBufferComponent::TickComponent( float DeltaTime, ELevelTick TickType,
 
     if( m_PlayerInput )
     {
-        float horizontalMovement = m_PlayerInput->GetAxisValue( TEXT( "MoveHorizontal" ) );
+        float horizontalMovement = m_PlayerInput->GetAxisValue( loc_MoveHorizontalAction );
 
         m_InputMovement = horizontalMovement;
 
@@ -133,19 +139,13 @@ void UMovesBufferComponent::OnSetupPlayerInputComponent( UInputComponent* Player
     m_PlayerInput = PlayerInputComponent;
     if( m_PlayerInput )
     {
-        static FName jumpAction           = TEXT( "Jump" );
-        static FName attackAction         = TEXT( "Attack" );
-        static FName specialAction        = TEXT( "Special" );
-        static FName moveHorizontalAction = TEXT( "MoveHorizontal" );
-        static FName moveVerticalAction   = TEXT( "MoveVertical" );
+        m_PlayerInput->BindAction( loc_JumpAction, IE_Pressed, this, &UMovesBufferComponent::OnStartJump );
+        m_PlayerInput->BindAction( loc_JumpAction, IE_Released, this, &UMovesBufferComponent::OnStopJump );
+        m_PlayerInput->BindAction( loc_AttackAction, IE_Pressed, this, &UMovesBufferComponent::OnAttack );
+        m_PlayerInput->BindAction( loc_SpecialAction, IE_Pressed, this, &UMovesBufferComponent::OnSpecial );
 
-        m_PlayerInput->BindAction( jumpAction, IE_Pressed, this, &UMovesBufferComponent::OnStartJump );
-        m_PlayerInput->BindAction( jumpAction, IE_Released, this, &UMovesBufferComponent::OnStopJump );
-        m_PlayerInput->BindAction( attackAction, IE_Pressed, this, &UMovesBufferComponent::OnAttack );
-        m_PlayerInput->BindAction( specialAction, IE_Pressed, this, &UMovesBufferComponent::OnSpecial );
-
-        m_PlayerInput->BindAxis( moveHorizontalAction );
-        m_PlayerInput->BindAxis( moveVerticalAction );
+        m_PlayerInput->BindAxis( loc_MoveHorizontalAction );
+        m_PlayerInput->BindAxis( loc_MoveVerticalAction );
     }
 
     InitInputBuffer();
@@ -246,7 +246,7 @@ void UMovesBufferComponent::AddToInputBuffer( EInputEntry InputEntry )
 {
     EInputEntry targetEntry = m_OwnerCharacter->IsFacingRight() ? InputEntry : MirrorInputEntry( InputEntry );
 
-    m_InputsBuffer.emplace_back( FInputBufferEntry{targetEntry, false} );
+    m_InputsBuffer.emplace_back( FInputBufferEntry( targetEntry, false ) );
     m_InputsBuffer.pop_front();
 
     m_IBBufferChanged = true;
@@ -274,9 +274,22 @@ bool UMovesBufferComponent::InputBufferContainsConsumable( EInputEntry InputEntr
     return false;
 }
 
+const FInputBufferEntry* UMovesBufferComponent::GetBufferedInput( int32 UniqueId )
+{
+    for( const FInputBufferEntry& entry : m_InputsBuffer )
+    {
+        if( entry.m_UniqueId == UniqueId && !entry.m_Used )
+        {
+            return &entry;
+        }
+    }
+
+    return nullptr;
+}
+
 void UMovesBufferComponent::AddToInputsSequenceBuffer( const FName& InputsSequenceName, int32 Priority )
 {
-    m_InputsSequenceBuffer.emplace_back( FInputsSequenceBufferEntry{InputsSequenceName, Priority, false} );
+    m_InputsSequenceBuffer.emplace_back( FInputsSequenceBufferEntry( InputsSequenceName, Priority, false ) );
     m_InputsSequenceBuffer.pop_front();
 
     m_ISBBufferChanged = true;
@@ -295,6 +308,19 @@ bool UMovesBufferComponent::InputsSequenceBufferContainsConsumable( const FName&
     return false;
 }
 
+const FInputsSequenceBufferEntry* UMovesBufferComponent::GetBufferedInputEntry( int32 UniqueId )
+{
+    for( const FInputsSequenceBufferEntry& entry : m_InputsSequenceBuffer )
+    {
+        if( entry.m_UniqueId == UniqueId && !entry.m_Used )
+        {
+            return &entry;
+        }
+    }
+
+    return nullptr;
+}
+
 void UMovesBufferComponent::ClearInputsBuffer()
 {
     m_InputsBuffer.clear();
@@ -306,7 +332,7 @@ void UMovesBufferComponent::InitInputBuffer()
 
     for( int32 i = 0; i < m_InputBufferSizeFrames; ++i )
     {
-        m_InputsBuffer.emplace_back( FInputBufferEntry{EInputEntry::None, false} );
+        m_InputsBuffer.emplace_back( FInputBufferEntry( EInputEntry::None, false ) );
     }
 }
 
@@ -323,6 +349,10 @@ void UMovesBufferComponent::UseBufferedInputsSequence( const FName& InputsSequen
     }
 }
 
+void UMovesBufferComponent::UseBufferedInputsSequence( int32 UniqueId )
+{
+}
+
 void UMovesBufferComponent::ClearInputsSequenceBuffer()
 {
     m_InputsSequenceBuffer.clear();
@@ -334,7 +364,7 @@ void UMovesBufferComponent::InitInputsSequenceBuffer()
 
     for( int i = 0; i < m_InputsSequencesBufferSizeFrames; ++i )
     {
-        m_InputsSequenceBuffer.emplace_back( FInputsSequenceBufferEntry{FInputsSequenceBufferEntry::s_SequenceNone, false} );
+        m_InputsSequenceBuffer.emplace_back( FInputsSequenceBufferEntry( FInputsSequenceBufferEntry::s_SequenceNone, 0, false ) );
     }
 }
 
@@ -476,4 +506,8 @@ void UMovesBufferComponent::UseBufferedInput( EInputEntry Input )
             entry.m_Used = true;
         }
     }
+}
+
+void UMovesBufferComponent::UseBufferedInput( int32 UniqueId )
+{
 }

@@ -16,26 +16,63 @@ class AFightingCharacter;
 class UInputComponent;
 class UInputSequenceResolver;
 
-struct FInputBufferEntry
+static int32 g_CurrentBufferEntryUniqueId = 0;
+
+struct FBufferEntry
 {
-    EInputEntry m_InputEntry;
+    explicit FBufferEntry( bool Used ) : m_Used( Used )
+    {
+        if( g_CurrentBufferEntryUniqueId < 1000 )
+        {
+            ++g_CurrentBufferEntryUniqueId;
+        }
+        else
+        {
+            g_CurrentBufferEntryUniqueId = 0;
+        }
+
+        m_UniqueId = g_CurrentBufferEntryUniqueId;
+    }
+
+    virtual ~FBufferEntry() = default;
+
+    int32 m_UniqueId = g_CurrentBufferEntryUniqueId;
     bool m_Used;
 
-    FORCEINLINE FString ToString()
+    virtual FString ToString() = 0;
+};
+
+struct FInputBufferEntry : public FBufferEntry
+{
+    explicit FInputBufferEntry( EInputEntry InputEntry, bool Used )
+        : FBufferEntry( Used ),
+          m_InputEntry( InputEntry )
+    {
+    }
+
+    EInputEntry m_InputEntry;
+
+    virtual FORCEINLINE FString ToString() override
     {
         return m_InputEntry == EInputEntry::None ? TEXT( "---" ) : UConversionStatics::ConvertEnumValueToString( m_InputEntry, false );
     }
 };
 
-struct FInputsSequenceBufferEntry
+struct FInputsSequenceBufferEntry : public FBufferEntry
 {
+    explicit FInputsSequenceBufferEntry( const FName& InputsSequenceName, int32 Priority, bool Used )
+        : FBufferEntry( Used ),
+          m_InputsSequenceName( InputsSequenceName ),
+          m_Priority( Priority )
+    {
+    }
+
     FName m_InputsSequenceName;
     int32 m_Priority;
-    bool m_Used;
 
     inline static FName s_SequenceNone = FName( TEXT( "" ) );
 
-    FORCEINLINE FString ToString()
+    virtual FORCEINLINE FString ToString() override
     {
         return m_InputsSequenceName == s_SequenceNone ? TEXT( "---" ) : m_InputsSequenceName.ToString();
     }
@@ -52,34 +89,20 @@ public:
     TObjectPtr<AFightingCharacter> m_OwnerCharacter = nullptr;
 
     // INPUT BUFFER [BEGIN]
-    UFUNCTION( BlueprintCallable )
     void UseBufferedInput( EInputEntry Input );
-
-    UFUNCTION( BlueprintCallable )
+    void UseBufferedInput( int32 UniqueId );
     bool IsInputBuffered( EInputEntry Input, bool ConsumeEntry = true );
-
-    UFUNCTION( BlueprintCallable )
     void ClearInputsBuffer();
-
-    UFUNCTION( BlueprintCallable )
     void InitInputBuffer();
     // INPUT BUFER [END]
 
     // MOVES BUFFER [BEGIN]
-    UFUNCTION( BlueprintCallable )
     void UseBufferedInputsSequence( const FName& InputsSequenceName );
-
-    UFUNCTION( BlueprintCallable )
+    void UseBufferedInputsSequence( int32 UniqueId );
     bool IsInputsSequenceBuffered( const FName& InputsSequenceName, bool ConsumeEntry = true );
-
-    UFUNCTION( BlueprintCallable )
     void ClearInputsSequenceBuffer();
-
-    UFUNCTION( BlueprintCallable )
     void InitInputsSequenceBuffer();
-
     void GetInputsSequenceBufferSnapshot( TArray<FInputsSequenceBufferEntry>& OutEntries, bool SkipEmptyEntries );
-
     // MOVES BUFFER [END]
 
     UPROPERTY( BlueprintReadOnly, DisplayName = "Input Movement" )
@@ -152,9 +175,11 @@ private:
 
     void AddToInputBuffer( EInputEntry InputEntry );
     bool InputBufferContainsConsumable( EInputEntry InputEntry ) const;
+    const FInputBufferEntry* GetBufferedInput( int32 UniqueId );
 
     void AddToInputsSequenceBuffer( const FName& InputsSequenceName, int32 Priority );
     bool InputsSequenceBufferContainsConsumable( const FName& MoveName );
+    const FInputsSequenceBufferEntry* GetBufferedInputEntry( int32 UniqueId );
 
     void OnMoveHorizontal( float Value );
 
