@@ -91,11 +91,9 @@ void UMovesBufferComponent::TickComponent( float DeltaTime, ELevelTick TickType,
             for( int32 i = 0; i < m_InputsBuffer.size(); ++i )
             {
                 FInputBufferEntry& entry = m_InputsBuffer.at( i );
-                FString message          = entry.ToString();
+                FColor color             = entry.m_Used ? FColor::Red : FColor::Green;
 
-                FColor color = entry.m_Used ? FColor::Red : FColor::Green;
-
-                GEngine->AddOnScreenDebugMessage( i, 1.f, color, FString::Printf( TEXT( "%s" ), *message ) );
+                FG_SLOG_KEY( i, FString::Printf( TEXT( "%s [%u]" ), *entry.ToString(), entry.m_UniqueId ), color );
             }
         }
     }
@@ -107,11 +105,9 @@ void UMovesBufferComponent::TickComponent( float DeltaTime, ELevelTick TickType,
             for( int32 i = 0; i < m_InputsSequenceBuffer.size(); ++i )
             {
                 FInputsSequenceBufferEntry& entry = m_InputsSequenceBuffer.at( i );
-                FString message                   = entry.ToString();
+                FColor color                      = entry.m_Used ? FColor::Red : FColor::Green;
 
-                FColor color = entry.m_Used ? FColor::Red : FColor::Green;
-
-                GEngine->AddOnScreenDebugMessage( i + 20, 1.f, color, FString::Printf( TEXT( "%s" ), *message ) );
+                FG_SLOG_KEY( i + 20, FString::Printf( TEXT( "%s [%u]" ), *entry.ToString(), entry.m_UniqueId ), color );
             }
         }
     }
@@ -274,7 +270,7 @@ bool UMovesBufferComponent::InputBufferContainsConsumable( EInputEntry InputEntr
     return false;
 }
 
-void UMovesBufferComponent::AddToInputsSequenceBuffer( const FName& InputsSequenceName, int32 Priority )
+void UMovesBufferComponent::AddToInputsSequenceBuffer( const FString& InputsSequenceName, int32 Priority )
 {
     m_InputsSequenceBuffer.emplace_back( FInputsSequenceBufferEntry( InputsSequenceName, Priority, false ) );
     m_InputsSequenceBuffer.pop_front();
@@ -282,7 +278,7 @@ void UMovesBufferComponent::AddToInputsSequenceBuffer( const FName& InputsSequen
     m_ISBBufferChanged = true;
 }
 
-bool UMovesBufferComponent::InputsSequenceBufferContainsConsumable( const FName& MoveName )
+bool UMovesBufferComponent::InputsSequenceBufferContainsConsumable( const FString& MoveName )
 {
     for( const FInputsSequenceBufferEntry& entry : m_InputsSequenceBuffer )
     {
@@ -310,7 +306,7 @@ void UMovesBufferComponent::InitInputBuffer()
     }
 }
 
-void UMovesBufferComponent::UseBufferedInputsSequence( const FName& InputsSequenceName )
+void UMovesBufferComponent::UseBufferedInputsSequence( const FString& InputsSequenceName )
 {
     verify( InputsSequenceBufferContainsConsumable( InputsSequenceName ) );
 
@@ -365,7 +361,7 @@ void UMovesBufferComponent::GetInputsSequenceBufferSnapshot( TArray<FInputsSeque
     }
 }
 
-bool UMovesBufferComponent::IsInputsSequenceBuffered( const FName& InputsSequenceName, bool ConsumeEntry /*= true*/ )
+bool UMovesBufferComponent::IsInputsSequenceBuffered( const FString& InputsSequenceName, bool ConsumeEntry /*= true*/ )
 {
     for( int32 i = 0; i < m_InputsSequenceBuffer.size(); ++i )
     {

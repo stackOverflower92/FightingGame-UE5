@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "FightingCharacter.generated.h"
 
+class UStateMachineComponent;
 class UProjectileSpawnerComponent;
 class UBoxComponent;
 class UHitStopComponent;
@@ -105,6 +106,9 @@ public:
 protected:
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "FSM" )
     TObjectPtr<UFSM> m_FSM = nullptr;
+
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "State Machine" )
+    TObjectPtr<UStateMachineComponent> m_StateMachine = nullptr;
 
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Moves Buffer" )
     TObjectPtr<UMovesBufferComponent> m_MovesBuffer = nullptr;

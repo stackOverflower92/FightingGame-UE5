@@ -10,6 +10,8 @@
 #include "FightingGame/Combat/HitStopComponent.h"
 #include "FightingGame/Common/CombatStatics.h"
 #include "FightingGame/Debugging/Debug.h"
+#include "FightingGame/FSM/StateMachineComponent.h"
+#include "FightingGame/FSM/StateMachineState.h"
 #include "FightingGame/Projectile/ProjectileSpawnerComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -33,6 +35,7 @@ AFightingCharacter::AFightingCharacter()
     PrimaryActorTick.bCanEverTick = true;
 
     m_FSM                        = CreateDefaultSubobject<UFSM>( TEXT( "FSM" ) );
+    m_StateMachine               = CreateDefaultSubobject<UStateMachineComponent>( TEXT( "State Machine" ) );
     m_MovesBuffer                = CreateDefaultSubobject<UMovesBufferComponent>( TEXT( "Moves Buffer" ) );
     m_HitboxHandler              = CreateDefaultSubobject<UHitboxHandlerComponent>( TEXT( "Hitbox Handler" ) );
     m_HitStopComponent           = CreateDefaultSubobject<UHitStopComponent>( TEXT( "Hit Stop" ) );
@@ -228,7 +231,7 @@ void AFightingCharacter::Tick( float DeltaTime )
     if( loc_DebugDamageStats == 1 )
     {
         FG_TEXT( GetWorld(), GetActorLocation(),
-                                               FString::Printf( TEXT( "[%%: %.1f][KMul: %.2f]" ), m_DamagePercent, GetKnockbackMultiplier() ) );
+                 FString::Printf( TEXT( "[%%: %.1f][KMul: %.2f]" ), m_DamagePercent, GetKnockbackMultiplier() ) );
     }
 
     m_FacingRight = m_TargetRotatorYaw > 0.f && m_TargetRotatorYaw < 180.f;
@@ -236,8 +239,8 @@ void AFightingCharacter::Tick( float DeltaTime )
 
     if( loc_DebugFacing == 1 )
     {
-       FG_TEXT( GetWorld(), GetActorLocation(),
-                                               FString::Printf( TEXT( "[Facing Right: %s]" ), m_FacingRight ? TEXT( "TRUE" ) : TEXT( "FALSE" ) ) );
+        FG_TEXT( GetWorld(), GetActorLocation(),
+                 FString::Printf( TEXT( "[Facing Right: %s]" ), m_FacingRight ? TEXT( "TRUE" ) : TEXT( "FALSE" ) ) );
     }
 
     CheckGroundedEvent();

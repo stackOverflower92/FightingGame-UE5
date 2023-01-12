@@ -12,6 +12,7 @@
 #include "FightingGame/FSM/FightingCharacterState.h"
 #include "MovesBufferComponent.generated.h"
 
+class UDataTable;
 class AFightingCharacter;
 class UInputComponent;
 class UInputSequenceResolver;
@@ -60,21 +61,21 @@ struct FInputBufferEntry : public FBufferEntry
 
 struct FInputsSequenceBufferEntry : public FBufferEntry
 {
-    explicit FInputsSequenceBufferEntry( const FName& InputsSequenceName, int32 Priority, bool Used )
+    explicit FInputsSequenceBufferEntry( const FString& InputsSequenceName, int32 Priority, bool Used )
         : FBufferEntry( Used ),
           m_InputsSequenceName( InputsSequenceName ),
           m_Priority( Priority )
     {
     }
 
-    FName m_InputsSequenceName;
+    FString m_InputsSequenceName;
     int32 m_Priority;
 
-    inline static FName s_SequenceNone = FName( TEXT( "" ) );
+    inline static FString s_SequenceNone = FString( TEXT( "" ) );
 
     virtual FORCEINLINE FString ToString() override
     {
-        return m_InputsSequenceName == s_SequenceNone ? TEXT( "---" ) : m_InputsSequenceName.ToString();
+        return m_InputsSequenceName == s_SequenceNone ? TEXT( "---" ) : m_InputsSequenceName;
     }
 };
 
@@ -97,9 +98,9 @@ public:
     // INPUT BUFER [END]
 
     // MOVES BUFFER [BEGIN]
-    void UseBufferedInputsSequence( const FName& InputsSequenceName );
+    void UseBufferedInputsSequence( const FString& InputsSequenceName );
     void UseBufferedInputsSequence( int32 UniqueId );
-    bool IsInputsSequenceBuffered( const FName& InputsSequenceName, bool ConsumeEntry = true );
+    bool IsInputsSequenceBuffered( const FString& InputsSequenceName, bool ConsumeEntry = true );
     void ClearInputsSequenceBuffer();
     void InitInputsSequenceBuffer();
     void GetInputsSequenceBufferSnapshot( TArray<FInputsSequenceBufferEntry>& OutEntries, bool SkipEmptyEntries );
@@ -113,6 +114,12 @@ public:
 
     UPROPERTY( BlueprintReadOnly, DisplayName = "Moving Left" )
     bool m_MovingLeft = false;
+
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Inputs To States Data Table" )
+    TObjectPtr<UDataTable> m_InputsToStatesDataTable = nullptr;
+
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Inputs To States Map" )
+    TMap<FString, FName> m_InputsToStateMap;
 
 protected:
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Inputs Buffer Size Frames" )
@@ -176,8 +183,8 @@ private:
     void AddToInputBuffer( EInputEntry InputEntry );
     bool InputBufferContainsConsumable( EInputEntry InputEntry ) const;
 
-    void AddToInputsSequenceBuffer( const FName& InputsSequenceName, int32 Priority );
-    bool InputsSequenceBufferContainsConsumable( const FName& MoveName );
+    void AddToInputsSequenceBuffer( const FString& InputsSequenceName, int32 Priority );
+    bool InputsSequenceBufferContainsConsumable( const FString& MoveName );
 
     void OnMoveHorizontal( float Value );
 

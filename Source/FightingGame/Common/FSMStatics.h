@@ -15,13 +15,13 @@ class FIGHTINGGAME_API UFSMStatics : public UBlueprintFunctionLibrary
 
 public:
 	UFUNCTION( BlueprintCallable, Category = "FSM" )
-	static bool Init( UFSM* Fsm, FName FirstStateName );
+	static bool Init( UFSM* Fsm, const FName& FirstStateName );
 
 	UFUNCTION( BlueprintCallable, Category = "FSM" )
-	static bool SetState( UFSM* Fsm, FName StateName );
+	static bool SetState( UFSM* Fsm, const FName& StateName );
 
 	UFUNCTION( BlueprintCallable, Category = "FSM" )
-	static bool PushState( UFSM* Fsm, FName StateName );
+	static bool PushState( UFSM* Fsm, const FName& StateName );
 
 	UFUNCTION( BlueprintCallable, Category = "FSM" )
 	static bool PopState( UFSM* Fsm );

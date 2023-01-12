@@ -17,7 +17,7 @@ void UInputSequenceResolver::Init( const TArray<TObjectPtr<UInputsSequence>>& In
 
         auto startsWithSameInput = [&]( TSharedPtr<FInputResolverNode> _root )
         {
-            ensureMsgf( !inputs.IsEmpty(), TEXT("Sequence [%s] has no inputs"), *sequence->m_Name.ToString() );
+            ensureMsgf( !inputs.IsEmpty(), TEXT("Sequence [%s] has no inputs"), *sequence->m_Name );
 
             return _root->m_InputState == inputs[0];
         };

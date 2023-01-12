@@ -14,7 +14,7 @@ class FIGHTINGGAME_API UMoveTransition : public UFightingCharacterStateTransitio
 
 public:
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Move Name" )
-    FName m_MoveName;
+    FString m_MoveName;
 
     UPROPERTY( EditAnywhere, DisplayName = "Require Hit Landed" )
     bool m_RequireHitLanded = false;

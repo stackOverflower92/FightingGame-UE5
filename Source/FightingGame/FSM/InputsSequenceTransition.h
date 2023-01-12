@@ -14,7 +14,7 @@ class FIGHTINGGAME_API UInputsSequenceTransition : public UFightingCharacterStat
 
 public:
     UPROPERTY( EditAnywhere, DisplayName = "Inputs Sequence Name" )
-    FName m_InputsSequenceName;
+    FString m_InputsSequenceName;
 
     UPROPERTY( EditAnywhere, DisplayName = "Require Hit Landed" )
     bool m_RequireHitLanded = false;

@@ -13,11 +13,14 @@ class FIGHTINGGAME_API UInputsSequence : public UDataAsset
 
 public:
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Name" )
-    FName m_Name;
+    FString m_Name;
 
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Sequence" )
     TArray<FMoveInputState> m_Inputs;
 
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Priority" )
     int32 m_Priority = 0;
+
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Is Special" )
+    bool m_IsSpecial = false;
 };

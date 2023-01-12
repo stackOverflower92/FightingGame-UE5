@@ -54,9 +54,9 @@ protected:
     bool m_AlwaysListenForBufferedInputSequence = false;
 
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Inputs Sequence Name To State Map" )
-    TMap<FName, FName> m_InputsSequenceNameToStateMap;
+    TMap<FString, FName> m_InputsSequenceNameToStateMap;
 
-    FName GetDesiredFSMStateFromInputsSequence( const FName& InputsSequenceName );
+    FName GetDesiredFSMStateFromInputsSequence( const FString& InputsSequenceName );
 
     UFUNCTION()
     void OnMontageEvent( UAnimMontage* Montage, EMontageEventType EventType );
@@ -81,5 +81,5 @@ private:
     FDelegateHandle m_CharacterGroundedHandle;
     FDelegateHandle m_CharacterAirborneHandle;
 
-    bool TryExecuteBufferedInputsSequences();
+    bool EvaluateInputsSequenceBufferedTransition();
 };

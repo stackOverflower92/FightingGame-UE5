@@ -3,10 +3,13 @@
 #include "FightingCharacterState.h"
 
 #include "FightingCharacterStateTransition.h"
+#include "Engine/DataTable.h"
 #include "FightingGame/Character/FightingCharacter.h"
 #include "FightingGame/Animation/FightingCharacterAnimInstance.h"
 #include "FightingGame/Common/CombatStatics.h"
 #include "FightingGame/Common/FSMStatics.h"
+#include "FightingGame/Debugging/Debug.h"
+#include "FightingGame/Input/InputsSequenceStateMappingRow.h"
 #include "FightingGame/Input/MovesBufferComponent.h"
 
 void UFightingCharacterState::Init_Implementation()
@@ -99,19 +102,19 @@ void UFightingCharacterState::Update_Implementation( float DeltaTime )
 {
     Super::Update_Implementation( DeltaTime );
 
-    if( m_OwnerCharacter->HasJustLandedHit() || m_AlwaysListenForBufferedInputSequence )
+    if( !m_IsReaction && (m_OwnerCharacter->HasJustLandedHit() || m_AlwaysListenForBufferedInputSequence) )
     {
-        if( TryExecuteBufferedInputsSequences() )
+        if( EvaluateInputsSequenceBufferedTransition() )
         {
             return;
         }
     }
 
-    for( auto Pair : m_InstancedTransitions )
+    for( auto pair : m_InstancedTransitions )
     {
-        if( Pair.Value->CanPerformTransition() )
+        if( pair.Value->CanPerformTransition() )
         {
-            UFSMStatics::SetState( FSMOwner, Pair.Key );
+            UFSMStatics::SetState( FSMOwner, pair.Key );
         }
     }
 
@@ -126,21 +129,43 @@ void UFightingCharacterState::Update_Implementation( float DeltaTime )
     }
 }
 
-FName UFightingCharacterState::GetDesiredFSMStateFromInputsSequence( const FName& InputsSequenceName )
+FName UFightingCharacterState::GetDesiredFSMStateFromInputsSequence( const FString& InputsSequenceName )
 {
     if( m_InputsSequenceNameToStateMap.Contains( InputsSequenceName ) )
     {
         return m_InputsSequenceNameToStateMap[InputsSequenceName];
     }
 
-    return FName( NAME_None );
+    if( m_OwnerCharacter->GetMovesBufferComponent()->m_InputsToStateMap.Contains( InputsSequenceName ) )
+    {
+        return m_OwnerCharacter->GetMovesBufferComponent()->m_InputsToStateMap[InputsSequenceName];
+    }
+
+    /*if( TObjectPtr<UDataTable> table = m_OwnerCharacter->GetMovesBufferComponent()->m_InputsToStatesDataTable )
+    {
+        for( auto name : table->GetRowNames() )
+        {
+            auto* row = table->FindRow<FInputsSequenceStateMappingRow>( name, TEXT( "" ) );
+            verify( row );
+
+            if( row->m_InputsSequence->m_Name == InputsSequenceName )
+            {
+                return row->m_StateName;
+            }
+        }
+    }*/
+
+    return NAME_None;
 }
 
 void UFightingCharacterState::OnMontageEvent( UAnimMontage* Montage, EMontageEventType EventType )
 {
-    if( TryExecuteBufferedInputsSequences() )
+    if( !m_IsReaction && m_MoveToExecute )
     {
-        return;
+        if( EvaluateInputsSequenceBufferedTransition() )
+        {
+            return;
+        }
     }
 
     for( auto Pair : m_InstancedTransitions )
@@ -159,38 +184,34 @@ void UFightingCharacterState::OnMontageEvent( UAnimMontage* Montage, EMontageEve
     }
 }
 
-bool UFightingCharacterState::TryExecuteBufferedInputsSequences()
+bool UFightingCharacterState::EvaluateInputsSequenceBufferedTransition()
 {
-    // #TODO this may become a flag on the exposed properties of this state?
-    bool canExecuteBufferedMoves = m_MoveToExecute != nullptr;
-    if( canExecuteBufferedMoves )
+    TArray<FInputsSequenceBufferEntry> inputsSequenceSnapshot;
+    m_OwnerCharacter->GetMovesBufferComponent()->GetInputsSequenceBufferSnapshot( inputsSequenceSnapshot, true );
+
+    if( !inputsSequenceSnapshot.IsEmpty() )
     {
-        TArray<FInputsSequenceBufferEntry> inputsSequenceSnapshot;
-        m_OwnerCharacter->GetMovesBufferComponent()->GetInputsSequenceBufferSnapshot( inputsSequenceSnapshot, true );
-
-        if( !inputsSequenceSnapshot.IsEmpty() )
+        inputsSequenceSnapshot.Sort( []( const FInputsSequenceBufferEntry& A, const FInputsSequenceBufferEntry& B )
         {
-            inputsSequenceSnapshot.Sort( []( const FInputsSequenceBufferEntry& A, const FInputsSequenceBufferEntry& B )
+            return A.m_Priority < B.m_Priority;
+        } );
+
+        FInputsSequenceBufferEntry& targetEntry = inputsSequenceSnapshot[0];
+
+        FString selectedInputsSequence = targetEntry.m_InputsSequenceName;
+        FName targetState              = GetDesiredFSMStateFromInputsSequence( selectedInputsSequence );
+
+        if( !targetState.IsNone() )
+        {
+            m_OwnerCharacter->GetMovesBufferComponent()->UseBufferedInputsSequence( targetEntry.m_UniqueId );
+
+            if( targetState.IsValid() )
             {
-                return A.m_Priority < B.m_Priority;
-            } );
-
-            FInputsSequenceBufferEntry& targetEntry = inputsSequenceSnapshot[0];
-
-            FName selectedInputsSequence = targetEntry.m_InputsSequenceName;
-            FName targetState            = GetDesiredFSMStateFromInputsSequence( selectedInputsSequence );
-
-            if( !targetState.IsNone() )
-            {
-                // #TODO this does weird things!
-                //m_OwnerCharacter->GetMovesBufferComponent()->InitInputsSequenceBuffer();
-
-                m_OwnerCharacter->GetMovesBufferComponent()->UseBufferedInputsSequence( targetEntry.m_UniqueId );
-
                 UFSMStatics::SetState( m_OwnerCharacter->GetFSM(), targetState );
-
                 return true;
             }
+
+            FG_SLOG_ERR( TEXT("targetState is not valid.") );
         }
     }
 

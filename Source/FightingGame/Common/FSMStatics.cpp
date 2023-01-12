@@ -6,89 +6,89 @@
 
 namespace
 {
-	const FName loc_DefaultStateName = TEXT( "DEFAULT_STATE" );
+    const FName loc_DefaultStateName = TEXT( "DEFAULT_STATE" );
 }
 
-bool UFSMStatics::Init( UFSM* Fsm, FName FirstStateName )
+bool UFSMStatics::Init( UFSM* Fsm, const FName& FirstStateName )
 {
-	if( !Fsm )
-	{
-		FG_SLOG_ERR( TEXT( "Fsm is null" ) );
-		return false;
-	}
+    if( !Fsm )
+    {
+        FG_SLOG_ERR( TEXT( "Fsm is null" ) );
+        return false;
+    }
 
-	Fsm->Start();
+    Fsm->Start();
 
-	if( !Fsm->DoesStateExist( loc_DefaultStateName ) )
-	{
-		FG_SLOG_ERR( TEXT( "Default state does not exist in FSM" ) );
-		return false;
-	}
+    if( !Fsm->DoesStateExist( loc_DefaultStateName ) )
+    {
+        FG_SLOG_ERR( TEXT( "Default state does not exist in FSM" ) );
+        return false;
+    }
 
-	Fsm->PushState( FirstStateName );
+    Fsm->PushState( FirstStateName );
 
-	return true;
+    return true;
 }
 
-bool UFSMStatics::SetState( UFSM* Fsm, FName StateName )
+bool UFSMStatics::SetState( UFSM* Fsm, const FName& StateName )
 {
-	if( !IsFSMValid( Fsm ) ) return false;
+    if( !IsFSMValid( Fsm ) ) return false;
 
-	Fsm->PopActiveState();
-	if( Fsm->GetActiveStateName() != loc_DefaultStateName )
-	{
-		FG_SLOG_ERR( FString::Printf( TEXT( "At this point the fsm should have the default state at the top of the stack." ) ) );
-		return false;
-	}
+    Fsm->PopActiveState();
+    if( Fsm->GetActiveStateName() != loc_DefaultStateName )
+    {
+        FG_SLOG_ERR( FString::Printf( TEXT( "At this point the fsm should have the default state at the top of the stack." ) ) );
+        return false;
+    }
 
-	if( !Fsm->DoesStateExist( StateName ) )
-	{
-		FG_SLOG_ERR( FString::Printf( TEXT( "Trying to push state [%s] that does not exist." ), *StateName.ToString()) );
-		return false;
-	}
+    if( !Fsm->DoesStateExist( StateName ) )
+    {
+        FG_SLOG_ERR( FString::Printf( TEXT( "Trying to push state [%s] that does not exist." ), *StateName.ToString()) );
+        return false;
+    }
 
-	Fsm->PushState( StateName );
+    Fsm->PushState( StateName );
 
-	return true;
+    return true;
 }
 
-bool UFSMStatics::PushState( UFSM* Fsm, FName StateName )
+bool UFSMStatics::PushState( UFSM* Fsm, const FName& StateName )
 {
-	if( !IsFSMValid( Fsm ) ) return false;
+    if( !IsFSMValid( Fsm ) ) return false;
 
-	if( !Fsm->DoesStateExist( StateName ) )
-	{
-		FG_SLOG_ERR( FString::Printf(TEXT( "Trying to push state [%s] that does not exist." ), *StateName.ToString() ) );
-		return false;
-	}
+    if( !Fsm->DoesStateExist( StateName ) )
+    {
+        FG_SLOG_ERR( FString::Printf(TEXT( "Trying to push state [%s] that does not exist." ), *StateName.ToString() ) );
+        return false;
+    }
 
-	Fsm->PushState( StateName );
+    Fsm->PushState( StateName );
 
-	return true;
+    return true;
 }
 
 bool UFSMStatics::PopState( UFSM* Fsm )
 {
-	if( !IsFSMValid( Fsm ) ) return false;
+    if( !IsFSMValid( Fsm ) ) return false;
 
-	Fsm->PopActiveState();
+    Fsm->PopActiveState();
 
-	return true;
+    return true;
 }
 
 bool UFSMStatics::IsFSMValid( UFSM* Fsm )
 {
-	if( !Fsm )
-	{
-		FG_SLOG_ERR( TEXT( "Fsm is null" ) );
-		return false;
-	}
+    if( !Fsm )
+    {
+        FG_SLOG_ERR( TEXT( "Fsm is null" ) );
+        return false;
+    }
 
-	if( !Fsm->IsMachineRunning() )
-	{
-		FG_SLOG_ERR( TEXT( "Fsm must be running to perform this operation" ) );
-		return false;
-	}
+    if( !Fsm->IsMachineRunning() )
+    {
+        FG_SLOG_ERR( TEXT( "Fsm must be running to perform this operation" ) );
+        return false;
+    }
 
-	return true;
+    return true;
 }
