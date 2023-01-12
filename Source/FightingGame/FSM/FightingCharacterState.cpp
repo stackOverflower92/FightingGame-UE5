@@ -4,13 +4,10 @@
 
 #include "FightingCharacterStateTransition.h"
 #include "StateMachineComponent.h"
-#include "Engine/DataTable.h"
 #include "FightingGame/Character/FightingCharacter.h"
 #include "FightingGame/Animation/FightingCharacterAnimInstance.h"
 #include "FightingGame/Common/CombatStatics.h"
-#include "FightingGame/Common/FSMStatics.h"
 #include "FightingGame/Debugging/Debug.h"
-#include "FightingGame/Input/InputsSequenceStateMappingRow.h"
 #include "FightingGame/Input/MovesBufferComponent.h"
 
 void UFightingCharacterState::OnInit()
@@ -107,6 +104,8 @@ void UFightingCharacterState::OnTick( float DeltaTime )
     {
         if( EvaluateInputsSequenceBufferedTransition() )
         {
+            // #TODO is this correct? can this transition have the ownership of that value?
+            m_OwnerCharacter->ResetHasJustLandedHit();
             return;
         }
     }
