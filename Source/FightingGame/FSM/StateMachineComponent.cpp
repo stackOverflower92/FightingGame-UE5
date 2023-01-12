@@ -4,6 +4,12 @@
 
 #include "FightingGame/Debugging/Debug.h"
 
+namespace
+{
+    int32 loc_DebugCurrentState = 0;
+    FG_CVAR_FLAG_DESC( CVarDebugDamageStats, TEXT("StateMachine.DebugCurrentState"), loc_DebugCurrentState );
+}
+
 UStateMachineComponent::UStateMachineComponent()
 {
     PrimaryComponentTick.bCanEverTick = true;
@@ -54,6 +60,8 @@ void UStateMachineComponent::SetState( const FName& StateId )
         m_CurrentState->OnExit();
     }
 
+    m_CanUpdateCurrentState = false;
+
     if( TObjectPtr<UStateMachineState> nextState = GetStateById( StateId ) )
     {
         m_CurrentState = nextState;
@@ -63,15 +71,23 @@ void UStateMachineComponent::SetState( const FName& StateId )
     {
         FG_SLOG_ERR( FString::Printf(TEXT("Could not find state named [%s]"), *StateId.ToString()) );
     }
+
+    m_CanUpdateCurrentState = true;
 }
 
 void UStateMachineComponent::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
 {
     Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
 
-    if( m_CurrentState )
+    if( m_CurrentState && m_CanUpdateCurrentState )
     {
         m_CurrentState->OnTick( DeltaTime );
+    }
+
+    if( loc_DebugCurrentState )
+    {
+        FG_SLOG_KEY( static_cast<uint64>(GetUniqueID()), FString::Printf(TEXT("(%s) STATE: %s"),
+                         *GetOwner()->GetName(), *m_CurrentState->m_Id.ToString()), FColor::Orange );
     }
 }
 

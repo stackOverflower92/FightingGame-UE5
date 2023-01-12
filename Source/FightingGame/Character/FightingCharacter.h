@@ -87,7 +87,7 @@ public:
     virtual bool IsHittable() override;
 
     FORCEINLINE TObjectPtr<UMovesBufferComponent> GetMovesBufferComponent() const { return m_MovesBuffer; }
-    FORCEINLINE TObjectPtr<UFSM> GetFSM() const { return m_FSM; }
+    FORCEINLINE TObjectPtr<UStateMachineComponent> GetFSM() const { return m_StateMachine; }
     FORCEINLINE TObjectPtr<UHitStopComponent> GetHitStopComponent() const { return m_HitStopComponent; }
     FORCEINLINE TObjectPtr<UProjectileSpawnerComponent> GetProjectileSpawnerComponent() const { return m_ProjectileSpawnerComponent; }
 
@@ -104,9 +104,6 @@ public:
     void ResetMeshRelativeLocation();
 
 protected:
-    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "FSM" )
-    TObjectPtr<UFSM> m_FSM = nullptr;
-
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "State Machine" )
     TObjectPtr<UStateMachineComponent> m_StateMachine = nullptr;
 

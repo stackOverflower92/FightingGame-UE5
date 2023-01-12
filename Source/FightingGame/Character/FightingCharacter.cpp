@@ -1,5 +1,4 @@
 #include "FightingCharacter.h"
-#include "FSM.h"
 #include "FightingGame/Common/FSMStatics.h"
 #include "FightingGame/Input/MovesBufferComponent.h"
 #include "FightingGame/Combat/HitboxHandlerComponent.h"
@@ -19,10 +18,10 @@
 namespace
 {
     int32 loc_DebugDamageStats = 0;
-    FG_CVAR_FLAG_DESC( CVarDebugDamageStats, TEXT("FightingCharacter.DebugDamageStats"), loc_DebugDamageStats );
+    FG_CVAR_FLAG_DESC( CVarDebugDamageStats, TEXT( "FightingCharacter.DebugDamageStats" ), loc_DebugDamageStats );
 
     int32 loc_DebugFacing = 0;
-    FG_CVAR_FLAG_DESC( CVarDebugFacing, TEXT("FightingCharacter.DebugFacing"), loc_DebugFacing );
+    FG_CVAR_FLAG_DESC( CVarDebugFacing, TEXT( "FightingCharacter.DebugFacing" ), loc_DebugFacing );
 
     int32 loc_DebugEnableShake = 0;
     FG_CVAR_FLAG_DESC( CVarDebugEnableShake, TEXT( "FightingCharacter.DebugEnableShake" ), loc_DebugEnableShake );
@@ -34,7 +33,6 @@ AFightingCharacter::AFightingCharacter()
 {
     PrimaryActorTick.bCanEverTick = true;
 
-    m_FSM                        = CreateDefaultSubobject<UFSM>( TEXT( "FSM" ) );
     m_StateMachine               = CreateDefaultSubobject<UStateMachineComponent>( TEXT( "State Machine" ) );
     m_MovesBuffer                = CreateDefaultSubobject<UMovesBufferComponent>( TEXT( "Moves Buffer" ) );
     m_HitboxHandler              = CreateDefaultSubobject<UHitboxHandlerComponent>( TEXT( "Hitbox Handler" ) );
@@ -126,7 +124,8 @@ void AFightingCharacter::BeginPlay()
 
     m_MovesBuffer->m_OwnerCharacter = this;
 
-    UFSMStatics::Init( m_FSM, m_FirstState );
+    m_StateMachine->Start();
+    //UFSMStatics::Init( m_St, m_FirstState );
 
     m_HitDelegateHandle = m_HitboxHandler->m_HitDelegate.AddUObject( this, &AFightingCharacter::OnHitLanded );
 
@@ -219,7 +218,7 @@ void AFightingCharacter::PushTimeDilation( float Value )
 void AFightingCharacter::PopTimeDilation()
 {
     m_TimeDilations.Pop();
-    ensureMsgf( m_TimeDilations.Num() > 0, TEXT("Time dilations stack cannot be empty") );
+    ensureMsgf( m_TimeDilations.Num() > 0, TEXT( "Time dilations stack cannot be empty" ) );
 
     CustomTimeDilation = m_TimeDilations.Last();
 }
@@ -283,11 +282,13 @@ void AFightingCharacter::OnHitReceived( const HitData& HitData )
     float DotAbs = FMath::Abs( FVector::DotProduct( GetActorForwardVector(), HitData.m_ProcessedKnockback.GetSafeNormal() ) );
     if( DotAbs < .9f && HitData.m_ProcessedKnockback.Length() >= 500.f )
     {
-        UFSMStatics::SetState( m_FSM, m_GroundToAirReactionStateName );
+        m_StateMachine->SetState( m_GroundToAirReactionStateName );
+        //UFSMStatics::SetState( m_FSM, m_GroundToAirReactionStateName );
     }
     else
     {
-        UFSMStatics::SetState( m_FSM, m_GroundedReactionStateName );
+        m_StateMachine->SetState( m_GroundedReactionStateName );
+        //UFSMStatics::SetState( m_FSM, m_GroundedReactionStateName );
     }
 
     if( HitData.m_HitStopDuration > 0.f )
@@ -456,7 +457,7 @@ void AFightingCharacter::InitWallBoxes()
         m_FrontWallBox = Cast<UBoxComponent>( frontWallBoxes[0] );
         if( !m_FrontWallBox )
         {
-            FG_SLOG_WARN( FString::Printf( TEXT( "Character [%s] has no Front Wallbox"), *GetName() ) );
+            FG_SLOG_WARN( FString::Printf( TEXT( "Character [%s] has no Front Wallbox" ), *GetName() ) );
         }
     }
 
@@ -468,7 +469,7 @@ void AFightingCharacter::InitWallBoxes()
         m_BackWallBox = Cast<UBoxComponent>( backWallBoxes[0] );
         if( !m_BackWallBox )
         {
-            FG_SLOG_WARN( FString::Printf( TEXT( "Character [%s] has no Back Wallbox"), *GetName() ) );
+            FG_SLOG_WARN( FString::Printf( TEXT( "Character [%s] has no Back Wallbox" ), *GetName() ) );
         }
     }
 }

@@ -3,6 +3,7 @@
 #include "FightingCharacterState.h"
 
 #include "FightingCharacterStateTransition.h"
+#include "StateMachineComponent.h"
 #include "Engine/DataTable.h"
 #include "FightingGame/Character/FightingCharacter.h"
 #include "FightingGame/Animation/FightingCharacterAnimInstance.h"
@@ -12,11 +13,11 @@
 #include "FightingGame/Input/InputsSequenceStateMappingRow.h"
 #include "FightingGame/Input/MovesBufferComponent.h"
 
-void UFightingCharacterState::Init_Implementation()
+void UFightingCharacterState::OnInit()
 {
-    Super::Init_Implementation();
+    Super::OnInit();
 
-    m_OwnerCharacter = Cast<AFightingCharacter>( ActorOwner );
+    m_OwnerCharacter = Cast<AFightingCharacter>( m_FSM->GetOwner() );
     ensure( m_OwnerCharacter );
 
     m_AnimInstance = Cast<UFightingCharacterAnimInstance>( m_OwnerCharacter->GetMesh()->GetAnimInstance() );
@@ -32,9 +33,9 @@ void UFightingCharacterState::Init_Implementation()
     }
 }
 
-void UFightingCharacterState::Enter_Implementation()
+void UFightingCharacterState::OnEnter()
 {
-    Super::Enter_Implementation();
+    Super::OnEnter();
 
     m_AnimInstance->m_MontageEvent.AddDynamic( this, &UFightingCharacterState::OnMontageEvent );
 
@@ -66,9 +67,9 @@ void UFightingCharacterState::Enter_Implementation()
     }
 }
 
-void UFightingCharacterState::Exit_Implementation()
+void UFightingCharacterState::OnExit()
 {
-    Super::Exit_Implementation();
+    Super::OnExit();
 
     if( m_AnimInstance )
     {
@@ -98,9 +99,9 @@ void UFightingCharacterState::Exit_Implementation()
     }
 }
 
-void UFightingCharacterState::Update_Implementation( float DeltaTime )
+void UFightingCharacterState::OnTick( float DeltaTime )
 {
-    Super::Update_Implementation( DeltaTime );
+    Super::OnTick( DeltaTime );
 
     if( !m_IsReaction && (m_OwnerCharacter->HasJustLandedHit() || m_AlwaysListenForBufferedInputSequence) )
     {
@@ -114,7 +115,8 @@ void UFightingCharacterState::Update_Implementation( float DeltaTime )
     {
         if( pair.Value->CanPerformTransition() )
         {
-            UFSMStatics::SetState( FSMOwner, pair.Key );
+            m_FSM->SetState( pair.Key );
+            //UFSMStatics::SetState( m_FSM, pair.Key );
         }
     }
 
@@ -207,7 +209,8 @@ bool UFightingCharacterState::EvaluateInputsSequenceBufferedTransition()
 
             if( targetState.IsValid() )
             {
-                UFSMStatics::SetState( m_OwnerCharacter->GetFSM(), targetState );
+                m_FSM->SetState( targetState );
+                //UFSMStatics::SetState( m_OwnerCharacter->GetFSM(), targetState );
                 return true;
             }
 

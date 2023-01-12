@@ -13,7 +13,7 @@ class FIGHTINGGAME_API UFSMStatics : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
-public:
+/*public:
 	UFUNCTION( BlueprintCallable, Category = "FSM" )
 	static bool Init( UFSM* Fsm, const FName& FirstStateName );
 
@@ -27,5 +27,5 @@ public:
 	static bool PopState( UFSM* Fsm );
 
 private:
-	static bool IsFSMValid( UFSM* Fsm );
+	static bool IsFSMValid( UFSM* Fsm );*/
 };

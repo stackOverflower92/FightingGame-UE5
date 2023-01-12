@@ -1,7 +1,6 @@
 // Copyright (c) Giammarco Agazzotti
 
 #include "FSMStatics.h"
-#include "FSM.h"
 #include "FightingGame/Debugging/Debug.h"
 
 namespace
@@ -9,9 +8,9 @@ namespace
     const FName loc_DefaultStateName = TEXT( "DEFAULT_STATE" );
 }
 
-bool UFSMStatics::Init( UFSM* Fsm, const FName& FirstStateName )
+/*bool UFSMStatics::Init( UFSM* Fsm, const FName& FirstStateName )
 {
-    if( !Fsm )
+    /*if( !Fsm )
     {
         FG_SLOG_ERR( TEXT( "Fsm is null" ) );
         return false;
@@ -25,14 +24,14 @@ bool UFSMStatics::Init( UFSM* Fsm, const FName& FirstStateName )
         return false;
     }
 
-    Fsm->PushState( FirstStateName );
+    Fsm->PushState( FirstStateName );#1#
 
     return true;
 }
 
 bool UFSMStatics::SetState( UFSM* Fsm, const FName& StateName )
 {
-    if( !IsFSMValid( Fsm ) ) return false;
+    /*if( !IsFSMValid( Fsm ) ) return false;
 
     Fsm->PopActiveState();
     if( Fsm->GetActiveStateName() != loc_DefaultStateName )
@@ -43,42 +42,42 @@ bool UFSMStatics::SetState( UFSM* Fsm, const FName& StateName )
 
     if( !Fsm->DoesStateExist( StateName ) )
     {
-        FG_SLOG_ERR( FString::Printf( TEXT( "Trying to push state [%s] that does not exist." ), *StateName.ToString()) );
+        FG_SLOG_ERR( FString::Printf( TEXT( "Trying to push state [%s] that does not exist." ), *StateName.ToString() ) );
         return false;
     }
 
-    Fsm->PushState( StateName );
+    Fsm->PushState( StateName );#1#
 
     return true;
 }
 
 bool UFSMStatics::PushState( UFSM* Fsm, const FName& StateName )
 {
-    if( !IsFSMValid( Fsm ) ) return false;
+    /*if( !IsFSMValid( Fsm ) ) return false;
 
     if( !Fsm->DoesStateExist( StateName ) )
     {
-        FG_SLOG_ERR( FString::Printf(TEXT( "Trying to push state [%s] that does not exist." ), *StateName.ToString() ) );
+        FG_SLOG_ERR( FString::Printf( TEXT( "Trying to push state [%s] that does not exist." ), *StateName.ToString() ) );
         return false;
     }
 
-    Fsm->PushState( StateName );
+    Fsm->PushState( StateName );#1#
 
     return true;
 }
 
 bool UFSMStatics::PopState( UFSM* Fsm )
 {
-    if( !IsFSMValid( Fsm ) ) return false;
+    /*if( !IsFSMValid( Fsm ) ) return false;
 
-    Fsm->PopActiveState();
+    Fsm->PopActiveState();#1#
 
     return true;
 }
 
 bool UFSMStatics::IsFSMValid( UFSM* Fsm )
 {
-    if( !Fsm )
+    /*if( !Fsm )
     {
         FG_SLOG_ERR( TEXT( "Fsm is null" ) );
         return false;
@@ -88,7 +87,7 @@ bool UFSMStatics::IsFSMValid( UFSM* Fsm )
     {
         FG_SLOG_ERR( TEXT( "Fsm must be running to perform this operation" ) );
         return false;
-    }
+    }#1#
 
     return true;
-}
+}*/

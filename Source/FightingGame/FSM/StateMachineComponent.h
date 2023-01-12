@@ -40,4 +40,6 @@ private:
     TObjectPtr<UStateMachineState> m_CurrentState = nullptr;
 
     TObjectPtr<UStateMachineState> GetStateById( const FName& Id );
+
+    bool m_CanUpdateCurrentState = true;
 };

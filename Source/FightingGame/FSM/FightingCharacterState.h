@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "StateBase.h"
+#include "StateMachineState.h"
 #include "FightingGame/Character/FightingCharacter.h"
 #include "FightingCharacterState.generated.h"
 
@@ -15,15 +15,15 @@ class UFightingCharacterAnimInstance;
 enum class EMontageEventType : uint8;
 
 UCLASS()
-class FIGHTINGGAME_API UFightingCharacterState : public UStateBase
+class FIGHTINGGAME_API UFightingCharacterState : public UStateMachineState
 {
     GENERATED_BODY()
 
 public:
-    virtual void Init_Implementation() override;
-    virtual void Enter_Implementation() override;
-    virtual void Exit_Implementation() override;
-    virtual void Update_Implementation( float DeltaTime ) override;
+    virtual void OnInit() override;
+    virtual void OnEnter() override;
+    virtual void OnExit() override;
+    virtual void OnTick( float DeltaTime ) override;
 
 protected:
     UPROPERTY( BlueprintReadOnly, DisplayName = "Owner Character" )
