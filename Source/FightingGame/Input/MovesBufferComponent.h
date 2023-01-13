@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include <deque>
 
 #include "InputEntry.h"
 #include "FightingGame/Combat/MoveDataAsset.h"
@@ -163,11 +162,11 @@ private:
     UPROPERTY()
     TObjectPtr<UInputSequenceResolver> m_InputSequenceResolver = nullptr;
 
-    std::deque<FInputBufferEntry> m_InputsBuffer;
+    TArray<FInputBufferEntry> m_InputsBuffer;
     float m_IBElapsedFrameTime = 0.f;
     bool m_IBBufferChanged     = false;
 
-    std::deque<FInputsSequenceBufferEntry> m_InputsSequenceBuffer;
+    TArray<FInputsSequenceBufferEntry> m_InputsSequenceBuffer;
     float m_ISBElapsedFrameTime = 0.f;
     bool m_ISBBufferChanged     = false;
 

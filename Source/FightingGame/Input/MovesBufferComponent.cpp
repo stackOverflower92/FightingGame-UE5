@@ -88,9 +88,9 @@ void UMovesBufferComponent::TickComponent( float DeltaTime, ELevelTick TickType,
     {
         if( m_OwnerCharacter && m_OwnerCharacter->m_PlayerIndex == 0 )
         {
-            for( int32 i = 0; i < m_InputsBuffer.size(); ++i )
+            for( int32 i = 0; i < m_InputsBuffer.Num(); ++i )
             {
-                FInputBufferEntry& entry = m_InputsBuffer.at( i );
+                FInputBufferEntry& entry = m_InputsBuffer[i];
                 FColor color             = entry.m_Used ? FColor::Red : FColor::Green;
 
                 FG_SLOG_KEY( i, FString::Printf( TEXT( "%s [%u]" ), *entry.ToString(), entry.m_UniqueId ), color );
@@ -102,9 +102,9 @@ void UMovesBufferComponent::TickComponent( float DeltaTime, ELevelTick TickType,
     {
         if( m_OwnerCharacter && m_OwnerCharacter->m_PlayerIndex == 0 )
         {
-            for( int32 i = 0; i < m_InputsSequenceBuffer.size(); ++i )
+            for( int32 i = 0; i < m_InputsSequenceBuffer.Num(); ++i )
             {
-                FInputsSequenceBufferEntry& entry = m_InputsSequenceBuffer.at( i );
+                FInputsSequenceBufferEntry& entry = m_InputsSequenceBuffer[i];
                 FColor color                      = entry.m_Used ? FColor::Red : FColor::Green;
 
                 FG_SLOG_KEY( i + 20, FString::Printf( TEXT( "%s [%u]" ), *entry.ToString(), entry.m_UniqueId ), color );
@@ -151,9 +151,9 @@ void UMovesBufferComponent::OnSetupPlayerInputComponent( UInputComponent* Player
 
 bool UMovesBufferComponent::IsInputBuffered( EInputEntry Input, bool ConsumeEntry )
 {
-    for( int32 i = 0; i < m_InputsBuffer.size(); ++i )
+    for( int32 i = 0; i < m_InputsBuffer.Num(); ++i )
     {
-        FInputBufferEntry& entry = m_InputsBuffer.at( i );
+        FInputBufferEntry& entry = m_InputsBuffer[i];
         if( entry.m_InputEntry != EInputEntry::None && entry.m_InputEntry == Input && !entry.m_Used )
         {
             if( ConsumeEntry )
@@ -242,8 +242,8 @@ void UMovesBufferComponent::AddToInputBuffer( EInputEntry InputEntry )
 {
     EInputEntry targetEntry = m_OwnerCharacter->IsFacingRight() ? InputEntry : MirrorInputEntry( InputEntry );
 
-    m_InputsBuffer.emplace_back( FInputBufferEntry( targetEntry, false ) );
-    m_InputsBuffer.pop_front();
+    m_InputsBuffer.Emplace( FInputBufferEntry( targetEntry, false ) );
+    m_InputsBuffer.RemoveAt( 0 );
 
     m_IBBufferChanged = true;
 
@@ -272,8 +272,8 @@ bool UMovesBufferComponent::InputBufferContainsConsumable( EInputEntry InputEntr
 
 void UMovesBufferComponent::AddToInputsSequenceBuffer( const FString& InputsSequenceName, int32 Priority )
 {
-    m_InputsSequenceBuffer.emplace_back( FInputsSequenceBufferEntry( InputsSequenceName, Priority, false ) );
-    m_InputsSequenceBuffer.pop_front();
+    m_InputsSequenceBuffer.Emplace( FInputsSequenceBufferEntry( InputsSequenceName, Priority, false ) );
+    m_InputsSequenceBuffer.RemoveAt( 0 );
 
     m_ISBBufferChanged = true;
 }
@@ -293,7 +293,7 @@ bool UMovesBufferComponent::InputsSequenceBufferContainsConsumable( const FStrin
 
 void UMovesBufferComponent::ClearInputsBuffer()
 {
-    m_InputsBuffer.clear();
+    m_InputsBuffer.Empty();
 }
 
 void UMovesBufferComponent::InitInputBuffer()
@@ -302,7 +302,7 @@ void UMovesBufferComponent::InitInputBuffer()
 
     for( int32 i = 0; i < m_InputBufferSizeFrames; ++i )
     {
-        m_InputsBuffer.emplace_back( FInputBufferEntry( EInputEntry::None, false ) );
+        m_InputsBuffer.Emplace( FInputBufferEntry( EInputEntry::None, false ) );
     }
 }
 
@@ -332,7 +332,7 @@ void UMovesBufferComponent::UseBufferedInputsSequence( int32 UniqueId )
 
 void UMovesBufferComponent::ClearInputsSequenceBuffer()
 {
-    m_InputsSequenceBuffer.clear();
+    m_InputsSequenceBuffer.Empty();
 }
 
 void UMovesBufferComponent::InitInputsSequenceBuffer()
@@ -341,7 +341,7 @@ void UMovesBufferComponent::InitInputsSequenceBuffer()
 
     for( int i = 0; i < m_InputsSequencesBufferSizeFrames; ++i )
     {
-        m_InputsSequenceBuffer.emplace_back( FInputsSequenceBufferEntry( FInputsSequenceBufferEntry::s_SequenceNone, 0, false ) );
+        m_InputsSequenceBuffer.Emplace( FInputsSequenceBufferEntry( FInputsSequenceBufferEntry::s_SequenceNone, 0, false ) );
     }
 }
 
@@ -352,6 +352,7 @@ void UMovesBufferComponent::GetInputsSequenceBufferSnapshot( TArray<FInputsSeque
     for( const auto& entry : m_InputsSequenceBuffer )
     {
         bool currentEntryIsNone = entry.m_InputsSequenceName == FInputsSequenceBufferEntry::s_SequenceNone;
+
         if( SkipEmptyEntries && currentEntryIsNone )
         {
             continue;
@@ -368,9 +369,9 @@ void UMovesBufferComponent::GetInputsSequenceBufferSnapshot( TArray<FInputsSeque
 
 bool UMovesBufferComponent::IsInputsSequenceBuffered( const FString& InputsSequenceName, bool ConsumeEntry /*= true*/ )
 {
-    for( int32 i = 0; i < m_InputsSequenceBuffer.size(); ++i )
+    for( int32 i = 0; i < m_InputsSequenceBuffer.Num(); ++i )
     {
-        FInputsSequenceBufferEntry& entry = m_InputsSequenceBuffer.at( i );
+        FInputsSequenceBufferEntry& entry = m_InputsSequenceBuffer[i];
 
         bool isValid     = entry.m_InputsSequenceName != FInputsSequenceBufferEntry::s_SequenceNone;
         bool hasSameName = entry.m_InputsSequenceName == InputsSequenceName;
