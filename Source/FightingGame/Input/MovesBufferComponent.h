@@ -103,7 +103,7 @@ public:
     bool IsInputsSequenceBuffered( const FString& InputsSequenceName, bool ConsumeEntry = true );
     void ClearInputsSequenceBuffer();
     void InitInputsSequenceBuffer();
-    void GetInputsSequenceBufferSnapshot( TArray<FInputsSequenceBufferEntry>& OutEntries, bool SkipEmptyEntries );
+    void GetInputsSequenceBufferSnapshot( TArray<FInputsSequenceBufferEntry>& OutEntries, bool SkipEmptyEntries, bool SkipUsedEntries );
     // MOVES BUFFER [END]
 
     UPROPERTY( BlueprintReadOnly, DisplayName = "Input Movement" )

@@ -25,6 +25,9 @@ protected:
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "First State Name", Category = "State Machine" )
     FName m_FirstStateName;
 
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "History Length", Category = "State Machine" )
+    int32 m_HistoryLength = 10;
+
     virtual void BeginPlay() override;
 
 public:
@@ -36,10 +39,17 @@ public:
 
 private:
     bool m_Started = false;
+
+    UPROPERTY()
     TArray<TObjectPtr<UStateMachineState>> m_StatesInstances;
+
+    UPROPERTY()
     TObjectPtr<UStateMachineState> m_CurrentState = nullptr;
 
-    TObjectPtr<UStateMachineState> GetStateById( const FName& Id );
+    bool m_CanTickCurrentState = true;
 
-    bool m_CanUpdateCurrentState = true;
+    UPROPERTY()
+    TArray<TObjectPtr<UStateMachineState>> m_StatesHistory;
+
+    TObjectPtr<UStateMachineState> GetStateById( const FName& Id );
 };

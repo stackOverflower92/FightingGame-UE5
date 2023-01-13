@@ -8,6 +8,9 @@ namespace
 {
     int32 loc_DebugCurrentState = 0;
     FG_CVAR_FLAG_DESC( CVarDebugDamageStats, TEXT("StateMachine.DebugCurrentState"), loc_DebugCurrentState );
+
+    int32 loc_DebugStatesHistory = 0;
+    FG_CVAR_FLAG_DESC( CVarDebugStatesHistory, TEXT("StateMachine.DebugStatesHistory"), loc_DebugStatesHistory );
 }
 
 UStateMachineComponent::UStateMachineComponent()
@@ -55,39 +58,65 @@ void UStateMachineComponent::Start()
 
 void UStateMachineComponent::SetState( const FName& StateId )
 {
+    m_CanTickCurrentState = false;
+
     if( m_CurrentState )
     {
+        if( m_CurrentState->m_Id == StateId && !m_CurrentState->m_Repeatable )
+        {
+            FG_SLOG_ERR( FString::Printf(TEXT("You're trying to repeat state [%s] but it's not repeatable"), *StateId.ToString()) );
+
+            m_CanTickCurrentState = true;
+            return;
+        }
+
         m_CurrentState->OnExit();
     }
 
-    m_CanUpdateCurrentState = false;
-
-    if( TObjectPtr<UStateMachineState> nextState = GetStateById( StateId ) )
+    m_CurrentState = GetStateById( StateId );
+    if( m_CurrentState )
     {
-        m_CurrentState = nextState;
         m_CurrentState->OnEnter();
+        m_CanTickCurrentState = true;
+
+        if( m_StatesHistory.Num() > m_HistoryLength )
+        {
+            m_StatesHistory.RemoveAt( 0 );
+        }
+
+        m_StatesHistory.Emplace( m_CurrentState );
     }
     else
     {
-        FG_SLOG_ERR( FString::Printf(TEXT("Could not find state named [%s]"), *StateId.ToString()) );
+        FG_SLOG_ERR( FString::Printf(TEXT("Cannot find state named [%s]"), *StateId.ToString()) );
     }
-
-    m_CanUpdateCurrentState = true;
 }
 
 void UStateMachineComponent::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
 {
     Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
 
-    if( m_CurrentState && m_CanUpdateCurrentState )
+    if( m_CurrentState && m_CurrentState->IsValidLowLevel() && m_CanTickCurrentState )
     {
         m_CurrentState->OnTick( DeltaTime );
     }
 
+    FString ownerName = GetOwner()->GetName();
+    uint64 uniqueId64 = GetOwner()->GetUniqueID();
     if( loc_DebugCurrentState )
     {
-        FG_SLOG_KEY( static_cast<uint64>(GetUniqueID()), FString::Printf(TEXT("(%s) STATE: %s"),
-                         *GetOwner()->GetName(), *m_CurrentState->m_Id.ToString()), FColor::Orange );
+        FG_SLOG_KEY( uniqueId64, FString::Printf(TEXT("(%s) STATE: %s"), *ownerName, *m_CurrentState->m_Id.ToString()), FColor::Orange );
+    }
+
+    if( loc_DebugStatesHistory )
+    {
+        static int32 startIndex = uniqueId64 + 1;
+        FG_SLOG_KEY( startIndex - 1, FString::Printf( TEXT( "[STATES HISTORY %s]" ), *ownerName), FColor::Emerald );
+
+        for( int32 i = 0; i < m_StatesHistory.Num(); ++i )
+        {
+            FG_SLOG_KEY( startIndex + i, FString::Printf(TEXT("%s"), *m_StatesHistory[i]->m_Id.ToString()), FColor::Emerald );
+        }
     }
 }
 

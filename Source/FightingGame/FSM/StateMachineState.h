@@ -20,6 +20,9 @@ public:
     UPROPERTY()
     TObjectPtr<UStateMachineComponent> m_FSM = nullptr;
 
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Repeatable" )
+    bool m_Repeatable = true;
+
     UFUNCTION( BlueprintImplementableEvent, meta=(DisplayName="On Init"), Category = "State Machine|State" )
     void ReceiveOnInit();
 

@@ -345,7 +345,7 @@ void UMovesBufferComponent::InitInputsSequenceBuffer()
     }
 }
 
-void UMovesBufferComponent::GetInputsSequenceBufferSnapshot( TArray<FInputsSequenceBufferEntry>& OutEntries, bool SkipEmptyEntries )
+void UMovesBufferComponent::GetInputsSequenceBufferSnapshot( TArray<FInputsSequenceBufferEntry>& OutEntries, bool SkipEmptyEntries, bool SkipUsedEntries )
 {
     OutEntries.Reset();
 
@@ -353,6 +353,11 @@ void UMovesBufferComponent::GetInputsSequenceBufferSnapshot( TArray<FInputsSeque
     {
         bool currentEntryIsNone = entry.m_InputsSequenceName == FInputsSequenceBufferEntry::s_SequenceNone;
         if( SkipEmptyEntries && currentEntryIsNone )
+        {
+            continue;
+        }
+
+        if( SkipUsedEntries && entry.m_Used )
         {
             continue;
         }

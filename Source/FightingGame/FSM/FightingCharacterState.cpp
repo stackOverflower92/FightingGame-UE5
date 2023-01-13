@@ -161,7 +161,7 @@ FName UFightingCharacterState::GetDesiredFSMStateFromInputsSequence( const FStri
 
 void UFightingCharacterState::OnMontageEvent( UAnimMontage* Montage, EMontageEventType EventType )
 {
-    if( !m_IsReaction && m_MoveToExecute )
+    if( !m_IsReaction && m_MoveToExecute && EventType == EMontageEventType::Ended )
     {
         if( EvaluateInputsSequenceBufferedTransition() )
         {
@@ -188,7 +188,7 @@ void UFightingCharacterState::OnMontageEvent( UAnimMontage* Montage, EMontageEve
 bool UFightingCharacterState::EvaluateInputsSequenceBufferedTransition()
 {
     TArray<FInputsSequenceBufferEntry> inputsSequenceSnapshot;
-    m_OwnerCharacter->GetMovesBufferComponent()->GetInputsSequenceBufferSnapshot( inputsSequenceSnapshot, true );
+    m_OwnerCharacter->GetMovesBufferComponent()->GetInputsSequenceBufferSnapshot( inputsSequenceSnapshot, true, true );
 
     if( !inputsSequenceSnapshot.IsEmpty() )
     {
