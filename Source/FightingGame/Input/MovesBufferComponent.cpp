@@ -319,11 +319,11 @@ void UMovesBufferComponent::UseBufferedInputsSequence( const FString& InputsSequ
     }
 }
 
-void UMovesBufferComponent::UseBufferedInputsSequence( int32 UniqueId )
+void UMovesBufferComponent::UseBufferedInputsSequence( const FInputsSequenceBufferEntry& Entry )
 {
     for( FInputsSequenceBufferEntry& entry : m_InputsSequenceBuffer )
     {
-        if( entry.m_UniqueId == UniqueId )
+        if( entry.m_UniqueId == Entry.m_UniqueId )
         {
             entry.m_Used = true;
         }

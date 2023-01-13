@@ -1,5 +1,4 @@
 #include "FightingCharacter.h"
-#include "FightingGame/Common/FSMStatics.h"
 #include "FightingGame/Input/MovesBufferComponent.h"
 #include "FightingGame/Combat/HitboxHandlerComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -10,7 +9,6 @@
 #include "FightingGame/Common/CombatStatics.h"
 #include "FightingGame/Debugging/Debug.h"
 #include "FightingGame/FSM/StateMachineComponent.h"
-#include "FightingGame/FSM/StateMachineState.h"
 #include "FightingGame/Projectile/ProjectileSpawnerComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -125,7 +123,6 @@ void AFightingCharacter::BeginPlay()
     m_MovesBuffer->m_OwnerCharacter = this;
 
     m_StateMachine->Start();
-    //UFSMStatics::Init( m_St, m_FirstState );
 
     m_HitDelegateHandle = m_HitboxHandler->m_HitDelegate.AddUObject( this, &AFightingCharacter::OnHitLanded );
 
@@ -283,12 +280,10 @@ void AFightingCharacter::OnHitReceived( const HitData& HitData )
     if( DotAbs < .9f && HitData.m_ProcessedKnockback.Length() >= 500.f )
     {
         m_StateMachine->SetState( m_GroundToAirReactionStateName );
-        //UFSMStatics::SetState( m_FSM, m_GroundToAirReactionStateName );
     }
     else
     {
         m_StateMachine->SetState( m_GroundedReactionStateName );
-        //UFSMStatics::SetState( m_FSM, m_GroundedReactionStateName );
     }
 
     if( HitData.m_HitStopDuration > 0.f )

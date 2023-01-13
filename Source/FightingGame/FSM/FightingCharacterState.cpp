@@ -116,7 +116,6 @@ void UFightingCharacterState::OnTick( float DeltaTime )
         if( pair.Value->CanPerformTransition() )
         {
             m_FSM->SetState( pair.Key );
-            //UFSMStatics::SetState( m_FSM, pair.Key );
         }
     }
 
@@ -131,13 +130,30 @@ void UFightingCharacterState::OnTick( float DeltaTime )
     }
 }
 
-FName UFightingCharacterState::GetDesiredFSMStateFromInputsSequence( const FString& InputsSequenceName )
+bool UFightingCharacterState::ThisStateOverridesInputsSequenceMapping( const FString& InputsSequenceName ) const
 {
-    if( m_InputsSequenceNameToStateMap.Contains( InputsSequenceName ) )
+    return m_InputsSequenceNameToStateMap.Contains( InputsSequenceName );
+}
+
+FName UFightingCharacterState::GetFSMStateFromInputsSequence( const FString& InputsSequenceName )
+{
+    if( ThisStateOverridesInputsSequenceMapping( InputsSequenceName ) )
     {
         return m_InputsSequenceNameToStateMap[InputsSequenceName];
     }
 
+    if( auto* row = GetStateMappingRowFromInputsSequence( InputsSequenceName ) )
+    {
+        return row->m_StateName;
+    }
+
+    FG_SLOG_ERR( FString::Printf(TEXT("Could not find input state mapping row for entry [%s]"), *InputsSequenceName) );
+
+    return NAME_None;
+}
+
+FInputsSequenceStateMappingRow* UFightingCharacterState::GetStateMappingRowFromInputsSequence( const FString& InputsSequenceName )
+{
     if( TObjectPtr<UDataTable> table = m_OwnerCharacter->GetMovesBufferComponent()->m_InputsToStatesDataTable )
     {
         for( auto name : table->GetRowNames() )
@@ -147,12 +163,12 @@ FName UFightingCharacterState::GetDesiredFSMStateFromInputsSequence( const FStri
 
             if( row->m_InputsSequence->m_Name == InputsSequenceName )
             {
-                return row->m_StateName;
+                return row;
             }
         }
     }
 
-    return NAME_None;
+    return nullptr;
 }
 
 void UFightingCharacterState::OnMontageEvent( UAnimMontage* Montage, EMontageEventType EventType )
@@ -186,6 +202,24 @@ bool UFightingCharacterState::EvaluateInputsSequenceBufferedTransition()
     TArray<FInputsSequenceBufferEntry> inputsSequenceSnapshot;
     m_OwnerCharacter->GetMovesBufferComponent()->GetInputsSequenceBufferSnapshot( inputsSequenceSnapshot, true, true );
 
+    for( int32 i = inputsSequenceSnapshot.Num() - 1; i >= 0; --i )
+    {
+        if( ThisStateOverridesInputsSequenceMapping( inputsSequenceSnapshot[i].m_InputsSequenceName ) )
+        {
+            continue;
+        }
+
+        auto mappingRow = GetStateMappingRowFromInputsSequence( inputsSequenceSnapshot[i].m_InputsSequenceName );
+
+        bool groundedContitionFailed = m_OwnerCharacter->IsGrounded() && !mappingRow->m_AllowWhenGrounded;
+        bool airborneConditionFailed = m_OwnerCharacter->IsAirborne() && !mappingRow->m_AllowWhenAirborne;
+
+        if( groundedContitionFailed || airborneConditionFailed )
+        {
+            inputsSequenceSnapshot.RemoveAt( i );
+        }
+    }
+
     if( !inputsSequenceSnapshot.IsEmpty() )
     {
         inputsSequenceSnapshot.Sort( []( const FInputsSequenceBufferEntry& A, const FInputsSequenceBufferEntry& B )
@@ -196,16 +230,15 @@ bool UFightingCharacterState::EvaluateInputsSequenceBufferedTransition()
         FInputsSequenceBufferEntry& targetEntry = inputsSequenceSnapshot[0];
 
         FString selectedInputsSequence = targetEntry.m_InputsSequenceName;
-        FName targetState              = GetDesiredFSMStateFromInputsSequence( selectedInputsSequence );
+        FName targetState              = GetFSMStateFromInputsSequence( selectedInputsSequence );
 
         if( !targetState.IsNone() )
         {
-            m_OwnerCharacter->GetMovesBufferComponent()->UseBufferedInputsSequence( targetEntry.m_UniqueId );
+            m_OwnerCharacter->GetMovesBufferComponent()->UseBufferedInputsSequence( targetEntry );
 
             if( targetState.IsValid() )
             {
                 m_FSM->SetState( targetState );
-                //UFSMStatics::SetState( m_OwnerCharacter->GetFSM(), targetState );
                 return true;
             }
 

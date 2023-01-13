@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "StateMachineState.h"
 #include "FightingGame/Character/FightingCharacter.h"
+#include "FightingGame/Input/InputsSequenceStateMappingRow.h"
 #include "FightingCharacterState.generated.h"
 
 class UFightingCharacterStateTransition;
@@ -56,7 +57,11 @@ protected:
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Inputs Sequence Name To State Map" )
     TMap<FString, FName> m_InputsSequenceNameToStateMap;
 
-    FName GetDesiredFSMStateFromInputsSequence( const FString& InputsSequenceName );
+    bool ThisStateOverridesInputsSequenceMapping( const FString& InputsSequenceName ) const;
+
+    FName GetFSMStateFromInputsSequence( const FString& InputsSequenceName );
+
+    FInputsSequenceStateMappingRow* GetStateMappingRowFromInputsSequence( const FString& InputsSequenceName );
 
     UFUNCTION()
     void OnMontageEvent( UAnimMontage* Montage, EMontageEventType EventType );

@@ -98,7 +98,7 @@ public:
 
     // MOVES BUFFER [BEGIN]
     void UseBufferedInputsSequence( const FString& InputsSequenceName );
-    void UseBufferedInputsSequence( int32 UniqueId );
+    void UseBufferedInputsSequence( const FInputsSequenceBufferEntry& Entry );
     bool IsInputsSequenceBuffered( const FString& InputsSequenceName, bool ConsumeEntry = true );
     void ClearInputsSequenceBuffer();
     void InitInputsSequenceBuffer();
