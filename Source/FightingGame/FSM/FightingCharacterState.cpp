@@ -8,6 +8,7 @@
 #include "FightingGame/Animation/FightingCharacterAnimInstance.h"
 #include "FightingGame/Common/CombatStatics.h"
 #include "FightingGame/Debugging/Debug.h"
+#include "FightingGame/Input/InputsSequenceStateMappingRow.h"
 #include "FightingGame/Input/MovesBufferComponent.h"
 
 void UFightingCharacterState::OnInit()
@@ -137,12 +138,7 @@ FName UFightingCharacterState::GetDesiredFSMStateFromInputsSequence( const FStri
         return m_InputsSequenceNameToStateMap[InputsSequenceName];
     }
 
-    if( m_OwnerCharacter->GetMovesBufferComponent()->m_InputsToStateMap.Contains( InputsSequenceName ) )
-    {
-        return m_OwnerCharacter->GetMovesBufferComponent()->m_InputsToStateMap[InputsSequenceName];
-    }
-
-    /*if( TObjectPtr<UDataTable> table = m_OwnerCharacter->GetMovesBufferComponent()->m_InputsToStatesDataTable )
+    if( TObjectPtr<UDataTable> table = m_OwnerCharacter->GetMovesBufferComponent()->m_InputsToStatesDataTable )
     {
         for( auto name : table->GetRowNames() )
         {
@@ -154,7 +150,7 @@ FName UFightingCharacterState::GetDesiredFSMStateFromInputsSequence( const FStri
                 return row->m_StateName;
             }
         }
-    }*/
+    }
 
     return NAME_None;
 }

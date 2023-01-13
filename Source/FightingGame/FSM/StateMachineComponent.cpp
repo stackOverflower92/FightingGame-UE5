@@ -7,7 +7,7 @@
 namespace
 {
     int32 loc_DebugCurrentState = 0;
-    FG_CVAR_FLAG_DESC( CVarDebugDamageStats, TEXT("StateMachine.DebugCurrentState"), loc_DebugCurrentState );
+    FG_CVAR_FLAG_DESC( CVarDebugCurrentState, TEXT("StateMachine.DebugCurrentState"), loc_DebugCurrentState );
 
     int32 loc_DebugStatesHistory = 0;
     FG_CVAR_FLAG_DESC( CVarDebugStatesHistory, TEXT("StateMachine.DebugStatesHistory"), loc_DebugStatesHistory );

@@ -118,9 +118,6 @@ public:
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Inputs To States Data Table" )
     TObjectPtr<UDataTable> m_InputsToStatesDataTable = nullptr;
 
-    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Inputs To States Map" )
-    TMap<FString, FName> m_InputsToStateMap;
-
 protected:
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Inputs Buffer Size Frames" )
     int32 m_InputBufferSizeFrames = 6;
