@@ -25,6 +25,33 @@ namespace
     FName loc_SpecialAction        = TEXT( "Special" );
     FName loc_MoveHorizontalAction = TEXT( "MoveHorizontal" );
     FName loc_MoveVerticalAction   = TEXT( "MoveVertical" );
+
+    int32 loc_CurrentBufferEntryUniqueId = 0;
+}
+
+FBufferEntry::FBufferEntry( bool Used ): m_Used( Used )
+{
+    if( loc_CurrentBufferEntryUniqueId < 1000 )
+    {
+        ++loc_CurrentBufferEntryUniqueId;
+    }
+    else
+    {
+        loc_CurrentBufferEntryUniqueId = 0;
+    }
+
+    m_UniqueId = loc_CurrentBufferEntryUniqueId;
+}
+
+FInputBufferEntry::FInputBufferEntry( EInputEntry InputEntry, bool Used ): FBufferEntry( Used ),
+                                                                           m_InputEntry( InputEntry )
+{
+}
+
+FInputsSequenceBufferEntry::FInputsSequenceBufferEntry( const FString& InputsSequenceName, int32 Priority, bool Used ): FBufferEntry( Used ),
+    m_InputsSequenceName( InputsSequenceName ),
+    m_Priority( Priority )
+{
 }
 
 UMovesBufferComponent::UMovesBufferComponent()

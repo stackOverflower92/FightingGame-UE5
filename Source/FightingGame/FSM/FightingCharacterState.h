@@ -54,8 +54,14 @@ protected:
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Always Listen for Buffered Input Sequence" )
     bool m_AlwaysListenForBufferedInputSequence = false;
 
-    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Inputs Sequence Name To State Map" )
-    TMap<FString, FName> m_InputsSequenceNameToStateMap;
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Inputs Sequences Override" )
+    TMap<FString, FName> m_InputsSequencesOverrides;
+
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Inputs Sequences Blocks" )
+    TArray<FString> m_BlockedInputsSequences;
+
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Blocks All Inputs Sequences" )
+    bool m_BlocksAllInputsSequences = false;
 
     bool ThisStateOverridesInputsSequenceMapping( const FString& InputsSequenceName ) const;
 

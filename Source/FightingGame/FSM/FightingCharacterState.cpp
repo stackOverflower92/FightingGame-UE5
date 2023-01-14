@@ -101,7 +101,7 @@ void UFightingCharacterState::OnTick( float DeltaTime )
 {
     Super::OnTick( DeltaTime );
 
-    if( !m_IsReaction && (m_OwnerCharacter->HasJustLandedHit() || m_AlwaysListenForBufferedInputSequence) )
+    if( !m_IsReaction && !m_BlocksAllInputsSequences && (m_OwnerCharacter->HasJustLandedHit() || m_AlwaysListenForBufferedInputSequence) )
     {
         if( EvaluateInputsSequenceBufferedTransition() )
         {
@@ -132,14 +132,14 @@ void UFightingCharacterState::OnTick( float DeltaTime )
 
 bool UFightingCharacterState::ThisStateOverridesInputsSequenceMapping( const FString& InputsSequenceName ) const
 {
-    return m_InputsSequenceNameToStateMap.Contains( InputsSequenceName );
+    return m_InputsSequencesOverrides.Contains( InputsSequenceName );
 }
 
 FName UFightingCharacterState::GetFSMStateFromInputsSequence( const FString& InputsSequenceName )
 {
     if( ThisStateOverridesInputsSequenceMapping( InputsSequenceName ) )
     {
-        return m_InputsSequenceNameToStateMap[InputsSequenceName];
+        return m_InputsSequencesOverrides[InputsSequenceName];
     }
 
     if( auto* row = GetStateMappingRowFromInputsSequence( InputsSequenceName ) )
@@ -173,7 +173,7 @@ FInputsSequenceStateMappingRow* UFightingCharacterState::GetStateMappingRowFromI
 
 void UFightingCharacterState::OnMontageEvent( UAnimMontage* Montage, EMontageEventType EventType )
 {
-    if( !m_IsReaction && m_MoveToExecute && EventType == EMontageEventType::Ended )
+    if( !m_IsReaction && m_MoveToExecute && !m_BlocksAllInputsSequences && EventType == EMontageEventType::Ended )
     {
         if( EvaluateInputsSequenceBufferedTransition() )
         {
@@ -204,6 +204,13 @@ bool UFightingCharacterState::EvaluateInputsSequenceBufferedTransition()
 
     for( int32 i = inputsSequenceSnapshot.Num() - 1; i >= 0; --i )
     {
+        if( m_BlockedInputsSequences.Contains( inputsSequenceSnapshot[i].m_InputsSequenceName ) )
+        {
+            inputsSequenceSnapshot.RemoveAt( i );
+
+            continue;
+        }
+
         if( ThisStateOverridesInputsSequenceMapping( inputsSequenceSnapshot[i].m_InputsSequenceName ) )
         {
             continue;

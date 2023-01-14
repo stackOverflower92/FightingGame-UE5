@@ -22,13 +22,4 @@ public:
 
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Animation Montage" )
     TObjectPtr<UAnimMontage> m_AnimationMontageAsset = nullptr;
-
-    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Inputs Sequence" )
-    TObjectPtr<UInputsSequence> m_InputsSequence;
-
-    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Allow When Grounded" )
-    bool m_AllowWhenGrounded = true;
-
-    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Allow When Airborne" )
-    bool m_AllowWhenAirborne = false;
 };

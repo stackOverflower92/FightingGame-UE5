@@ -6,7 +6,6 @@
 #include "Components/ActorComponent.h"
 
 #include "InputEntry.h"
-#include "FightingGame/Combat/MoveDataAsset.h"
 #include "FightingGame/Common/ConversionStatics.h"
 #include "FightingGame/FSM/FightingCharacterState.h"
 #include "MovesBufferComponent.generated.h"
@@ -16,27 +15,13 @@ class AFightingCharacter;
 class UInputComponent;
 class UInputSequenceResolver;
 
-static int32 g_CurrentBufferEntryUniqueId = 0;
-
 struct FBufferEntry
 {
-    explicit FBufferEntry( bool Used ) : m_Used( Used )
-    {
-        if( g_CurrentBufferEntryUniqueId < 1000 )
-        {
-            ++g_CurrentBufferEntryUniqueId;
-        }
-        else
-        {
-            g_CurrentBufferEntryUniqueId = 0;
-        }
-
-        m_UniqueId = g_CurrentBufferEntryUniqueId;
-    }
+    explicit FBufferEntry( bool Used );
 
     virtual ~FBufferEntry() = default;
 
-    int32 m_UniqueId = g_CurrentBufferEntryUniqueId;
+    int32 m_UniqueId = 0;
     bool m_Used;
 
     virtual FString ToString() = 0;
@@ -44,11 +29,7 @@ struct FBufferEntry
 
 struct FInputBufferEntry : public FBufferEntry
 {
-    explicit FInputBufferEntry( EInputEntry InputEntry, bool Used )
-        : FBufferEntry( Used ),
-          m_InputEntry( InputEntry )
-    {
-    }
+    explicit FInputBufferEntry( EInputEntry InputEntry, bool Used );
 
     EInputEntry m_InputEntry;
 
@@ -60,12 +41,7 @@ struct FInputBufferEntry : public FBufferEntry
 
 struct FInputsSequenceBufferEntry : public FBufferEntry
 {
-    explicit FInputsSequenceBufferEntry( const FString& InputsSequenceName, int32 Priority, bool Used )
-        : FBufferEntry( Used ),
-          m_InputsSequenceName( InputsSequenceName ),
-          m_Priority( Priority )
-    {
-    }
+    explicit FInputsSequenceBufferEntry( const FString& InputsSequenceName, int32 Priority, bool Used );
 
     FString m_InputsSequenceName;
     int32 m_Priority;
