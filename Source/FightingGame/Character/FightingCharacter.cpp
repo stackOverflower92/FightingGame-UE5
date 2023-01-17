@@ -296,9 +296,9 @@ void AFightingCharacter::OnHitReceived( const HitData& HitData )
         }
     }
 
-    if( HitData.m_HitStopDuration > 0.f )
+    if( HitData.m_OpponentHitStopDuration > 0.f )
     {
-        GetHitStopComponent()->EnableHitStop( HitData.m_HitStopDuration, HitData.m_Shake );
+        GetHitStopComponent()->EnableHitStop( HitData.m_OpponentHitStopDuration, HitData.m_Shake );
     }
 }
 
@@ -362,6 +362,7 @@ void AFightingCharacter::OnHitLanded( TObjectPtr<AActor> Target, const HitData& 
 
 void AFightingCharacter::StartHitLandedTimer()
 {
+    // #TODO use hitstop duration value for this timer? maybe its cleaner and more straightforward
     if( GetWorldTimerManager().IsTimerActive( m_HitLandedStateTimerHandle ) )
     {
         GetWorldTimerManager().ClearTimer( m_HitLandedStateTimerHandle );

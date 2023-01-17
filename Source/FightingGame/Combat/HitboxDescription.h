@@ -45,8 +45,15 @@ struct FHitboxDescription
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Ignore Knockback Multiplier" )
     bool m_IgnoreKnockbackMultiplier = false;
 
-    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Hit Stop Duration" )
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Hit Stop Duration (Owner)" )
     float m_HitStopDuration = 0.f;
+
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Use Separate Hit Stop Values" )
+    bool m_UseSeparateHitStopValues = false;
+
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Hit Stop Duration (Opponent)", meta=(EditCondition = "m_UseSeparateHitStopValues",
+        EditConditionHides = "m_UseSeparateHitStopValues") )
+    float m_OpponentHitStopDuration = 0.f;
 
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Shake" )
     bool m_Shake = true;

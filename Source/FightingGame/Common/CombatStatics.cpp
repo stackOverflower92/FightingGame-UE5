@@ -121,12 +121,16 @@ HitData UCombatStatics::GenerateHitDataFromHitboxDescription( TObjectPtr<AActor>
         targetLocation.Y *= facingEntity->IsFacingRight() ? 1.f : -1.f;
     }
 
+    float hitStopDuration         = HitboxDesc.m_HitStopDuration;
+    float opponentHitStopDuration = HitboxDesc.m_UseSeparateHitStopValues ? HitboxDesc.m_OpponentHitStopDuration : hitStopDuration;
+
     return HitData( HitboxDesc.m_ForceOpponentFacing,
                     HitboxDesc.m_DamagePercent,
                     HitboxDesc.m_Radius,
                     processedKnockback,
                     HitboxDesc.m_IgnoreKnockbackMultiplier,
-                    HitboxDesc.m_HitStopDuration,
+                    hitStopDuration,
+                    opponentHitStopDuration,
                     HitboxDesc.m_Shake,
                     HitboxOwner->GetWorld(),
                     HitboxOwner,
