@@ -23,4 +23,7 @@ struct FIGHTINGGAME_API FInputsSequenceStateMappingRow : public FTableRowBase
 
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Allow When Airborne" )
     bool m_AllowWhenAirborne = false;
+
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Allow As Cancel On Hit" )
+    bool m_AllowAsOnHitCancel = false;
 };

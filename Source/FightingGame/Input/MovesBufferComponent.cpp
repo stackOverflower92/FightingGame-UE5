@@ -69,17 +69,7 @@ void UMovesBufferComponent::BeginPlay()
 
     m_InputSequenceResolver->m_InputRouteEndedDelegate.AddUObject( this, &UMovesBufferComponent::OnInputRouteEnded );
 
-    TArray<TObjectPtr<UInputsSequence>> inputs;
-    TArray<TTuple<bool, bool>> groundedAirborneFlags;
-    for( int32 i = 0; i < m_InputsList.Num(); ++i )
-    {
-        inputs.Emplace( m_InputsList[i] );
-
-        // #TODO find a way to link these inputs to the actual moves
-        groundedAirborneFlags.Emplace( TTuple<bool, bool>( true, true ) );
-    }
-
-    m_InputSequenceResolver->Init( inputs, groundedAirborneFlags );
+    m_InputSequenceResolver->Init( m_InputsList );
 }
 
 void UMovesBufferComponent::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
@@ -346,13 +336,23 @@ void UMovesBufferComponent::UseBufferedInputsSequence( const FString& InputsSequ
     }
 }
 
-void UMovesBufferComponent::UseBufferedInputsSequence( const FInputsSequenceBufferEntry& Entry )
+void UMovesBufferComponent::UseBufferedInputsSequence( const FInputsSequenceBufferEntry& Entry, bool UseId )
 {
     for( FInputsSequenceBufferEntry& entry : m_InputsSequenceBuffer )
     {
-        if( entry.m_UniqueId == Entry.m_UniqueId )
+        if( UseId )
         {
-            entry.m_Used = true;
+            if( entry.m_UniqueId == Entry.m_UniqueId )
+            {
+                entry.m_Used = true;
+            }
+        }
+        else
+        {
+            if( entry.m_InputsSequenceName == Entry.m_InputsSequenceName )
+            {
+                entry.m_Used = true;
+            }
         }
     }
 }
@@ -372,7 +372,8 @@ void UMovesBufferComponent::InitInputsSequenceBuffer()
     }
 }
 
-void UMovesBufferComponent::GetInputsSequenceBufferSnapshot( TArray<FInputsSequenceBufferEntry>& OutEntries, bool SkipEmptyEntries, bool SkipUsedEntries )
+void UMovesBufferComponent::GetInputsSequenceBufferSnapshot( TArray<FInputsSequenceBufferEntry>& OutEntries, bool SkipEmptyEntries, bool SkipUsedEntries,
+                                                             bool UniqueEntries )
 {
     OutEntries.Reset();
 
@@ -390,7 +391,22 @@ void UMovesBufferComponent::GetInputsSequenceBufferSnapshot( TArray<FInputsSeque
             continue;
         }
 
-        OutEntries.Emplace( entry );
+        if( UniqueEntries )
+        {
+            auto predIsUniqueEntry = [&]( const FInputsSequenceBufferEntry& _entry )
+            {
+                return _entry.m_InputsSequenceName == entry.m_InputsSequenceName;
+            };
+
+            if( !OutEntries.ContainsByPredicate( predIsUniqueEntry ) )
+            {
+                OutEntries.Emplace( entry );
+            }
+        }
+        else
+        {
+            OutEntries.Emplace( entry );
+        }
     }
 }
 

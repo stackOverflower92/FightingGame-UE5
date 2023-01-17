@@ -4,16 +4,12 @@
 
 #include "FightingGame/Debugging/Debug.h"
 
-void UInputSequenceResolver::Init( const TArray<TObjectPtr<UInputsSequence>>& InputsList, const TArray<TTuple<bool, bool>>& GroundedAirborneStates )
+void UInputSequenceResolver::Init( const TArray<TObjectPtr<UInputsSequence>>& InputsList )
 {
-    ensureMsgf( InputsList.Num() == GroundedAirborneStates.Num(), TEXT("Inputs list size differs from grounded airborne states size") );
-
     for( int32 i = 0; i < InputsList.Num(); ++i )
     {
         TObjectPtr<UInputsSequence> sequence = InputsList[i];
         TArray<FMoveInputState>& inputs      = sequence->m_Inputs;
-        bool allowWhenGrounded               = GroundedAirborneStates[i].Key;
-        bool allowWhenAirborne               = GroundedAirborneStates[i].Value;
 
         auto startsWithSameInput = [&]( TSharedPtr<FInputResolverNode> _root )
         {
@@ -28,15 +24,14 @@ void UInputSequenceResolver::Init( const TArray<TObjectPtr<UInputsSequence>>& In
         }
         else
         {
-            m_CurrentSequenceRoot = MakeShared<FInputResolverNode>( sequence, inputs[0], GroundedAirborneStates[0].Key,
-                                                                    GroundedAirborneStates[0].Value );
+            m_CurrentSequenceRoot = MakeShared<FInputResolverNode>( sequence, inputs[0] );
 
             m_Trees.Emplace( m_CurrentSequenceRoot );
         }
 
         for( int32 j = 1; j < inputs.Num(); ++j )
         {
-            auto node = MakeShared<FInputResolverNode>( sequence, inputs[j], allowWhenGrounded, allowWhenAirborne );
+            auto node = MakeShared<FInputResolverNode>( sequence, inputs[j] );
 
             InsertNode( node );
         }

@@ -10,15 +10,13 @@
 
 struct FInputResolverNode
 {
-    FInputResolverNode( TObjectPtr<UInputsSequence> InputsSequence, FMoveInputState InputState, bool AllowWhenGrounded, bool AllowWhenAirborne )
-        : m_InputsSequence( InputsSequence ), m_InputState( InputState ), m_AllowWhenGrounded( AllowWhenGrounded ), m_AllowWhenAirborne( AllowWhenAirborne )
+    FInputResolverNode( TObjectPtr<UInputsSequence> InputsSequence, FMoveInputState InputState )
+        : m_InputsSequence( InputsSequence ), m_InputState( InputState )
     {
     }
 
     TObjectPtr<UInputsSequence> m_InputsSequence;
     FMoveInputState m_InputState;
-    bool m_AllowWhenGrounded;
-    bool m_AllowWhenAirborne;
 
     TSharedPtr<FInputResolverNode> m_Parent = nullptr;
     TArray<TSharedPtr<FInputResolverNode>> m_Children;
@@ -45,7 +43,7 @@ class FIGHTINGGAME_API UInputSequenceResolver : public UObject
 public:
     FInputRouteEnded m_InputRouteEndedDelegate;
 
-    void Init( const TArray<TObjectPtr<UInputsSequence>>& InputsList, const TArray<TTuple<bool, bool>>& GroundedAirborneStates );
+    void Init( const TArray<TObjectPtr<UInputsSequence>>& InputsList );
     EInputRegistrationResult RegisterInput( EInputEntry InputEntry );
 
 protected:

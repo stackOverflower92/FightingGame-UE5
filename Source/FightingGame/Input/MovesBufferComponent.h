@@ -74,11 +74,11 @@ public:
 
     // MOVES BUFFER [BEGIN]
     void UseBufferedInputsSequence( const FString& InputsSequenceName );
-    void UseBufferedInputsSequence( const FInputsSequenceBufferEntry& Entry );
+    void UseBufferedInputsSequence( const FInputsSequenceBufferEntry& Entry, bool UseId );
     bool IsInputsSequenceBuffered( const FString& InputsSequenceName, bool ConsumeEntry = true );
     void ClearInputsSequenceBuffer();
     void InitInputsSequenceBuffer();
-    void GetInputsSequenceBufferSnapshot( TArray<FInputsSequenceBufferEntry>& OutEntries, bool SkipEmptyEntries, bool SkipUsedEntries );
+    void GetInputsSequenceBufferSnapshot( TArray<FInputsSequenceBufferEntry>& OutEntries, bool SkipEmptyEntries, bool SkipUsedEntries, bool UniqueEntries );
     // MOVES BUFFER [END]
 
     UPROPERTY( BlueprintReadOnly, DisplayName = "Input Movement" )

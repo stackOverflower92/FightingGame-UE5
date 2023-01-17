@@ -15,6 +15,18 @@ class UFightingCharacterAnimInstance;
 
 enum class EMontageEventType : uint8;
 
+USTRUCT( BlueprintType )
+struct FInputsSequenceOverrideData
+{
+    GENERATED_BODY()
+
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Target State" )
+    FName m_TargetState;
+
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Allow As Cancel On Hit" )
+    bool m_AllowAsOnHitCancel = false;
+};
+
 UCLASS()
 class FIGHTINGGAME_API UFightingCharacterState : public UStateMachineState
 {
@@ -55,7 +67,7 @@ protected:
     bool m_AlwaysListenForBufferedInputSequence = false;
 
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Inputs Sequences Override" )
-    TMap<FString, FName> m_InputsSequencesOverrides;
+    TMap<FString, FInputsSequenceOverrideData> m_InputsSequencesOverrides;
 
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Inputs Sequences Blocks" )
     TArray<FString> m_BlockedInputsSequences;
@@ -92,5 +104,5 @@ private:
     FDelegateHandle m_CharacterGroundedHandle;
     FDelegateHandle m_CharacterAirborneHandle;
 
-    bool EvaluateInputsSequenceBufferedTransition();
+    bool EvaluateInputsSequenceBufferedTransition( bool WasUsedDuringHit );
 };

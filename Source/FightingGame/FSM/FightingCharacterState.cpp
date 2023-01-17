@@ -103,7 +103,7 @@ void UFightingCharacterState::OnTick( float DeltaTime )
 
     if( !m_IsReaction && !m_BlocksAllInputsSequences && (m_OwnerCharacter->HasJustLandedHit() || m_AlwaysListenForBufferedInputSequence) )
     {
-        if( EvaluateInputsSequenceBufferedTransition() )
+        if( EvaluateInputsSequenceBufferedTransition( m_OwnerCharacter->HasJustLandedHit() ) )
         {
             // #TODO is this correct? can this transition have the ownership of that value?
             m_OwnerCharacter->ResetHasJustLandedHit();
@@ -139,7 +139,17 @@ FName UFightingCharacterState::GetFSMStateFromInputsSequence( const FString& Inp
 {
     if( ThisStateOverridesInputsSequenceMapping( InputsSequenceName ) )
     {
-        return m_InputsSequencesOverrides[InputsSequenceName];
+        if( m_OwnerCharacter->HasJustLandedHit() )
+        {
+            if( m_InputsSequencesOverrides[InputsSequenceName].m_AllowAsOnHitCancel )
+            {
+                return m_InputsSequencesOverrides[InputsSequenceName].m_TargetState;
+            }
+        }
+        else
+        {
+            return m_InputsSequencesOverrides[InputsSequenceName].m_TargetState;
+        }
     }
 
     if( auto* row = GetStateMappingRowFromInputsSequence( InputsSequenceName ) )
@@ -175,7 +185,7 @@ void UFightingCharacterState::OnMontageEvent( UAnimMontage* Montage, EMontageEve
 {
     if( !m_IsReaction && m_MoveToExecute && !m_BlocksAllInputsSequences && EventType == EMontageEventType::Ended )
     {
-        if( EvaluateInputsSequenceBufferedTransition() )
+        if( EvaluateInputsSequenceBufferedTransition( false ) )
         {
             return;
         }
@@ -197,26 +207,34 @@ void UFightingCharacterState::OnMontageEvent( UAnimMontage* Montage, EMontageEve
     }
 }
 
-bool UFightingCharacterState::EvaluateInputsSequenceBufferedTransition()
+bool UFightingCharacterState::EvaluateInputsSequenceBufferedTransition( bool WasUsedDuringHit )
 {
     TArray<FInputsSequenceBufferEntry> inputsSequenceSnapshot;
-    m_OwnerCharacter->GetMovesBufferComponent()->GetInputsSequenceBufferSnapshot( inputsSequenceSnapshot, true, true );
+    m_OwnerCharacter->GetMovesBufferComponent()->GetInputsSequenceBufferSnapshot( inputsSequenceSnapshot, true, true, true );
 
     for( int32 i = inputsSequenceSnapshot.Num() - 1; i >= 0; --i )
     {
-        if( m_BlockedInputsSequences.Contains( inputsSequenceSnapshot[i].m_InputsSequenceName ) )
+        const FString& inputsSequence = inputsSequenceSnapshot[i].m_InputsSequenceName;
+
+        if( m_BlockedInputsSequences.Contains( inputsSequence ) )
         {
             inputsSequenceSnapshot.RemoveAt( i );
 
             continue;
         }
 
-        if( ThisStateOverridesInputsSequenceMapping( inputsSequenceSnapshot[i].m_InputsSequenceName ) )
+        auto mappingRow = GetStateMappingRowFromInputsSequence( inputsSequence );
+
+        if( WasUsedDuringHit && !mappingRow->m_AllowAsOnHitCancel )
         {
+            inputsSequenceSnapshot.RemoveAt( i );
             continue;
         }
 
-        auto mappingRow = GetStateMappingRowFromInputsSequence( inputsSequenceSnapshot[i].m_InputsSequenceName );
+        if( ThisStateOverridesInputsSequenceMapping( inputsSequence ) )
+        {
+            continue;
+        }
 
         bool groundedContitionFailed = m_OwnerCharacter->IsGrounded() && !mappingRow->m_AllowWhenGrounded;
         bool airborneConditionFailed = m_OwnerCharacter->IsAirborne() && !mappingRow->m_AllowWhenAirborne;
@@ -241,7 +259,7 @@ bool UFightingCharacterState::EvaluateInputsSequenceBufferedTransition()
 
         if( !targetState.IsNone() )
         {
-            m_OwnerCharacter->GetMovesBufferComponent()->UseBufferedInputsSequence( targetEntry );
+            m_OwnerCharacter->GetMovesBufferComponent()->UseBufferedInputsSequence( targetEntry, false );
 
             if( targetState.IsValid() )
             {
