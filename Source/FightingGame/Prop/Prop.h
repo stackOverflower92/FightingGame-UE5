@@ -20,6 +20,8 @@ protected:
 
 public:
 	virtual void OnHitReceived( const HitData& HitData ) override;
+    virtual bool IsHittable() override;
+    virtual bool IsBlocking() override;
 
 	virtual void Tick( float DeltaTime ) override;
 };

@@ -273,17 +273,27 @@ void AFightingCharacter::OnHitReceived( const HitData& HitData )
         UCombatStatics::FaceOther( this, HitData.m_Owner, true );
     }
 
-    m_DamagePercent += HitData.m_DamagePercent;
-    UCombatStatics::ApplyKnockbackTo( HitData.m_ProcessedKnockback, HitData.m_ProcessedKnockback.Length(), this, HitData.m_IgnoreKnockbackMultiplier );
-
-    float DotAbs = FMath::Abs( FVector::DotProduct( GetActorForwardVector(), HitData.m_ProcessedKnockback.GetSafeNormal() ) );
-    if( DotAbs < .9f && HitData.m_ProcessedKnockback.Length() >= 500.f )
+    if( IsBlocking() )
     {
-        m_StateMachine->SetState( m_GroundToAirReactionStateName );
+        if( IsGrounded() )
+        {
+            m_StateMachine->SetState( m_GroundBlockStateName );
+        }
     }
     else
     {
-        m_StateMachine->SetState( m_GroundedReactionStateName );
+        m_DamagePercent += HitData.m_DamagePercent;
+        UCombatStatics::ApplyKnockbackTo( HitData.m_ProcessedKnockback, HitData.m_ProcessedKnockback.Length(), this, HitData.m_IgnoreKnockbackMultiplier );
+
+        float DotAbs = FMath::Abs( FVector::DotProduct( GetActorForwardVector(), HitData.m_ProcessedKnockback.GetSafeNormal() ) );
+        if( DotAbs < .9f && HitData.m_ProcessedKnockback.Length() >= 500.f )
+        {
+            m_StateMachine->SetState( m_GroundToAirReactionStateName );
+        }
+        else
+        {
+            m_StateMachine->SetState( m_GroundedReactionStateName );
+        }
     }
 
     if( HitData.m_HitStopDuration > 0.f )
@@ -295,6 +305,16 @@ void AFightingCharacter::OnHitReceived( const HitData& HitData )
 bool AFightingCharacter::IsHittable()
 {
     return m_Hittable;
+}
+
+bool AFightingCharacter::IsBlocking()
+{
+    if( m_StandingStillCountsAsBlock )
+    {
+        return m_IsMovingBackward || FMath::IsNearlyZero( GetMovesBufferComponent()->m_InputMovement );
+    }
+
+    return m_IsMovingBackward;
 }
 
 void AFightingCharacter::UpdateYaw( float DeltaTime )

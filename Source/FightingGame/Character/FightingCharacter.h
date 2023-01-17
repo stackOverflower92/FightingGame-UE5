@@ -85,6 +85,7 @@ public:
 
     virtual void OnHitReceived( const HitData& HitData ) override;
     virtual bool IsHittable() override;
+    virtual bool IsBlocking() override;
 
     FORCEINLINE TObjectPtr<UMovesBufferComponent> GetMovesBufferComponent() const { return m_MovesBuffer; }
     FORCEINLINE TObjectPtr<UStateMachineComponent> GetFSM() const { return m_StateMachine; }
@@ -137,6 +138,9 @@ protected:
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Ground To Air Reaction State Name" )
     FName m_GroundToAirReactionStateName = "REACTION_LIGHT_AIRBORNE";
 
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Ground Block State Name" )
+    FName m_GroundBlockStateName = "GROUND_BLOCK";
+
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Hit Landed State Duration" )
     float m_HitLandedStateDuration = .2f;
 
@@ -178,6 +182,9 @@ protected:
 
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Backward Walking Speed" )
     float m_BackwardWalkingSpeed = 400.f;
+
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Standing Still Counts As Block" )
+    bool m_StandingStillCountsAsBlock = false;
 
     UPROPERTY()
     TObjectPtr<AFightingCharacter> m_OpponentToFace = nullptr;

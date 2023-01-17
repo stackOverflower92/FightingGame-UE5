@@ -12,14 +12,15 @@
 UINTERFACE( MinimalAPI )
 class UHittable : public UInterface
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 };
 
 class FIGHTINGGAME_API IHittable
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	virtual void OnHitReceived( const HitData& HitData );
-	virtual bool IsHittable();
+    virtual void OnHitReceived( const HitData& HitData );
+    virtual bool IsHittable();
+    virtual bool IsBlocking();
 };

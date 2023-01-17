@@ -8,5 +8,10 @@ void IHittable::OnHitReceived( const HitData& HitData )
 
 bool IHittable::IsHittable()
 {
-	return true;
+    return true;
+}
+
+bool IHittable::IsBlocking()
+{
+    return false;
 }
