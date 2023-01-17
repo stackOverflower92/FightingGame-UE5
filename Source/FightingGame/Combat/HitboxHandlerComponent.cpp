@@ -191,7 +191,14 @@ void UHitboxHandlerComponent::UpdateHitbox( const HitData& HitData )
 
                 if( TObjectPtr<AHitboxVisualizer> visualizer = DEBUG_GetHitboxVisualizerOrDefault( HitData.m_Id ) )
                 {
-                    visualizer->SetHitState();
+                    if( hittable->IsBlocking() )
+                    {
+                        visualizer->SetBlockedState();
+                    }
+                    else
+                    {
+                        visualizer->SetHitState();
+                    }
                 }
             }
         }

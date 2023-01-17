@@ -103,6 +103,7 @@ public:
 
     void UpdateMeshShake();
     void ResetMeshRelativeLocation();
+    bool IsAutoFacingEnabled();
 
 protected:
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "State Machine" )

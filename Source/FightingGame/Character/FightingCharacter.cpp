@@ -61,7 +61,7 @@ void AFightingCharacter::UpdateFacing()
     float lastHorizontalMovementSign    = FMath::Sign( lastHorizontalMovement );
     float currentHorizontalMovementSign = FMath::Sign( m_CurrentHorizontalMovement );
 
-    if( m_OpponentToFace )
+    if( IsAutoFacingEnabled() )
     {
         m_IsMovingBackward = m_CurrentHorizontalMovement > 0.f && !IsFacingRight() || m_CurrentHorizontalMovement < 0.f && IsFacingRight();
 
@@ -309,6 +309,8 @@ bool AFightingCharacter::IsHittable()
 
 bool AFightingCharacter::IsBlocking()
 {
+    if( !IsAutoFacingEnabled() ) return false;
+
     if( m_StandingStillCountsAsBlock )
     {
         return m_IsMovingBackward || FMath::IsNearlyZero( GetMovesBufferComponent()->m_InputMovement );
@@ -524,4 +526,9 @@ void AFightingCharacter::UpdateMeshShake()
 void AFightingCharacter::ResetMeshRelativeLocation()
 {
     GetMesh()->SetRelativeLocation( m_InitialMeshRelativeLocation );
+}
+
+bool AFightingCharacter::IsAutoFacingEnabled()
+{
+    return m_OpponentToFace != nullptr;
 }

@@ -10,33 +10,37 @@
 UCLASS()
 class FIGHTINGGAME_API AHitboxVisualizer : public ASphereVisualizer
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	AHitboxVisualizer();
+    AHitboxVisualizer();
 
 protected:
-	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Knockback Line Thickness" )
-	float m_KnockbackLineThickness = 3.f;
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Knockback Line Thickness" )
+    float m_KnockbackLineThickness = 3.f;
 
-	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Regular Color" )
-	FLinearColor m_RegularColor = FLinearColor::Red;
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Regular Color" )
+    FLinearColor m_RegularColor = FLinearColor::Red;
 
-	UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Hit Color" )
-	FLinearColor m_HitColor = FLinearColor::Green;
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Hit Color" )
+    FLinearColor m_HitColor = FLinearColor::Green;
 
-	virtual void BeginPlay() override;
+    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Hit Color" )
+    FLinearColor m_BlockedColor = FLinearColor::Blue;
+
+    virtual void BeginPlay() override;
 
 public:
-	FORCEINLINE void SetKnockback( const FVector& Knockback ) { m_Knockback = Knockback; }
+    FORCEINLINE void SetKnockback( const FVector& Knockback ) { m_Knockback = Knockback; }
 
-	virtual void Tick( float DeltaTime ) override;
+    virtual void Tick( float DeltaTime ) override;
 
-	void SetRegularState();
-	void SetHitState();
+    void SetRegularState();
+    void SetHitState();
+    void SetBlockedState();
 
 protected:
-	TOptional<FVector> m_Knockback;
+    TOptional<FVector> m_Knockback;
 
-	void SetColor( const FLinearColor& Color );
+    void SetColor( const FLinearColor& Color );
 };
