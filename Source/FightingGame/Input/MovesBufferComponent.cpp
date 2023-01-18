@@ -27,12 +27,13 @@ namespace
     FName loc_MoveVerticalAction   = TEXT( "MoveVertical" );
     FName loc_CounterAction        = TEXT( "Counter" );
 
+    int32 loc_MaxEntryId                 = 1000;
     int32 loc_CurrentBufferEntryUniqueId = 0;
 }
 
 FBufferEntry::FBufferEntry( bool Used ): m_Used( Used )
 {
-    if( loc_CurrentBufferEntryUniqueId < 1000 )
+    if( loc_CurrentBufferEntryUniqueId < loc_MaxEntryId )
     {
         ++loc_CurrentBufferEntryUniqueId;
     }

@@ -192,7 +192,14 @@ void UHitboxHandlerComponent::UpdateHitbox( const HitData& HitData )
                 {
                     if( hittable->IsBlocking() )
                     {
-                        visualizer->SetBlockedState();
+                        if( HitData.m_IgnoreBlock )
+                        {
+                            visualizer->SetHitState();
+                        }
+                        else
+                        {
+                            visualizer->SetBlockedState();
+                        }
                     }
                     else
                     {

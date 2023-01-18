@@ -124,6 +124,8 @@ HitData UCombatStatics::GenerateHitDataFromHitboxDescription( TObjectPtr<AActor>
     float hitStopDuration         = HitboxDesc.m_HitStopDuration;
     float opponentHitStopDuration = HitboxDesc.m_UseSeparateHitStopValues ? HitboxDesc.m_OpponentHitStopDuration : hitStopDuration;
 
+    TObjectPtr<USkeletalMeshComponent> skeletalMesh = HitboxDesc.m_UseLocation ? nullptr : SkeletalMesh;
+
     return HitData( HitboxDesc.m_ForceOpponentFacing,
                     HitboxDesc.m_DamagePercent,
                     HitboxDesc.m_Radius,
@@ -134,7 +136,7 @@ HitData UCombatStatics::GenerateHitDataFromHitboxDescription( TObjectPtr<AActor>
                     HitboxDesc.m_Shake,
                     HitboxOwner->GetWorld(),
                     HitboxOwner,
-                    SkeletalMesh,
+                    skeletalMesh,
                     socketName,
                     targetLocation,
                     Id,
