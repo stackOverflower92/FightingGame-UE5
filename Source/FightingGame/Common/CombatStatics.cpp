@@ -140,6 +140,8 @@ HitData UCombatStatics::GenerateHitDataFromHitboxDescription( TObjectPtr<AActor>
                     Id,
                     GroupId,
                     HitboxDesc.m_Priority,
+                    HitboxDesc.m_IsCounter,
+                    HitboxDesc.m_IgnoreBlock,
                     AdditionalActorsToIgnore );
 }
 

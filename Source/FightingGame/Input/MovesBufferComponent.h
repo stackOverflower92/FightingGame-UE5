@@ -164,6 +164,7 @@ private:
     void OnStopJump();
     void OnAttack();
     void OnSpecial();
+    void OnCounter();
 
     void UpdateMovementDirection();
     void UpdateDirectionalInputs( UInputComponent* InputComponent );

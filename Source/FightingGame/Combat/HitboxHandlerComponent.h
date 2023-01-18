@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "HitboxDescription.h"
 #include "Components/ActorComponent.h"
+#include "FightingGame/Collision/CustomCollisionChannels.h"
 #include "FightingGame/Combat/HitData.h"
 #include "HitboxHandlerComponent.generated.h"
 
@@ -15,79 +16,79 @@ DECLARE_MULTICAST_DELEGATE_TwoParams( FHit, TObjectPtr<AActor>, const HitData& )
 
 struct FHitGroupPair
 {
-	uint32 m_Id   = -1;
-	int m_GroupId = -1;
+    uint32 m_Id   = -1;
+    int m_GroupId = -1;
 
-	friend bool operator==( const FHitGroupPair& Lhs, const FHitGroupPair& Rhs )
-	{
-		return Lhs.m_Id == Rhs.m_Id && Lhs.m_GroupId == Rhs.m_GroupId;
-	}
+    friend bool operator==( const FHitGroupPair& Lhs, const FHitGroupPair& Rhs )
+    {
+        return Lhs.m_Id == Rhs.m_Id && Lhs.m_GroupId == Rhs.m_GroupId;
+    }
 
-	friend bool operator!=( const FHitGroupPair& Lhs, const FHitGroupPair& Rhs )
-	{
-		return !(Lhs == Rhs);
-	}
+    friend bool operator!=( const FHitGroupPair& Lhs, const FHitGroupPair& Rhs )
+    {
+        return !(Lhs == Rhs);
+    }
 };
 
 UCLASS( ClassGroup = ( Custom ), meta = ( BlueprintSpawnableComponent ) )
 class FIGHTINGGAME_API UHitboxHandlerComponent : public UActorComponent
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	UHitboxHandlerComponent();
+    UHitboxHandlerComponent();
 
 protected:
-	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Hitbox Visualizer" )
-	TSubclassOf<AHitboxVisualizer> m_HitboxVisualizer = nullptr;
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Hitbox Visualizer" )
+    TSubclassOf<AHitboxVisualizer> m_HitboxVisualizer = nullptr;
 
-	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Default Hitboxes" )
-	TArray<FHitboxDescription> m_DefaultHitboxes;
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Default Hitboxes" )
+    TArray<FHitboxDescription> m_DefaultHitboxes;
 
-	UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Spawn Default Hitboxes on Begin Play" )
-	bool m_SpawnDefaultHitboxesOnBeginPlay = true;
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Spawn Default Hitboxes on Begin Play" )
+    bool m_SpawnDefaultHitboxesOnBeginPlay = true;
 
-	UPROPERTY()
-	TObjectPtr<USceneComponent> m_ReferenceComponent = nullptr;
+    UPROPERTY()
+    TObjectPtr<USceneComponent> m_ReferenceComponent = nullptr;
 
-	virtual void BeginPlay() override;
-	virtual void EndPlay( const EEndPlayReason::Type EndPlayReason ) override;
+    virtual void BeginPlay() override;
+    virtual void EndPlay( const EEndPlayReason::Type EndPlayReason ) override;
 
 public:
-	FHit m_HitDelegate;
-	TArray<TObjectPtr<AActor>> m_AdditionalActorsToIgnore;
+    FHit m_HitDelegate;
+    TArray<TObjectPtr<AActor>> m_AdditionalActorsToIgnore;
 
-	void SetReferenceComponent( TObjectPtr<USceneComponent> Component );
+    void SetReferenceComponent( TObjectPtr<USceneComponent> Component );
 
-	void AddHitbox( HitData Hit );
-	void RemoveHitbox( uint32 HitUniqueId );
-	void UpdateHitboxes();
+    void AddHitbox( HitData Hit );
+    void RemoveHitbox( uint32 HitUniqueId );
+    void UpdateHitboxes();
 
-	void ShowDebugTraces( bool Show );
+    void ShowDebugTraces( bool Show );
 
-	void SpawnDefaultHitboxes();
+    void SpawnDefaultHitboxes();
 
-	virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
+    virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
 
 private:
-	TMap<uint32, TArray<FHitGroupPair>> m_ActorGroupsMap;
-	TMap<int, TArray<HitData>> m_ActiveGroupedHitboxes;
+    TMap<uint32, TArray<FHitGroupPair>> m_ActorGroupsMap;
+    TMap<int, TArray<HitData>> m_ActiveGroupedHitboxes;
 
-	TArray<TObjectPtr<AHitboxVisualizer>> m_HitboxVisualizers;
+    TArray<TObjectPtr<AHitboxVisualizer>> m_HitboxVisualizers;
 
-	bool m_DebugTraces = true;
+    bool m_DebugTraces = true;
 
-	bool TraceHitbox( const HitData& HitData, FHitResult& OutHit );
-	bool WasActorAlreadyHit( AActor* Actor, const HitData& Hit );
-	void RegisterHitActor( AActor* Actor, const HitData& Hit );
-	void UpdateHitbox( const HitData& HitData );
+    bool TraceHitbox( const HitData& HitData, FHitResult& OutHit, ECollisionChannel CollisionChannel = CUSTOM_TRACE_HURTBOX );
+    bool WasActorAlreadyHit( AActor* Actor, const HitData& Hit );
+    void RegisterHitActor( AActor* Actor, const HitData& Hit );
+    void UpdateHitbox( const HitData& HitData );
 
-	void RemovePendingHitboxes();
+    void RemovePendingHitboxes();
 
-	FVector GetHitTraceLocation( const HitData& Hit );
+    FVector GetHitTraceLocation( const HitData& Hit );
 
-	void DEBUG_SpawnDebugSphere( const HitData& Hit );
-	TObjectPtr<AHitboxVisualizer> DEBUG_GetHitboxVisualizerOrDefault( int HitboxId );
-	void DEBUG_DestroyDebugSphere( int HitboxId );
-	void DEBUG_UpdateDebugSpheres();
+    void DEBUG_SpawnDebugSphere( const HitData& Hit );
+    TObjectPtr<AHitboxVisualizer> DEBUG_GetHitboxVisualizerOrDefault( int HitboxId );
+    void DEBUG_DestroyDebugSphere( int HitboxId );
+    void DEBUG_UpdateDebugSpheres();
 };

@@ -2,7 +2,6 @@
 
 #include "HitboxHandlerComponent.h"
 #include "Hittable.h"
-#include "FightingGame/Collision/CustomCollisionChannels.h"
 #include "FightingGame/Common/CombatStatics.h"
 #include "FightingGame/Debugging/Debug.h"
 #include "FightingGame/Debugging/HitboxVisualizer.h"
@@ -127,11 +126,11 @@ void UHitboxHandlerComponent::TickComponent( float DeltaTime, ELevelTick TickTyp
     RemovePendingHitboxes();
 }
 
-bool UHitboxHandlerComponent::TraceHitbox( const HitData& HitData, FHitResult& OutHit )
+bool UHitboxHandlerComponent::TraceHitbox( const HitData& HitData, FHitResult& OutHit, ECollisionChannel CollisionChannel /*= CUSTOM_TRACE_HURTBOX*/ )
 {
     TArray<TEnumAsByte<EObjectTypeQuery>> targetTraceTypes;
 
-    const EObjectTypeQuery targetCollisionType = UEngineTypes::ConvertToObjectType( CUSTOM_TRACE_HURTBOX );
+    const EObjectTypeQuery targetCollisionType = UEngineTypes::ConvertToObjectType( CollisionChannel );
     targetTraceTypes.Add( targetCollisionType );
 
     FVector location = GetHitTraceLocation( HitData );
@@ -175,7 +174,7 @@ void UHitboxHandlerComponent::RegisterHitActor( AActor* Actor, const HitData& Hi
 void UHitboxHandlerComponent::UpdateHitbox( const HitData& HitData )
 {
     FHitResult outHit;
-    const bool success = TraceHitbox( HitData, outHit );
+    bool success = TraceHitbox( HitData, outHit );
 
     AActor* hitActor = outHit.GetActor();
     if( auto* hittable = Cast<IHittable>( hitActor ) )

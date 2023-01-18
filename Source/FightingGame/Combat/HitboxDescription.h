@@ -17,6 +17,12 @@ struct FHitboxDescription
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Socket Name (Mirrored)" )
     FName m_SocketNameMirrored;
 
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Is Counter" )
+    bool m_IsCounter = false;
+
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Ignore Block" )
+    bool m_IgnoreBlock = false;
+
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Use Location (Instead of sockets)" )
     bool m_UseLocation = false;
 

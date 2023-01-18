@@ -25,6 +25,7 @@ namespace
     FName loc_SpecialAction        = TEXT( "Special" );
     FName loc_MoveHorizontalAction = TEXT( "MoveHorizontal" );
     FName loc_MoveVerticalAction   = TEXT( "MoveVertical" );
+    FName loc_CounterAction        = TEXT( "Counter" );
 
     int32 loc_CurrentBufferEntryUniqueId = 0;
 }
@@ -156,6 +157,7 @@ void UMovesBufferComponent::OnSetupPlayerInputComponent( UInputComponent* Player
         m_PlayerInput->BindAction( loc_JumpAction, IE_Released, this, &UMovesBufferComponent::OnStopJump );
         m_PlayerInput->BindAction( loc_AttackAction, IE_Pressed, this, &UMovesBufferComponent::OnAttack );
         m_PlayerInput->BindAction( loc_SpecialAction, IE_Pressed, this, &UMovesBufferComponent::OnSpecial );
+        m_PlayerInput->BindAction( loc_CounterAction, IE_Pressed, this, &UMovesBufferComponent::OnCounter );
 
         m_PlayerInput->BindAxis( loc_MoveHorizontalAction );
         m_PlayerInput->BindAxis( loc_MoveVerticalAction );
@@ -464,6 +466,11 @@ void UMovesBufferComponent::OnAttack()
 void UMovesBufferComponent::OnSpecial()
 {
     AddToInputBuffer( EInputEntry::Special );
+}
+
+void UMovesBufferComponent::OnCounter()
+{
+    AddToInputBuffer( EInputEntry::Counter );
 }
 
 void UMovesBufferComponent::UpdateMovementDirection()

@@ -263,6 +263,15 @@ void AFightingCharacter::SetupPlayerInputComponent( UInputComponent* PlayerInput
 
 void AFightingCharacter::OnHitReceived( const HitData& HitData )
 {
+    if( m_IsCountering )
+    {
+        if( IsGrounded() )
+        {
+            m_StateMachine->SetState( m_GroundCounterStateName );
+            return;
+        }
+    }
+
     if( !m_Hittable )
     {
         return;
@@ -273,32 +282,31 @@ void AFightingCharacter::OnHitReceived( const HitData& HitData )
         UCombatStatics::FaceOther( this, HitData.m_Owner, true );
     }
 
-    if( IsBlocking() )
+    if( HitData.m_OpponentHitStopDuration > 0.f )
+    {
+        GetHitStopComponent()->EnableHitStop( HitData.m_OpponentHitStopDuration, HitData.m_Shake );
+    }
+
+    if( IsBlocking() && !HitData.m_IgnoreBlock )
     {
         if( IsGrounded() )
         {
             m_StateMachine->SetState( m_GroundBlockStateName );
+            return;
         }
+    }
+
+    m_DamagePercent += HitData.m_DamagePercent;
+    UCombatStatics::ApplyKnockbackTo( HitData.m_ProcessedKnockback, HitData.m_ProcessedKnockback.Length(), this, HitData.m_IgnoreKnockbackMultiplier );
+
+    float DotAbs = FMath::Abs( FVector::DotProduct( GetActorForwardVector(), HitData.m_ProcessedKnockback.GetSafeNormal() ) );
+    if( DotAbs < .9f && HitData.m_ProcessedKnockback.Length() >= 500.f )
+    {
+        m_StateMachine->SetState( m_GroundToAirReactionStateName );
     }
     else
     {
-        m_DamagePercent += HitData.m_DamagePercent;
-        UCombatStatics::ApplyKnockbackTo( HitData.m_ProcessedKnockback, HitData.m_ProcessedKnockback.Length(), this, HitData.m_IgnoreKnockbackMultiplier );
-
-        float DotAbs = FMath::Abs( FVector::DotProduct( GetActorForwardVector(), HitData.m_ProcessedKnockback.GetSafeNormal() ) );
-        if( DotAbs < .9f && HitData.m_ProcessedKnockback.Length() >= 500.f )
-        {
-            m_StateMachine->SetState( m_GroundToAirReactionStateName );
-        }
-        else
-        {
-            m_StateMachine->SetState( m_GroundedReactionStateName );
-        }
-    }
-
-    if( HitData.m_OpponentHitStopDuration > 0.f )
-    {
-        GetHitStopComponent()->EnableHitStop( HitData.m_OpponentHitStopDuration, HitData.m_Shake );
+        m_StateMachine->SetState( m_GroundedReactionStateName );
     }
 }
 
@@ -317,6 +325,11 @@ bool AFightingCharacter::IsBlocking()
     }
 
     return m_IsMovingBackward;
+}
+
+void AFightingCharacter::SetIsCountering( bool IsCountering )
+{
+    m_IsCountering = IsCountering;
 }
 
 void AFightingCharacter::UpdateYaw( float DeltaTime )

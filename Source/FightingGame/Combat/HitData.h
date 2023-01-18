@@ -19,13 +19,15 @@ struct HitData
     uint32 m_Id;
     int32 m_GroupId;
     int32 m_Priority;
+    bool m_IsCounter;
+    bool m_IgnoreBlock;
     TArray<TObjectPtr<AActor>> m_AdditionalActorsToIgnore;
     bool m_PendingRemoval;
 
     explicit HitData( bool InForceOpponentFacing, float InDamagePercent, float InRadius, const FVector& InProcessedKnockback, bool InIgnoreKnockbackMultiplier,
                       float InHitStopDuration, float InOpponentHitStopDuration, bool InShake, UWorld* InWorld, AActor* InOwner, USkeletalMeshComponent* InSkeletalMesh,
-                      const FName& InSocketToFollow,
-                      FVector InLocation, uint32 InId, int32 InGroupId, int32 InPriority, const TArray<TObjectPtr<AActor>>& InAdditionalActorsToIgnore );
+                      const FName& InSocketToFollow, FVector InLocation, uint32 InId, int32 InGroupId,
+                      int32 InPriority, bool InIsCounter, bool InIgnoreBlock, const TArray<TObjectPtr<AActor>>& InAdditionalActorsToIgnore );
 
     void GetActorsToIgnore( TArray<TObjectPtr<AActor>>& OutActors ) const
     {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "FightingGame/Combat/CounterEntity.h"
 #include "FightingGame/Combat/FacingEntity.h"
 #include "FightingGame/Combat/GroundSensitiveEntity.h"
 #include "FightingGame/Combat/Hittable.h"
@@ -22,7 +23,7 @@ DECLARE_MULTICAST_DELEGATE( FAirborne )
 
 UCLASS()
 class FIGHTINGGAME_API AFightingCharacter : public ACharacter,
-                                            public IHittable, public IFacingEntity, public IGroundSensitiveEntity
+                                            public IHittable, public IFacingEntity, public IGroundSensitiveEntity, public ICounterEntity
 {
     GENERATED_BODY()
 
@@ -87,6 +88,8 @@ public:
     virtual bool IsHittable() override;
     virtual bool IsBlocking() override;
 
+    virtual void SetIsCountering( bool IsCountering ) override;
+
     FORCEINLINE TObjectPtr<UMovesBufferComponent> GetMovesBufferComponent() const { return m_MovesBuffer; }
     FORCEINLINE TObjectPtr<UStateMachineComponent> GetFSM() const { return m_StateMachine; }
     FORCEINLINE TObjectPtr<UHitStopComponent> GetHitStopComponent() const { return m_HitStopComponent; }
@@ -142,6 +145,9 @@ protected:
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Ground Block State Name" )
     FName m_GroundBlockStateName = "GROUND_BLOCK";
 
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Ground Counter State Name" )
+    FName m_GroundCounterStateName = "GROUND_COUNTER";
+
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Hit Landed State Duration" )
     float m_HitLandedStateDuration = .2f;
 
@@ -189,6 +195,8 @@ protected:
 
     UPROPERTY()
     TObjectPtr<AFightingCharacter> m_OpponentToFace = nullptr;
+
+    bool m_IsCountering = false;
 
     virtual void BeginPlay() override;
     virtual void EndPlay( const EEndPlayReason::Type EndPlayReason ) override;

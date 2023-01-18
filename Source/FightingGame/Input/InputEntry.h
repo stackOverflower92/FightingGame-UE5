@@ -17,6 +17,7 @@ enum class EInputEntry : uint8
     Up,
     UpForward,
     Neutral,
+    Counter,
 
     COUNT UMETA( Hidden ),
     INVALID UMETA( Hidden ),
