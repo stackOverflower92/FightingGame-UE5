@@ -223,6 +223,11 @@ float AFightingCharacter::GetHP() const
     return m_HP;
 }
 
+float AFightingCharacter::GetInitialHP() const
+{
+    return m_InitialHP;
+}
+
 bool AFightingCharacter::IsAirKnockbackHappening() const
 {
     return m_IsAirKnockbackHappening;

@@ -87,6 +87,7 @@ public:
     void ApplyDamage( float Damage );
     void SetHP( float NewHP );
     float GetHP() const;
+    float GetInitialHP() const;
 
     UFUNCTION( BlueprintCallable )
     bool IsAirKnockbackHappening() const;

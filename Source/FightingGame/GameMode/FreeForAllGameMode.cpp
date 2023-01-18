@@ -5,7 +5,9 @@
 #include "FightingGame/Character/FightingCharacter.h"
 #include "FightingGame/Common/CombatStatics.h"
 #include "FightingGame/Common/ConversionStatics.h"
+#include "FightingGame/Common/GlobalDelegates.h"
 #include "FightingGame/Debugging/Debug.h"
+#include "FightingGame/UI/HUDBase.h"
 #include "Kismet/GameplayStatics.h"
 
 void AFreeForAllGameMode::BeginPlay()
@@ -70,6 +72,8 @@ void AFreeForAllGameMode::SpawnCharacters()
     InitCameraManager();
 
     EnablePlayersInput( true );
+
+    GlobalDelegates::Get().m_GameModeInitializedDelegate.Broadcast();
 }
 
 void AFreeForAllGameMode::EnablePlayersInput( bool Enable )
