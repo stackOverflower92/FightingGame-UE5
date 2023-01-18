@@ -4,6 +4,7 @@
 #include "IndexedPlayerStart.h"
 #include "FightingGame/Character/FightingCharacter.h"
 #include "FightingGame/Common/CombatStatics.h"
+#include "FightingGame/Common/ConversionStatics.h"
 #include "FightingGame/Debugging/Debug.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -37,9 +38,12 @@ void AFreeForAllGameMode::SpawnCharacters()
 
         m_PlayerControllers.Emplace( player );
 
-        TObjectPtr<AIndexedPlayerStart> start    = m_PlayerStarts[i];
-        TObjectPtr<AFightingCharacter> character = GetWorld()->SpawnActor<AFightingCharacter>( m_CharacterClass, start->GetTransform() );
-        character->m_PlayerIndex                 = i;
+        TObjectPtr<AIndexedPlayerStart> start         = m_PlayerStarts[i];
+        TObjectPtr<AFightingCharacter> character      = GetWorld()->SpawnActor<AFightingCharacter>( m_CharacterClass, start->GetTransform() );
+        character->m_PlayerIndex                      = i;
+        character->m_DamageIncreasesCharactersPercent = m_DamageIncreasesCharactersPercent;
+
+        character->m_DeathDelegate.AddUObject( this, &AFreeForAllGameMode::OnCharacterDeath );
 
         m_Characters.Emplace( character );
 
@@ -84,4 +88,9 @@ void AFreeForAllGameMode::EnablePlayersInput( bool Enable )
             }
         }
     }
+}
+
+void AFreeForAllGameMode::OnCharacterDeath( TObjectPtr<AFightingCharacter> Character, EDeathReason Reason )
+{
+    FG_SLOG_INFO( FString::Printf(TEXT("[%s] Died. Reason: %s"), *Character->GetName(), *UConversionStatics::ConvertEnumValueToString( Reason, false )) );
 }

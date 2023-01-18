@@ -39,6 +39,9 @@ struct FHitboxDescription
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Damage Percent" )
     float m_DamagePercent = 0.f;
 
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Damage HP" )
+    float m_DamageHP = 0.f;
+
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Radius" )
     float m_Radius = 10.f;
 

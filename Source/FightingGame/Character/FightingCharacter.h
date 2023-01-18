@@ -16,10 +16,20 @@ class UFSM;
 class UMovesBufferComponent;
 class UHitboxHandlerComponent;
 
+UENUM( BlueprintType )
+enum class EDeathReason : uint8
+{
+    ZeroHP,
+
+    COUNT UMETA( Hidden ),
+    INVALID UMETA( Hidden ),
+};
+
 DECLARE_MULTICAST_DELEGATE( FFacingChanged )
 DECLARE_MULTICAST_DELEGATE_OneParam( FHitLanded, AActor* )
 DECLARE_MULTICAST_DELEGATE( FGrounded )
 DECLARE_MULTICAST_DELEGATE( FAirborne )
+DECLARE_MULTICAST_DELEGATE_TwoParams( FDeath, TObjectPtr<AFightingCharacter>, EDeathReason )
 
 UCLASS()
 class FIGHTINGGAME_API AFightingCharacter : public ACharacter,
@@ -34,7 +44,9 @@ public:
     FHitLanded m_HitLandedDelegate;
     FGrounded m_GroundedDelegate;
     FAirborne m_AirborneDelegate;
-    int32 m_PlayerIndex = 0;
+    FDeath m_DeathDelegate;
+    int32 m_PlayerIndex                     = 0;
+    bool m_DamageIncreasesCharactersPercent = false;
 
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Current Horizontal Movement" )
     float m_CurrentHorizontalMovement = 0.f;
@@ -71,6 +83,10 @@ public:
     float GetKnockbackMultiplier() const;
     float GetDamagePercent() const;
     void SetDamagePercent( float Percent );
+
+    void ApplyDamage( float Damage );
+    void SetHP( float NewHP );
+    float GetHP() const;
 
     UFUNCTION( BlueprintCallable )
     bool IsAirKnockbackHappening() const;
@@ -205,6 +221,8 @@ private:
     bool m_FacingRight               = true;
     float m_TargetRotatorYaw         = 90.f;
     float m_DamagePercent            = 0.f;
+    float m_HP                       = 100.f;
+    float m_InitialHP                = -1.f;
     bool m_IsAirKnockbackHappening   = false;
     bool m_GroundedDelegateBroadcast = false;
     bool m_AirborneDelegateBroadcast = false;
@@ -219,6 +237,7 @@ private:
     FVector m_InitialMeshRelativeLocation;
 
     FDelegateHandle m_HitDelegateHandle;
+    FDelegateHandle m_DeathDelegateHandle;
 
     void UpdateYaw( float DeltaTime );
     void UpdateVerticalScale();

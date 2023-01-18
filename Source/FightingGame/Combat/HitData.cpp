@@ -1,11 +1,13 @@
 ﻿#include "HitData.h"
 
-HitData::HitData( bool InForceOpponentFacing, float InDamagePercent, float InRadius, const FVector& InProcessedKnockback, bool InIgnoreKnockbackMultiplier,
+HitData::HitData( bool InForceOpponentFacing, float InDamagePercent, float InDamageHP, float InRadius, const FVector& InProcessedKnockback,
+                  bool InIgnoreKnockbackMultiplier,
                   float InHitStopDuration, float InOpponentHitStopDuration, bool InShake, UWorld* InWorld, AActor* InOwner, USkeletalMeshComponent* InSkeletalMesh,
                   const FName& InSocketToFollow, FVector InLocation, uint32 InId, int32 InGroupId,
                   int32 InPriority, bool InIsCounter, bool InIgnoreBlock, const TArray<TObjectPtr<AActor>>& InAdditionalActorsToIgnore )
     : m_ForceOpponentFacing( InForceOpponentFacing ),
       m_DamagePercent( InDamagePercent ),
+      m_DamageHP( InDamageHP ),
       m_Radius( InRadius ),
       m_ProcessedKnockback( InProcessedKnockback ),
       m_IgnoreKnockbackMultiplier( InIgnoreKnockbackMultiplier ),

@@ -4,6 +4,7 @@
 #include "FightingGame/FightingGameGameModeBase.h"
 #include "FreeForAllGameMode.generated.h"
 
+enum class EDeathReason : uint8;
 class AIndexedPlayerStart;
 class ACameraManager;
 class AFightingCharacter;
@@ -30,6 +31,9 @@ protected:
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Enable characters auto-facing" )
     bool m_EnableCharactersAutoFacing = false;
 
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Damage Increases Characters Percent Value" )
+    bool m_DamageIncreasesCharactersPercent = false;
+
 private:
     TArray<TObjectPtr<AIndexedPlayerStart>> m_PlayerStarts;
     TArray<TObjectPtr<APlayerController>> m_PlayerControllers;
@@ -37,4 +41,6 @@ private:
 
     void SpawnCharacters();
     void EnablePlayersInput( bool Enable );
+
+    void OnCharacterDeath( TObjectPtr<AFightingCharacter> Character, EDeathReason Reason );
 };

@@ -27,6 +27,11 @@ void UHitboxHandlerComponent::BeginPlay()
     {
         SpawnDefaultHitboxes();
     }
+
+    if( !m_HitboxVisualizer )
+    {
+        FG_SLOG_WARN( FString::Printf( TEXT( "HitboxVisualizer is null, hiboxes will not be shown for actor [%s]" ), *GetOwner()->GetName()) );
+    }
 }
 
 void UHitboxHandlerComponent::EndPlay( const EEndPlayReason::Type EndPlayReason )
@@ -269,32 +274,29 @@ FVector UHitboxHandlerComponent::GetHitTraceLocation( const HitData& Hit )
 
 void UHitboxHandlerComponent::DEBUG_SpawnDebugSphere( const HitData& Hit )
 {
-    if( !m_HitboxVisualizer )
+    if( m_HitboxVisualizer )
     {
-        FG_SLOG_WARN( TEXT("HitboxVisualizer is null, hiboxes will not be shown for this object") );
-        return;
-    }
+        TObjectPtr<AHitboxVisualizer> inst = Hit.m_World->SpawnActor<AHitboxVisualizer>( m_HitboxVisualizer );
 
-    TObjectPtr<AHitboxVisualizer> inst = Hit.m_World->SpawnActor<AHitboxVisualizer>( m_HitboxVisualizer );
+        inst->SetId( Hit.m_Id );
+        inst->SetRadius( Hit.m_Radius );
+        inst->SetVisualizerOwner( Hit.m_Owner );
+        inst->SetKnockback( Hit.m_ProcessedKnockback );
 
-    inst->SetId( Hit.m_Id );
-    inst->SetRadius( Hit.m_Radius );
-    inst->SetVisualizerOwner( Hit.m_Owner );
-    inst->SetKnockback( Hit.m_ProcessedKnockback );
-
-    if( Hit.m_SkeletalMesh )
-    {
-        if( m_ReferenceComponent )
+        if( Hit.m_SkeletalMesh )
         {
-            inst->AttachToComponent( m_ReferenceComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Hit.m_SocketToFollow );
+            if( m_ReferenceComponent )
+            {
+                inst->AttachToComponent( m_ReferenceComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Hit.m_SocketToFollow );
+            }
         }
-    }
-    else
-    {
-        inst->SetLocation( Hit.m_Location );
-    }
+        else
+        {
+            inst->SetLocation( Hit.m_Location );
+        }
 
-    m_HitboxVisualizers.Emplace( inst );
+        m_HitboxVisualizers.Emplace( inst );
+    }
 }
 
 TObjectPtr<AHitboxVisualizer> UHitboxHandlerComponent::DEBUG_GetHitboxVisualizerOrDefault( int HitboxId )

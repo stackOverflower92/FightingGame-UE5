@@ -133,6 +133,8 @@ void AFightingCharacter::BeginPlay()
     InitPushbox();
 
     GetHitboxHandler()->SetReferenceComponent( GetMesh() );
+
+    m_InitialHP = m_HP;
 }
 
 void AFightingCharacter::EndPlay( const EEndPlayReason::Type EndPlayReason )
@@ -193,6 +195,32 @@ float AFightingCharacter::GetDamagePercent() const
 void AFightingCharacter::SetDamagePercent( float Percent )
 {
     m_DamagePercent = FMath::Max( 0.f, Percent );
+}
+
+void AFightingCharacter::ApplyDamage( float Damage )
+{
+    float newHp = m_HP -= Damage;
+    m_HP        = FMath::Clamp( newHp, 0.f, m_InitialHP );
+
+    if( FMath::IsNearlyZero( m_HP ) )
+    {
+        m_DeathDelegate.Broadcast( this, EDeathReason::ZeroHP );
+    }
+}
+
+void AFightingCharacter::SetHP( float NewHP )
+{
+    m_HP = FMath::Clamp( NewHP, 0.f, m_InitialHP );
+
+    if( FMath::IsNearlyZero( m_HP ) )
+    {
+        m_DeathDelegate.Broadcast( this, EDeathReason::ZeroHP );
+    }
+}
+
+float AFightingCharacter::GetHP() const
+{
+    return m_HP;
 }
 
 bool AFightingCharacter::IsAirKnockbackHappening() const
@@ -297,7 +325,10 @@ void AFightingCharacter::OnHitReceived( const HitData& HitData )
     }
 
     m_DamagePercent += HitData.m_DamagePercent;
-    UCombatStatics::ApplyKnockbackTo( HitData.m_ProcessedKnockback, HitData.m_ProcessedKnockback.Length(), this, HitData.m_IgnoreKnockbackMultiplier );
+    ApplyDamage( HitData.m_DamageHP );
+
+    bool ignoreKnockbackMultiplier = m_DamageIncreasesCharactersPercent ? HitData.m_IgnoreKnockbackMultiplier : true;
+    UCombatStatics::ApplyKnockbackTo( HitData.m_ProcessedKnockback, HitData.m_ProcessedKnockback.Length(), this, ignoreKnockbackMultiplier );
 
     float DotAbs = FMath::Abs( FVector::DotProduct( GetActorForwardVector(), HitData.m_ProcessedKnockback.GetSafeNormal() ) );
     if( DotAbs < .9f && HitData.m_ProcessedKnockback.Length() >= 500.f )
