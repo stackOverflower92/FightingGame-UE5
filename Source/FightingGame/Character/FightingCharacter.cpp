@@ -12,6 +12,7 @@
 #include "FightingGame/Projectile/ProjectileSpawnerComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include <imgui.h>
 
 namespace
 {
@@ -23,6 +24,9 @@ namespace
 
     int32 loc_DebugEnableShake = 0;
     FG_CVAR_FLAG_DESC( CVarDebugEnableShake, TEXT( "FightingCharacter.DebugEnableShake" ), loc_DebugEnableShake );
+
+    int32 loc_DebugHP = 0;
+    FG_CVAR_FLAG_DESC( CVarDebugHP, TEXT( "FightingCharacter.DebugHP" ), loc_DebugHP );
 
     constexpr auto loc_RotationStartEpsilon = 1.f;
 }
@@ -257,7 +261,7 @@ void AFightingCharacter::Tick( float DeltaTime )
 {
     Super::Tick( DeltaTime );
 
-    if( loc_DebugDamageStats == 1 )
+    if( loc_DebugDamageStats )
     {
         FG_TEXT( GetWorld(), GetActorLocation(),
                  FString::Printf( TEXT( "[%%: %.1f][KMul: %.2f]" ), m_DamagePercent, GetKnockbackMultiplier() ) );
@@ -266,10 +270,20 @@ void AFightingCharacter::Tick( float DeltaTime )
     m_FacingRight = m_TargetRotatorYaw > 0.f && m_TargetRotatorYaw < 180.f;
     UpdateYaw( DeltaTime );
 
-    if( loc_DebugFacing == 1 )
+    if( loc_DebugFacing )
     {
         FG_TEXT( GetWorld(), GetActorLocation(),
                  FString::Printf( TEXT( "[Facing Right: %s]" ), m_FacingRight ? TEXT( "TRUE" ) : TEXT( "FALSE" ) ) );
+    }
+
+    if( loc_DebugHP )
+    {
+        ImGui::Begin( "Character Health" );
+        {
+            ImGui::Text( "HP" );
+            ImGui::ProgressBar( GetHP() / GetInitialHP() );
+        }
+        ImGui::End();
     }
 
     CheckGroundedEvent();
