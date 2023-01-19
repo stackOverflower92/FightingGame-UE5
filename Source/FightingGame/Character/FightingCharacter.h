@@ -165,6 +165,9 @@ protected:
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Ground Counter State Name" )
     FName m_GroundCounterStateName = "GROUND_COUNTER";
 
+    /*
+     * If value is < 0 then the hit data hitstop duration will be used
+     */
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Hit Landed State Duration" )
     float m_HitLandedStateDuration = .2f;
 
@@ -244,7 +247,7 @@ private:
     void UpdateVerticalScale();
 
     void OnHitLanded( TObjectPtr<AActor> Target, const HitData& HitData );
-    void StartHitLandedTimer();
+    void StartHitLandedTimer( float Duration );
     void OnHitLandedTimerEnded();
 
     void CheckGroundedEvent();

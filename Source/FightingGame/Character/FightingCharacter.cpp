@@ -401,7 +401,7 @@ void AFightingCharacter::OnHitLanded( TObjectPtr<AActor> Target, const HitData& 
 
     m_HasJustLandedHit = true;
 
-    StartHitLandedTimer();
+    StartHitLandedTimer( m_HitLandedStateDuration >= 0.f ? m_HitLandedStateDuration : HitData.m_HitStopDuration );
 
     if( HitData.m_HitStopDuration > 0.f )
     {
@@ -409,7 +409,7 @@ void AFightingCharacter::OnHitLanded( TObjectPtr<AActor> Target, const HitData& 
     }
 }
 
-void AFightingCharacter::StartHitLandedTimer()
+void AFightingCharacter::StartHitLandedTimer( float Duration )
 {
     // #TODO use hitstop duration value for this timer? maybe its cleaner and more straightforward
     if( GetWorldTimerManager().IsTimerActive( m_HitLandedStateTimerHandle ) )
@@ -417,7 +417,7 @@ void AFightingCharacter::StartHitLandedTimer()
         GetWorldTimerManager().ClearTimer( m_HitLandedStateTimerHandle );
     }
 
-    GetWorldTimerManager().SetTimer( m_HitLandedStateTimerHandle, this, &AFightingCharacter::OnHitLandedTimerEnded, m_HitLandedStateDuration );
+    GetWorldTimerManager().SetTimer( m_HitLandedStateTimerHandle, this, &AFightingCharacter::OnHitLandedTimerEnded, Duration );
 }
 
 void AFightingCharacter::OnHitLandedTimerEnded()

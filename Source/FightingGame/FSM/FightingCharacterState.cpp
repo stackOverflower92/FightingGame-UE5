@@ -219,7 +219,6 @@ bool UFightingCharacterState::EvaluateInputsSequenceBufferedTransition( bool Was
         if( m_BlockedInputsSequences.Contains( inputsSequence ) )
         {
             inputsSequenceSnapshot.RemoveAt( i );
-
             continue;
         }
 
