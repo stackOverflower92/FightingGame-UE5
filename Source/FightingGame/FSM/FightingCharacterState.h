@@ -6,6 +6,7 @@
 #include "StateMachineState.h"
 #include "FightingGame/Character/FightingCharacter.h"
 #include "FightingGame/Input/InputsSequenceStateMappingRow.h"
+#include "FightingGame/Input/MovesBufferComponent.h"
 #include "FightingCharacterState.generated.h"
 
 class UFightingCharacterStateTransition;
@@ -77,7 +78,6 @@ protected:
 
     bool ThisStateOverridesInputsSequenceMapping( const FString& InputsSequenceName ) const;
 
-    FName GetFSMStateFromInputsSequence( const FString& InputsSequenceName );
 
     FInputsSequenceStateMappingRow* GetStateMappingRowFromInputsSequence( const FString& InputsSequenceName );
 
@@ -105,4 +105,6 @@ private:
     FDelegateHandle m_CharacterAirborneHandle;
 
     bool EvaluateInputsSequenceBufferedTransition( bool WasUsedDuringHit );
+    void FilterInputsSequenceBufferSnapshot( TArray<FInputsSequenceBufferEntry>& Snapshot, bool WasUsedDuringHit );
+    FName GetInputsSequenceMappedState( const FString& InputsSequenceName );
 };

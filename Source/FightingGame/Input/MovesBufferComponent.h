@@ -7,12 +7,12 @@
 
 #include "InputEntry.h"
 #include "FightingGame/Common/ConversionStatics.h"
-#include "FightingGame/FSM/FightingCharacterState.h"
 #include "MovesBufferComponent.generated.h"
 
 class UDataTable;
 class AFightingCharacter;
 class UInputComponent;
+class UInputsSequence;
 class UInputSequenceResolver;
 
 struct FBufferEntry

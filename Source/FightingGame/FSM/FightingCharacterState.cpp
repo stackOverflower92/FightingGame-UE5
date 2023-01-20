@@ -9,7 +9,7 @@
 #include "FightingGame/Common/CombatStatics.h"
 #include "FightingGame/Debugging/Debug.h"
 #include "FightingGame/Input/InputsSequenceStateMappingRow.h"
-#include "FightingGame/Input/MovesBufferComponent.h"
+#include "VisualLogger/VisualLogger.h"
 
 void UFightingCharacterState::OnInit()
 {
@@ -135,40 +135,13 @@ bool UFightingCharacterState::ThisStateOverridesInputsSequenceMapping( const FSt
     return m_InputsSequencesOverrides.Contains( InputsSequenceName );
 }
 
-FName UFightingCharacterState::GetFSMStateFromInputsSequence( const FString& InputsSequenceName )
-{
-    if( ThisStateOverridesInputsSequenceMapping( InputsSequenceName ) )
-    {
-        if( m_OwnerCharacter->HasJustLandedHit() )
-        {
-            if( m_InputsSequencesOverrides[InputsSequenceName].m_AllowAsOnHitCancel )
-            {
-                return m_InputsSequencesOverrides[InputsSequenceName].m_TargetState;
-            }
-        }
-        else
-        {
-            return m_InputsSequencesOverrides[InputsSequenceName].m_TargetState;
-        }
-    }
-
-    if( auto* row = GetStateMappingRowFromInputsSequence( InputsSequenceName ) )
-    {
-        return row->m_StateName;
-    }
-
-    FG_SLOG_ERR( FString::Printf(TEXT("Could not find input state mapping row for entry [%s]"), *InputsSequenceName) );
-
-    return NAME_None;
-}
-
 FInputsSequenceStateMappingRow* UFightingCharacterState::GetStateMappingRowFromInputsSequence( const FString& InputsSequenceName )
 {
     if( TObjectPtr<UDataTable> table = m_OwnerCharacter->GetMovesBufferComponent()->m_InputsToStatesDataTable )
     {
         for( auto name : table->GetRowNames() )
         {
-            auto* row = table->FindRow<FInputsSequenceStateMappingRow>( name, TEXT( "" ) );
+            auto* row = table->FindRow<FInputsSequenceStateMappingRow>( name, TEXT_EMPTY );
             verify( row );
 
             if( row->m_InputsSequence->m_Name == InputsSequenceName )
@@ -212,21 +185,43 @@ bool UFightingCharacterState::EvaluateInputsSequenceBufferedTransition( bool Was
     TArray<FInputsSequenceBufferEntry> inputsSequenceSnapshot;
     m_OwnerCharacter->GetMovesBufferComponent()->GetInputsSequenceBufferSnapshot( inputsSequenceSnapshot, true, true, true );
 
-    for( int32 i = inputsSequenceSnapshot.Num() - 1; i >= 0; --i )
+    if( inputsSequenceSnapshot.IsEmpty() ) return false;
+
+    FilterInputsSequenceBufferSnapshot( inputsSequenceSnapshot, WasUsedDuringHit );
+
+    if( inputsSequenceSnapshot.IsEmpty() ) return false;
+
+    inputsSequenceSnapshot.Sort( []( const FInputsSequenceBufferEntry& A, const FInputsSequenceBufferEntry& B )
     {
-        const FString& inputsSequence = inputsSequenceSnapshot[i].m_InputsSequenceName;
+        return A.m_Priority < B.m_Priority;
+    } );
+
+    FInputsSequenceBufferEntry& targetEntry = inputsSequenceSnapshot[0];
+
+    FString selectedInputsSequence = targetEntry.m_InputsSequenceName;
+    FName targetState              = GetInputsSequenceMappedState( selectedInputsSequence );
+
+    if( !targetState.IsNone() && targetState.IsValid() )
+    {
+        m_OwnerCharacter->GetMovesBufferComponent()->UseBufferedInputsSequence( targetEntry, false );
+
+        m_FSM->SetState( targetState );
+
+        return true;
+    }
+
+    return false;
+}
+
+void UFightingCharacterState::FilterInputsSequenceBufferSnapshot( TArray<FInputsSequenceBufferEntry>& Snapshot, bool WasUsedDuringHit )
+{
+    for( int32 i = Snapshot.Num() - 1; i >= 0; --i )
+    {
+        const FString& inputsSequence = Snapshot[i].m_InputsSequenceName;
 
         if( m_BlockedInputsSequences.Contains( inputsSequence ) )
         {
-            inputsSequenceSnapshot.RemoveAt( i );
-            continue;
-        }
-
-        auto mappingRow = GetStateMappingRowFromInputsSequence( inputsSequence );
-
-        if( WasUsedDuringHit && !mappingRow->m_AllowAsOnHitCancel )
-        {
-            inputsSequenceSnapshot.RemoveAt( i );
+            Snapshot.RemoveAt( i );
             continue;
         }
 
@@ -235,42 +230,51 @@ bool UFightingCharacterState::EvaluateInputsSequenceBufferedTransition( bool Was
             continue;
         }
 
+        auto mappingRow = GetStateMappingRowFromInputsSequence( inputsSequence );
+
+        if( WasUsedDuringHit && !mappingRow->m_AllowAsOnHitCancel )
+        {
+            Snapshot.RemoveAt( i );
+            continue;
+        }
+
         bool groundedContitionFailed = m_OwnerCharacter->IsGrounded() && !mappingRow->m_AllowWhenGrounded;
         bool airborneConditionFailed = m_OwnerCharacter->IsAirborne() && !mappingRow->m_AllowWhenAirborne;
 
         if( groundedContitionFailed || airborneConditionFailed )
         {
-            inputsSequenceSnapshot.RemoveAt( i );
+            Snapshot.RemoveAt( i );
         }
     }
+}
 
-    if( !inputsSequenceSnapshot.IsEmpty() )
+FName UFightingCharacterState::GetInputsSequenceMappedState( const FString& InputsSequenceName )
+{
+    if( ThisStateOverridesInputsSequenceMapping( InputsSequenceName ) )
     {
-        inputsSequenceSnapshot.Sort( []( const FInputsSequenceBufferEntry& A, const FInputsSequenceBufferEntry& B )
+        const auto& sequenceOverride = m_InputsSequencesOverrides[InputsSequenceName];
+
+        if( m_OwnerCharacter->HasJustLandedHit() )
         {
-            return A.m_Priority < B.m_Priority;
-        } );
-
-        FInputsSequenceBufferEntry& targetEntry = inputsSequenceSnapshot[0];
-
-        FString selectedInputsSequence = targetEntry.m_InputsSequenceName;
-        FName targetState              = GetFSMStateFromInputsSequence( selectedInputsSequence );
-
-        if( !targetState.IsNone() )
-        {
-            m_OwnerCharacter->GetMovesBufferComponent()->UseBufferedInputsSequence( targetEntry, false );
-
-            if( targetState.IsValid() )
+            if( sequenceOverride.m_AllowAsOnHitCancel )
             {
-                m_FSM->SetState( targetState );
-                return true;
+                return sequenceOverride.m_TargetState;
             }
-
-            FG_SLOG_ERR( TEXT("targetState is not valid.") );
+        }
+        else
+        {
+            return sequenceOverride.m_TargetState;
+        }
+    }
+    else
+    {
+        if( auto* row = GetStateMappingRowFromInputsSequence( InputsSequenceName ) )
+        {
+            return row->m_StateName;
         }
     }
 
-    return false;
+    return NAME_None;
 }
 
 void UFightingCharacterState::OnCharacterAirborne_Implementation()

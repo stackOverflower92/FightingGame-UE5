@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Giammarco Agazzotti
 
 #include "InputSequenceResolver.h"
-
 #include "FightingGame/Debugging/Debug.h"
 
 void UInputSequenceResolver::Init( const TArray<TObjectPtr<UInputsSequence>>& InputsList )

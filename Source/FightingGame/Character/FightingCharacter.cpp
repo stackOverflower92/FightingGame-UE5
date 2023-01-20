@@ -278,7 +278,7 @@ void AFightingCharacter::Tick( float DeltaTime )
 
     if( loc_DebugHP )
     {
-        ImGui::Begin( "Character Health" );
+        ImGui::Begin( "Character HP" );
         {
             ImGui::Text( "HP" );
             ImGui::ProgressBar( GetHP() / GetInitialHP() );

@@ -46,13 +46,16 @@ public:
     void Init( const TArray<TObjectPtr<UInputsSequence>>& InputsList );
     EInputRegistrationResult RegisterInput( EInputEntry InputEntry );
 
+    void OnTick();
+
 protected:
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Route Auto-Reset Time (Seconds)" )
     float m_RouteAutoResetTime = 0.1f;
 
 private:
     TArray<TSharedPtr<FInputResolverNode>> m_Trees;
-    TSharedPtr<FInputResolverNode> m_CurrentSequenceRoot = nullptr;
+    TSharedPtr<FInputResolverNode> m_CurrentSequenceRoot      = nullptr;
+    TSharedPtr<FInputResolverNode> m_CurrentDebugSequenceRoot = nullptr;
 
     TSharedPtr<FInputResolverNode> m_CurrentRouteNode = nullptr;
 
