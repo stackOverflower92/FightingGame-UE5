@@ -324,7 +324,7 @@ void AFightingCharacter::OnHitReceived( const HitData& HitData )
         return;
     }
 
-    if( HitData.m_ForceOpponentFacing )
+    if( HitData.m_ForceOpponentFacing && !m_HasSuperArmor )
     {
         UCombatStatics::FaceOther( this, HitData.m_Owner, true );
     }
@@ -344,19 +344,33 @@ void AFightingCharacter::OnHitReceived( const HitData& HitData )
     }
 
     m_DamagePercent += HitData.m_DamagePercent;
-    ApplyDamage( HitData.m_DamageHP );
-
-    bool ignoreKnockbackMultiplier = m_DamageIncreasesCharactersPercent ? HitData.m_IgnoreKnockbackMultiplier : true;
-    UCombatStatics::ApplyKnockbackTo( HitData.m_ProcessedKnockback, HitData.m_ProcessedKnockback.Length(), this, ignoreKnockbackMultiplier );
-
-    float DotAbs = FMath::Abs( FVector::DotProduct( GetActorForwardVector(), HitData.m_ProcessedKnockback.GetSafeNormal() ) );
-    if( DotAbs < .9f && HitData.m_ProcessedKnockback.Length() >= 500.f )
+    if( m_HasSuperArmor )
     {
-        m_StateMachine->SetState( m_GroundToAirReactionStateName );
+        m_DamagePercent *= m_SuperArmorData.m_DamagePercentMultiplier;
     }
-    else
+
+    float damageHp = HitData.m_DamageHP;
+    if( m_HasSuperArmor )
     {
-        m_StateMachine->SetState( m_GroundedReactionStateName );
+        damageHp *= m_SuperArmorData.m_DamageMultiplier;
+    }
+
+    ApplyDamage( damageHp );
+
+    if( !m_HasSuperArmor )
+    {
+        bool ignoreKnockbackMultiplier = m_DamageIncreasesCharactersPercent ? HitData.m_IgnoreKnockbackMultiplier : true;
+        UCombatStatics::ApplyKnockbackTo( HitData.m_ProcessedKnockback, HitData.m_ProcessedKnockback.Length(), this, ignoreKnockbackMultiplier );
+
+        float DotAbs = FMath::Abs( FVector::DotProduct( GetActorForwardVector(), HitData.m_ProcessedKnockback.GetSafeNormal() ) );
+        if( DotAbs < .9f && HitData.m_ProcessedKnockback.Length() >= 500.f )
+        {
+            m_StateMachine->SetState( m_GroundToAirReactionStateName );
+        }
+        else
+        {
+            m_StateMachine->SetState( m_GroundedReactionStateName );
+        }
     }
 }
 
@@ -375,6 +389,13 @@ bool AFightingCharacter::IsBlocking()
     }
 
     return m_IsMovingBackward;
+}
+
+void AFightingCharacter::EnableSuperArmor( bool Enable, const SuperArmorData& Data )
+{
+    m_HasSuperArmor = Enable;
+
+    m_SuperArmorData = Data;
 }
 
 void AFightingCharacter::SetIsCountering( bool IsCountering )

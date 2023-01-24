@@ -5,6 +5,7 @@
 #include "FightingGame/Combat/FacingEntity.h"
 #include "FightingGame/Combat/GroundSensitiveEntity.h"
 #include "FightingGame/Combat/Hittable.h"
+#include "FightingGame/Combat/SuperArmorData.h"
 #include "GameFramework/Character.h"
 #include "FightingCharacter.generated.h"
 
@@ -104,6 +105,7 @@ public:
     virtual void OnHitReceived( const HitData& HitData ) override;
     virtual bool IsHittable() override;
     virtual bool IsBlocking() override;
+    virtual void EnableSuperArmor( bool Enable, const SuperArmorData& Data ) override;
 
     virtual void SetIsCountering( bool IsCountering ) override;
 
@@ -233,12 +235,14 @@ private:
     bool m_HasJustLandedHit          = false;
     FTimerHandle m_HitLandedStateTimerHandle;
     bool m_Hittable               = true;
+    bool m_HasSuperArmor          = false;
     float m_CachedHitStopDuration = 0.f;
     bool m_CachedDoMeshShake      = false;
     bool m_CachedConsiderShake    = false;
     TArray<float> m_TimeDilations;
     bool m_CanUpdateMeshShake = false;
     FVector m_InitialMeshRelativeLocation;
+    SuperArmorData m_SuperArmorData;
 
     FDelegateHandle m_HitDelegateHandle;
     FDelegateHandle m_DeathDelegateHandle;

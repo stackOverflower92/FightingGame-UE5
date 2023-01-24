@@ -15,3 +15,7 @@ bool IHittable::IsBlocking()
 {
     return false;
 }
+
+void IHittable::EnableSuperArmor( bool Enable, const SuperArmorData& Data )
+{
+}
