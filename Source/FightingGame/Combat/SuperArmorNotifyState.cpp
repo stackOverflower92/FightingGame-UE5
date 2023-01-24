@@ -13,7 +13,7 @@ void USuperArmorNotifyState::NotifyBegin( USkeletalMeshComponent* MeshComp, UAni
 
     if( auto* hittable = Cast<IHittable>( MeshComp->GetOwner() ) )
     {
-        hittable->EnableSuperArmor( true, SuperArmorData{m_DamagePercentMultiplier, m_DamageMultiplier} );
+        hittable->EnableSuperArmor( SuperArmorData{m_DamagePercentMultiplier, m_DamageMultiplier} );
     }
 }
 
@@ -23,6 +23,6 @@ void USuperArmorNotifyState::NotifyEnd( USkeletalMeshComponent* MeshComp, UAnimS
 
     if( auto* hittable = Cast<IHittable>( MeshComp->GetOwner() ) )
     {
-        hittable->EnableSuperArmor( false, SuperArmorData{m_DamagePercentMultiplier, m_DamageMultiplier} );
+        hittable->DisableSuperArmor();
     }
 }

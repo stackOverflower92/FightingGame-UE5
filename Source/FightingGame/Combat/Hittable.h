@@ -25,5 +25,6 @@ public:
     virtual void OnHitReceived( const HitData& HitData );
     virtual bool IsHittable();
     virtual bool IsBlocking();
-    virtual void EnableSuperArmor( bool Enable, const SuperArmorData& Data );
+    virtual void EnableSuperArmor( const SuperArmorData& Data );
+    virtual void DisableSuperArmor();
 };

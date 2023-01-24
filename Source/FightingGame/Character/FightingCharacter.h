@@ -105,7 +105,8 @@ public:
     virtual void OnHitReceived( const HitData& HitData ) override;
     virtual bool IsHittable() override;
     virtual bool IsBlocking() override;
-    virtual void EnableSuperArmor( bool Enable, const SuperArmorData& Data ) override;
+    virtual void EnableSuperArmor( const SuperArmorData& Data ) override;
+    virtual void DisableSuperArmor() override;
 
     virtual void SetIsCountering( bool IsCountering ) override;
 

@@ -391,11 +391,15 @@ bool AFightingCharacter::IsBlocking()
     return m_IsMovingBackward;
 }
 
-void AFightingCharacter::EnableSuperArmor( bool Enable, const SuperArmorData& Data )
+void AFightingCharacter::EnableSuperArmor( const SuperArmorData& Data )
 {
-    m_HasSuperArmor = Enable;
-
     m_SuperArmorData = Data;
+    m_HasSuperArmor  = true;
+}
+
+void AFightingCharacter::DisableSuperArmor()
+{
+    m_HasSuperArmor = false;
 }
 
 void AFightingCharacter::SetIsCountering( bool IsCountering )

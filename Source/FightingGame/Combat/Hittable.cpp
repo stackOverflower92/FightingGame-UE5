@@ -16,6 +16,10 @@ bool IHittable::IsBlocking()
     return false;
 }
 
-void IHittable::EnableSuperArmor( bool Enable, const SuperArmorData& Data )
+void IHittable::EnableSuperArmor( const SuperArmorData& Data )
+{
+}
+
+void IHittable::DisableSuperArmor()
 {
 }
