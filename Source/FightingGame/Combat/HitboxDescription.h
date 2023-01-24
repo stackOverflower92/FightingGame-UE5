@@ -66,4 +66,7 @@ struct FHitboxDescription
 
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Shake" )
     bool m_Shake = true;
+
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Hit Sound" )
+    TObjectPtr<USoundBase> m_HitSound = nullptr;
 };

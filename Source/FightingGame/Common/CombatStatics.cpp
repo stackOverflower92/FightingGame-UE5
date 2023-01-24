@@ -145,7 +145,8 @@ HitData UCombatStatics::GenerateHitDataFromHitboxDescription( TObjectPtr<AActor>
                     HitboxDesc.m_Priority,
                     HitboxDesc.m_IsCounter,
                     HitboxDesc.m_IgnoreBlock,
-                    AdditionalActorsToIgnore );
+                    AdditionalActorsToIgnore,
+                    HitboxDesc.m_HitSound );
 }
 
 FVector UCombatStatics::GetKnockbackFromOrientation( TObjectPtr<IFacingEntity> FacingEntity, float Orientation )

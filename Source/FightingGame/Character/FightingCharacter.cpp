@@ -372,6 +372,11 @@ void AFightingCharacter::OnHitReceived( const HitData& HitData )
             m_StateMachine->SetState( m_GroundedReactionStateName );
         }
     }
+
+    if( HitData.m_HitSound )
+    {
+        UGameplayStatics::PlaySoundAtLocation( GetWorld(), HitData.m_HitSound, GetActorLocation() );
+    }
 }
 
 bool AFightingCharacter::IsHittable()

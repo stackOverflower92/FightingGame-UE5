@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+class USoundCue;
+
 // #TODO this should become a USTRUCT i think
 struct HitData
 {
@@ -23,13 +25,15 @@ struct HitData
     bool m_IsCounter;
     bool m_IgnoreBlock;
     TArray<TObjectPtr<AActor>> m_AdditionalActorsToIgnore;
+    TObjectPtr<USoundBase> m_HitSound;
     bool m_PendingRemoval;
 
     explicit HitData( bool InForceOpponentFacing, float InDamagePercent, float InDamageHP, float InRadius, const FVector& InProcessedKnockback,
                       bool InIgnoreKnockbackMultiplier,
                       float InHitStopDuration, float InOpponentHitStopDuration, bool InShake, UWorld* InWorld, AActor* InOwner, USkeletalMeshComponent* InSkeletalMesh,
                       const FName& InSocketToFollow, FVector InLocation, uint32 InId, int32 InGroupId,
-                      int32 InPriority, bool InIsCounter, bool InIgnoreBlock, const TArray<TObjectPtr<AActor>>& InAdditionalActorsToIgnore );
+                      int32 InPriority, bool InIsCounter, bool InIgnoreBlock, const TArray<TObjectPtr<AActor>>& InAdditionalActorsToIgnore,
+                      TObjectPtr<USoundBase> InHitSound );
 
     void GetActorsToIgnore( TArray<TObjectPtr<AActor>>& OutActors ) const
     {

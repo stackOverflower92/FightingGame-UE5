@@ -4,7 +4,8 @@ HitData::HitData( bool InForceOpponentFacing, float InDamagePercent, float InDam
                   bool InIgnoreKnockbackMultiplier,
                   float InHitStopDuration, float InOpponentHitStopDuration, bool InShake, UWorld* InWorld, AActor* InOwner, USkeletalMeshComponent* InSkeletalMesh,
                   const FName& InSocketToFollow, FVector InLocation, uint32 InId, int32 InGroupId,
-                  int32 InPriority, bool InIsCounter, bool InIgnoreBlock, const TArray<TObjectPtr<AActor>>& InAdditionalActorsToIgnore )
+                  int32 InPriority, bool InIsCounter, bool InIgnoreBlock, const TArray<TObjectPtr<AActor>>& InAdditionalActorsToIgnore,
+                  TObjectPtr<USoundBase> InHitSound )
     : m_ForceOpponentFacing( InForceOpponentFacing ),
       m_DamagePercent( InDamagePercent ),
       m_DamageHP( InDamageHP ),
@@ -25,6 +26,7 @@ HitData::HitData( bool InForceOpponentFacing, float InDamagePercent, float InDam
       m_IsCounter( InIsCounter ),
       m_IgnoreBlock( InIgnoreBlock ),
       m_AdditionalActorsToIgnore( InAdditionalActorsToIgnore ),
+      m_HitSound( InHitSound ),
       m_PendingRemoval( false )
 {
 }
