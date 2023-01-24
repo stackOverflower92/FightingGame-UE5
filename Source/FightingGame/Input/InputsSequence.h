@@ -20,7 +20,4 @@ public:
 
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Priority" )
     int32 m_Priority = 0;
-
-    UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Is Special" )
-    bool m_IsSpecial = false;
 };

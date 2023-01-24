@@ -48,7 +48,6 @@ EInputRegistrationResult UInputSequenceResolver::RegisterInput( EInputEntry Inpu
 
     auto predSameInputEntry = [&InputEntry]( TSharedPtr<FInputResolverNode> _node )
     {
-        // #TODO check state too
         return _node->m_InputState.m_InputEntry == InputEntry;
     };
 
@@ -57,15 +56,12 @@ EInputRegistrationResult UInputSequenceResolver::RegisterInput( EInputEntry Inpu
         if( (*it)->m_Children.IsEmpty() )
         {
             m_InputRouteEndedDelegate.Broadcast( (*it)->m_InputsSequence );
-
-            ResetRouteTimer();
             m_CurrentRouteNode = nullptr;
 
             return EInputRegistrationResult::RouteEnded;
         }
 
         m_CurrentRouteNode = *it;
-
         ResetRouteTimer();
         StartRouteTimer();
 

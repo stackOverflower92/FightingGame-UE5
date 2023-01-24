@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 
 #include "InputEntry.h"
+#include "InputPhase.h"
 #include "FightingGame/Common/ConversionStatics.h"
 #include "MovesBufferComponent.generated.h"
 
@@ -29,9 +30,10 @@ struct FBufferEntry
 
 struct FInputBufferEntry : public FBufferEntry
 {
-    explicit FInputBufferEntry( EInputEntry InputEntry, bool Used );
+    explicit FInputBufferEntry( EInputEntry InputEntry, EInputPhase Phase, bool Used );
 
     EInputEntry m_InputEntry;
+    EInputPhase m_Phase;
 
     virtual FORCEINLINE FString ToString() override
     {
@@ -52,6 +54,12 @@ struct FInputsSequenceBufferEntry : public FBufferEntry
     {
         return m_InputsSequenceName == s_SequenceNone ? TEXT( "---" ) : m_InputsSequenceName;
     }
+};
+
+struct FHoldInputBufferData
+{
+    int32 m_ElapsedFrames = 0;
+    bool m_Expired        = false;
 };
 
 UCLASS( ClassGroup = ( Custom ), meta = ( BlueprintSpawnableComponent ) )
@@ -146,25 +154,36 @@ private:
     float m_ISBElapsedFrameTime = 0.f;
     bool m_ISBBufferChanged     = false;
 
+    TMap<EInputEntry, FHoldInputBufferData> m_HoldInputsMap;
+
     float m_MovementDirection = 0.f;
 
     FVector2D m_LastDirectionalInputVector;
     FVector2D m_DirectionalInputVector;
     EInputEntry m_LastDirectionalInputEntry = EInputEntry::Neutral;
 
-    void AddToInputBuffer( EInputEntry InputEntry );
+    void AddToInputBuffer( EInputEntry InputEntry, EInputPhase Phase );
     bool InputBufferContainsConsumable( EInputEntry InputEntry ) const;
 
     void AddToInputsSequenceBuffer( const FString& InputsSequenceName, int32 Priority );
     bool InputsSequenceBufferContainsConsumable( const FString& MoveName );
 
+    void AddUniqueToHoldInputsMap( EInputEntry InputEntry );
+    void RemoveFromHoldInputsMap( EInputEntry InputEntry );
+
     void OnMoveHorizontal( float Value );
 
-    void OnStartJump();
-    void OnStopJump();
-    void OnAttack();
-    void OnSpecial();
-    void OnCounter();
+    void OnJumpPressed();
+    void OnJumpReleased();
+
+    void OnAttackPressed();
+    void OnAttackReleased();
+
+    void OnSpecialPressed();
+    void OnSpecialReleased();
+
+    void OnCounterPressed();
+    void OnCounterReleased();
 
     void UpdateMovementDirection();
     void UpdateDirectionalInputs( UInputComponent* InputComponent );

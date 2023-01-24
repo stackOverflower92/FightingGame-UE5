@@ -1,6 +1,8 @@
 // Copyright (c) Giammarco Agazzotti
 
 #include "MovesBufferComponent.h"
+
+#include "imgui.h"
 #include "Components/InputComponent.h"
 #include "FightingGame/Character/FightingCharacter.h"
 #include "FightingGame/Combat/InputSequenceResolver.h"
@@ -19,6 +21,9 @@ namespace
 
     int32 loc_ShowDirectionalAngle = 0;
     FG_CVAR_FLAG_DESC( CVarShowDirectionalAngle, TEXT("MovesBufferComponent.ShowDirectionalAngle"), loc_ShowDirectionalAngle );
+
+    int32 loc_ShowHoldInputsMap = 0;
+    FG_CVAR_FLAG_DESC( CVarShowHoldInputsMap, TEXT("MovesBufferComponent.ShowHoldInputsMap"), loc_ShowHoldInputsMap );
 
     FName loc_JumpAction           = TEXT( "Jump" );
     FName loc_AttackAction         = TEXT( "Attack" );
@@ -45,12 +50,15 @@ FBufferEntry::FBufferEntry( bool Used ): m_Used( Used )
     m_UniqueId = loc_CurrentBufferEntryUniqueId;
 }
 
-FInputBufferEntry::FInputBufferEntry( EInputEntry InputEntry, bool Used ): FBufferEntry( Used ),
-                                                                           m_InputEntry( InputEntry )
+FInputBufferEntry::FInputBufferEntry( EInputEntry InputEntry, EInputPhase Phase, bool Used ) :
+    FBufferEntry( Used ),
+    m_InputEntry( InputEntry ),
+    m_Phase( Phase )
 {
 }
 
-FInputsSequenceBufferEntry::FInputsSequenceBufferEntry( const FString& InputsSequenceName, int32 Priority, bool Used ): FBufferEntry( Used ),
+FInputsSequenceBufferEntry::FInputsSequenceBufferEntry( const FString& InputsSequenceName, int32 Priority, bool Used ) :
+    FBufferEntry( Used ),
     m_InputsSequenceName( InputsSequenceName ),
     m_Priority( Priority )
 {
@@ -87,7 +95,24 @@ void UMovesBufferComponent::TickComponent( float DeltaTime, ELevelTick TickType,
 
         if( !m_IBBufferChanged )
         {
-            AddToInputBuffer( EInputEntry::None );
+            AddToInputBuffer( EInputEntry::None, EInputPhase::Pressed );
+        }
+
+        for( TTuple<EInputEntry, FHoldInputBufferData>& pair : m_HoldInputsMap )
+        {
+            if( !pair.Value.m_Expired )
+            {
+                ++pair.Value.m_ElapsedFrames;
+            }
+        }
+
+        using HoldInputsMapType = TMap<EInputEntry, FHoldInputBufferData>;
+        for( HoldInputsMapType::TIterator it = m_HoldInputsMap.CreateIterator(); it; ++it )
+        {
+            if( (*it).Value.m_Expired )
+            {
+                it.RemoveCurrent();
+            }
         }
     }
 
@@ -131,6 +156,25 @@ void UMovesBufferComponent::TickComponent( float DeltaTime, ELevelTick TickType,
         }
     }
 
+    if( loc_ShowHoldInputsMap )
+    {
+        FString title = FString::Printf( TEXT( "Hold Inputs (%s)" ), *m_OwnerCharacter->GetName() );
+        ImGui::Begin( TCHAR_TO_ANSI( *title ) );
+        {
+            for( const auto& pair : m_HoldInputsMap )
+            {
+                if( !pair.Value.m_Expired )
+                {
+                    FString entryStringified = UConversionStatics::ConvertEnumValueToString( pair.Key );
+                    FString text             = FString::Printf( TEXT( "%s - %u" ), *entryStringified, pair.Value.m_ElapsedFrames );
+
+                    ImGui::Text( TCHAR_TO_ANSI( *text ) );
+                }
+            }
+        }
+        ImGui::End();
+    }
+
     m_IBBufferChanged  = false;
     m_ISBBufferChanged = false;
 
@@ -154,11 +198,17 @@ void UMovesBufferComponent::OnSetupPlayerInputComponent( UInputComponent* Player
     m_PlayerInput = PlayerInputComponent;
     if( m_PlayerInput )
     {
-        m_PlayerInput->BindAction( loc_JumpAction, IE_Pressed, this, &UMovesBufferComponent::OnStartJump );
-        m_PlayerInput->BindAction( loc_JumpAction, IE_Released, this, &UMovesBufferComponent::OnStopJump );
-        m_PlayerInput->BindAction( loc_AttackAction, IE_Pressed, this, &UMovesBufferComponent::OnAttack );
-        m_PlayerInput->BindAction( loc_SpecialAction, IE_Pressed, this, &UMovesBufferComponent::OnSpecial );
-        m_PlayerInput->BindAction( loc_CounterAction, IE_Pressed, this, &UMovesBufferComponent::OnCounter );
+        m_PlayerInput->BindAction( loc_JumpAction, IE_Pressed, this, &UMovesBufferComponent::OnJumpPressed );
+        m_PlayerInput->BindAction( loc_JumpAction, IE_Released, this, &UMovesBufferComponent::OnJumpReleased );
+
+        m_PlayerInput->BindAction( loc_AttackAction, IE_Pressed, this, &UMovesBufferComponent::OnAttackPressed );
+        m_PlayerInput->BindAction( loc_AttackAction, IE_Released, this, &UMovesBufferComponent::OnAttackReleased );
+
+        m_PlayerInput->BindAction( loc_SpecialAction, IE_Pressed, this, &UMovesBufferComponent::OnSpecialPressed );
+        m_PlayerInput->BindAction( loc_SpecialAction, IE_Released, this, &UMovesBufferComponent::OnSpecialReleased );
+
+        m_PlayerInput->BindAction( loc_CounterAction, IE_Pressed, this, &UMovesBufferComponent::OnCounterPressed );
+        m_PlayerInput->BindAction( loc_CounterAction, IE_Released, this, &UMovesBufferComponent::OnCounterReleased );
 
         m_PlayerInput->BindAxis( loc_MoveHorizontalAction );
         m_PlayerInput->BindAxis( loc_MoveVerticalAction );
@@ -258,11 +308,11 @@ void UMovesBufferComponent::OnInputRouteEnded( TObjectPtr<UInputsSequence> Input
     AddToInputsSequenceBuffer( InputsSequence->m_Name, InputsSequence->m_Priority );
 }
 
-void UMovesBufferComponent::AddToInputBuffer( EInputEntry InputEntry )
+void UMovesBufferComponent::AddToInputBuffer( EInputEntry InputEntry, EInputPhase Phase )
 {
     EInputEntry targetEntry = m_OwnerCharacter->IsFacingRight() ? InputEntry : MirrorInputEntry( InputEntry );
 
-    m_InputsBuffer.Emplace( FInputBufferEntry( targetEntry, false ) );
+    m_InputsBuffer.Emplace( FInputBufferEntry( targetEntry, Phase, false ) );
     m_InputsBuffer.RemoveAt( 0 );
 
     m_IBBufferChanged = true;
@@ -270,9 +320,16 @@ void UMovesBufferComponent::AddToInputBuffer( EInputEntry InputEntry )
     if( InputEntry != EInputEntry::None )
     {
         auto result = m_InputSequenceResolver->RegisterInput( targetEntry );
-        if( result == EInputRegistrationResult::InputNotFound )
+
+        switch( result )
         {
-            m_InputSequenceResolver->RegisterInput( targetEntry );
+            case EInputRegistrationResult::InputNotFound:
+                {
+                    m_InputSequenceResolver->RegisterInput( targetEntry );
+                    break;
+                }
+
+            default: break;
         }
     }
 }
@@ -311,6 +368,22 @@ bool UMovesBufferComponent::InputsSequenceBufferContainsConsumable( const FStrin
     return false;
 }
 
+void UMovesBufferComponent::AddUniqueToHoldInputsMap( EInputEntry InputEntry )
+{
+    if( !m_HoldInputsMap.Contains( InputEntry ) )
+    {
+        m_HoldInputsMap.Emplace( InputEntry );
+    }
+}
+
+void UMovesBufferComponent::RemoveFromHoldInputsMap( EInputEntry InputEntry )
+{
+    if( m_HoldInputsMap.Contains( InputEntry ) )
+    {
+        m_HoldInputsMap[InputEntry].m_Expired = true;
+    }
+}
+
 void UMovesBufferComponent::ClearInputsBuffer()
 {
     m_InputsBuffer.Empty();
@@ -322,7 +395,7 @@ void UMovesBufferComponent::InitInputBuffer()
 
     for( int32 i = 0; i < m_InputBufferSizeFrames; ++i )
     {
-        m_InputsBuffer.Emplace( FInputBufferEntry( EInputEntry::None, false ) );
+        m_InputsBuffer.Emplace( FInputBufferEntry( EInputEntry::None, EInputPhase::Pressed, false ) );
     }
 }
 
@@ -449,29 +522,48 @@ void UMovesBufferComponent::OnMoveHorizontal( float Value )
 }
 
 // TODO: these are all the same, make it generic maybe?
-void UMovesBufferComponent::OnStartJump()
+void UMovesBufferComponent::OnJumpPressed()
 {
-    AddToInputBuffer( EInputEntry::StartJump );
+    AddToInputBuffer( EInputEntry::Jump, EInputPhase::Pressed );
+    AddUniqueToHoldInputsMap( EInputEntry::Jump );
 }
 
-void UMovesBufferComponent::OnStopJump()
+void UMovesBufferComponent::OnJumpReleased()
 {
-    AddToInputBuffer( EInputEntry::StopJump );
+    RemoveFromHoldInputsMap( EInputEntry::Jump );
 }
 
-void UMovesBufferComponent::OnAttack()
+void UMovesBufferComponent::OnAttackPressed()
 {
-    AddToInputBuffer( EInputEntry::Attack );
+    AddToInputBuffer( EInputEntry::Attack, EInputPhase::Pressed );
+    AddUniqueToHoldInputsMap( EInputEntry::Attack );
 }
 
-void UMovesBufferComponent::OnSpecial()
+void UMovesBufferComponent::OnAttackReleased()
 {
-    AddToInputBuffer( EInputEntry::Special );
+    RemoveFromHoldInputsMap( EInputEntry::Attack );
 }
 
-void UMovesBufferComponent::OnCounter()
+void UMovesBufferComponent::OnSpecialPressed()
 {
-    AddToInputBuffer( EInputEntry::Counter );
+    AddToInputBuffer( EInputEntry::Special, EInputPhase::Pressed );
+    AddUniqueToHoldInputsMap( EInputEntry::Special );
+}
+
+void UMovesBufferComponent::OnSpecialReleased()
+{
+    RemoveFromHoldInputsMap( EInputEntry::Special );
+}
+
+void UMovesBufferComponent::OnCounterPressed()
+{
+    AddToInputBuffer( EInputEntry::Counter, EInputPhase::Pressed );
+    AddUniqueToHoldInputsMap( EInputEntry::Counter );
+}
+
+void UMovesBufferComponent::OnCounterReleased()
+{
+    RemoveFromHoldInputsMap( EInputEntry::Counter );
 }
 
 void UMovesBufferComponent::UpdateMovementDirection()
@@ -495,8 +587,8 @@ void UMovesBufferComponent::UpdateMovementDirection()
 
 void UMovesBufferComponent::UpdateDirectionalInputs( UInputComponent* InputComponent )
 {
-    m_DirectionalInputVector.X = InputComponent->GetAxisValue( "MoveHorizontal" );
-    m_DirectionalInputVector.Y = InputComponent->GetAxisValue( "MoveVertical" );
+    m_DirectionalInputVector.X = InputComponent->GetAxisValue( TEXT( "MoveHorizontal" ) );
+    m_DirectionalInputVector.Y = InputComponent->GetAxisValue( TEXT( "MoveVertical" ) );
 
     if( m_DirectionalInputVector.Length() > m_MinDirectionalInputVectorLength )
     {
@@ -513,7 +605,7 @@ void UMovesBufferComponent::UpdateDirectionalInputs( UInputComponent* InputCompo
         {
             m_LastDirectionalInputEntry = entry;
 
-            AddToInputBuffer( entry );
+            AddToInputBuffer( entry, EInputPhase::Pressed );
         }
     }
     else
@@ -522,7 +614,7 @@ void UMovesBufferComponent::UpdateDirectionalInputs( UInputComponent* InputCompo
         {
             m_LastDirectionalInputEntry = EInputEntry::Neutral;
 
-            AddToInputBuffer( EInputEntry::Neutral );
+            AddToInputBuffer( EInputEntry::Neutral, EInputPhase::Pressed );
         }
     }
 

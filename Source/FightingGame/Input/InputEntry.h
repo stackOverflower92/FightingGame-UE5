@@ -4,8 +4,7 @@ UENUM( BlueprintType )
 enum class EInputEntry : uint8
 {
     None,
-    StartJump,
-    StopJump,
+    Jump,
     Attack,
     Special,
     Forward,

@@ -46,7 +46,8 @@ public:
     void Init( const TArray<TObjectPtr<UInputsSequence>>& InputsList );
     EInputRegistrationResult RegisterInput( EInputEntry InputEntry );
 
-    void OnTick();
+    void StartRouteTimer();
+    void ResetRouteTimer();
 
 protected:
     UPROPERTY( EditAnywhere, BlueprintReadOnly, DisplayName = "Route Auto-Reset Time (Seconds)" )
@@ -62,7 +63,5 @@ private:
     FTimerHandle m_RouteTimerHandle;
 
     void InsertNode( TSharedPtr<FInputResolverNode> Node );
-    void StartRouteTimer();
-    void ResetRouteTimer();
     void OnRouteTimerEnded();
 };
