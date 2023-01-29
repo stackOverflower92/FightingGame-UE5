@@ -1,6 +1,8 @@
 // Copyright (c) Giammarco Agazzotti
 
 #include "HitboxHandlerComponent.h"
+
+#include "GroundSensitiveEntity.h"
 #include "Hittable.h"
 #include "FightingGame/Common/CombatStatics.h"
 #include "FightingGame/Debugging/Debug.h"
@@ -178,15 +180,28 @@ void UHitboxHandlerComponent::RegisterHitActor( AActor* Actor, const HitData& Hi
 
 void UHitboxHandlerComponent::UpdateHitbox( const HitData& HitData )
 {
-    FHitResult outHit;
-    bool success = TraceHitbox( HitData, outHit );
+    // #TODO check clang
 
-    AActor* hitActor = outHit.GetActor();
+    FHitResult outHurtboxHit;
+    bool didHitHurtbox = TraceHitbox( HitData, outHurtboxHit );
+
+    TObjectPtr<AActor> hitActor = outHurtboxHit.GetActor();
     if( auto* hittable = Cast<IHittable>( hitActor ) )
     {
+        if( auto* groundSensitiveEntity = Cast<IGroundSensitiveEntity>( hitActor ) )
+        {
+            bool groundedCheckFailed = HitData.m_AllowOnGroundedOpponents && !groundSensitiveEntity->IsGrounded();
+            bool airborneCheckFailed = HitData.m_AllowOnAirborneOpponents && !groundSensitiveEntity->IsAirborne();
+
+            if( groundedCheckFailed && airborneCheckFailed )
+            {
+                return;
+            }
+        }
+
         if( hittable->IsHittable() )
         {
-            if( success && !WasActorAlreadyHit( hitActor, HitData ) )
+            if( didHitHurtbox && !WasActorAlreadyHit( hitActor, HitData ) )
             {
                 RegisterHitActor( hitActor, HitData );
 

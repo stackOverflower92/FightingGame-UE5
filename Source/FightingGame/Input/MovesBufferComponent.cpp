@@ -242,6 +242,11 @@ float UMovesBufferComponent::GetMovementDirection() const
     return m_MovementDirection;
 }
 
+float UMovesBufferComponent::GetMovementStrength() const
+{
+    return FMath::Abs( m_InputMovement );
+}
+
 EInputEntry UMovesBufferComponent::GetDirectionalInputEntryFromAngle( float Angle ) const
 {
     // Assuming the character is facing right

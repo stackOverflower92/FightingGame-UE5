@@ -54,6 +54,12 @@ struct FHitboxDescription
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Ignore Knockback Multiplier" )
     bool m_IgnoreKnockbackMultiplier = false;
 
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Allow On Grounded Opponents" )
+    bool m_AllowOnGroundedOpponents = true;
+
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Allow On Airborne Opponents" )
+    bool m_AllowOnAirborneOpponents = true;
+
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Hit Stop Duration (Owner)" )
     float m_HitStopDuration = 0.f;
 
@@ -69,4 +75,10 @@ struct FHitboxDescription
 
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Hit Sound" )
     TObjectPtr<USoundBase> m_HitSound = nullptr;
+
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Can Clang" )
+    bool m_CanClang = true;
+
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Clang Priority", meta=(EditCondition = "m_CanClang", EditConditionHides = "m_CanClang") )
+    int32 m_ClangPriority = 0;
 };

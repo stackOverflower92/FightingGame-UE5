@@ -5,7 +5,7 @@ HitData::HitData( bool InForceOpponentFacing, float InDamagePercent, float InDam
                   float InHitStopDuration, float InOpponentHitStopDuration, bool InShake, UWorld* InWorld, AActor* InOwner, USkeletalMeshComponent* InSkeletalMesh,
                   const FName& InSocketToFollow, FVector InLocation, uint32 InId, int32 InGroupId,
                   int32 InPriority, bool InIsCounter, bool InIgnoreBlock, const TArray<TObjectPtr<AActor>>& InAdditionalActorsToIgnore,
-                  TObjectPtr<USoundBase> InHitSound )
+                  TObjectPtr<USoundBase> InHitSound, bool InCanClang, int32 InClangPriority, bool InAllowOnGroundedOpponents, bool InAllowOnAirborneOpponents )
     : m_ForceOpponentFacing( InForceOpponentFacing ),
       m_DamagePercent( InDamagePercent ),
       m_DamageHP( InDamageHP ),
@@ -27,6 +27,10 @@ HitData::HitData( bool InForceOpponentFacing, float InDamagePercent, float InDam
       m_IgnoreBlock( InIgnoreBlock ),
       m_AdditionalActorsToIgnore( InAdditionalActorsToIgnore ),
       m_HitSound( InHitSound ),
+      m_CanClang( InCanClang ),
+      m_ClangPriority( InClangPriority ),
+      m_AllowOnGroundedOpponents( InAllowOnGroundedOpponents ),
+      m_AllowOnAirborneOpponents( InAllowOnAirborneOpponents ),
       m_PendingRemoval( false )
 {
 }

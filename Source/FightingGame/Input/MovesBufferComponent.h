@@ -139,6 +139,12 @@ public:
     UFUNCTION( BlueprintCallable )
     float GetMovementDirection() const;
 
+    /*
+     * Returns a value from 0 to 1 indicating the "strength" of the movement input
+     */
+    UFUNCTION(BlueprintCallable)
+    float GetMovementStrength() const;
+
 private:
     UPROPERTY()
     UInputComponent* m_PlayerInput = nullptr;
