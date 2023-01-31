@@ -6,6 +6,7 @@
 #include "Animation/AnimNotifies/AnimNotifyState.h"
 #include "HitboxNotifyState.generated.h"
 
+class UHitboxDescriptionDataAsset;
 struct FHitboxDescription;
 
 UCLASS()
@@ -16,6 +17,9 @@ class FIGHTINGGAME_API UHitboxNotifyState : public UAnimNotifyState
 public:
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Hitboxes" )
     TArray<FHitboxDescription> m_HitBoxes;
+
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Hitboxes Data Assets" )
+    TArray<TObjectPtr<UHitboxDescriptionDataAsset>> m_HitboxesAssets;
 
     virtual void NotifyBegin( USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration,
                               const FAnimNotifyEventReference& EventReference ) override;

@@ -3,6 +3,7 @@
 #include "HitboxHandlerComponent.h"
 
 #include "GroundSensitiveEntity.h"
+#include "HitboxDescriptionDataAsset.h"
 #include "Hittable.h"
 #include "FightingGame/Common/CombatStatics.h"
 #include "FightingGame/Debugging/Debug.h"
@@ -115,9 +116,26 @@ void UHitboxHandlerComponent::ShowDebugTraces( bool Show )
 
 void UHitboxHandlerComponent::SpawnDefaultHitboxes()
 {
+    TArray<FHitboxDescription> aggregatedHitboxDescriptions;
     for( int i = 0; i < m_DefaultHitboxes.Num(); ++i )
     {
-        AddHitbox( UCombatStatics::GenerateHitDataFromHitboxDescription( GetOwner(), nullptr, m_DefaultHitboxes[i],
+        aggregatedHitboxDescriptions.Emplace( m_DefaultHitboxes[i] );
+    }
+
+    for( int i = 0; i < m_DefaultHitboxesDataAssets.Num(); ++i )
+    {
+        if( !m_DefaultHitboxesDataAssets[i] )
+        {
+            FG_SLOG_ERR( "There is a null hitbox description data asset, will be skipped" );
+            continue;
+        }
+
+        aggregatedHitboxDescriptions.Emplace( m_DefaultHitboxesDataAssets[i]->m_HitboxDescription );
+    }
+
+    for( int i = 0; i < aggregatedHitboxDescriptions.Num(); ++i )
+    {
+        AddHitbox( UCombatStatics::GenerateHitDataFromHitboxDescription( GetOwner(), nullptr, aggregatedHitboxDescriptions[i],
                                                                          i, GetOwner()->GetUniqueID(), m_AdditionalActorsToIgnore ) );
     }
 }

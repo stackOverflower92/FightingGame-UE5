@@ -9,6 +9,7 @@
 #include "FightingGame/Combat/HitData.h"
 #include "HitboxHandlerComponent.generated.h"
 
+class UHitboxDescriptionDataAsset;
 class AHitboxVisualizer;
 struct FHitboxDescription;
 
@@ -44,6 +45,9 @@ protected:
 
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Default Hitboxes" )
     TArray<FHitboxDescription> m_DefaultHitboxes;
+
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Default Hitboxes Data Assets" )
+    TArray<TObjectPtr<UHitboxDescriptionDataAsset>> m_DefaultHitboxesDataAssets;
 
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Spawn Default Hitboxes on Begin Play" )
     bool m_SpawnDefaultHitboxesOnBeginPlay = true;
