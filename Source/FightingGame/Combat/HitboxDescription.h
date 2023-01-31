@@ -45,7 +45,7 @@ struct FHitboxDescription
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Radius" )
     float m_Radius = 10.f;
 
-    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Knockback Orientation" )
+    UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Knockback Orientation (Degrees)" )
     float m_KnockbackOrientation = 0.f;
 
     UPROPERTY( EditAnywhere, BlueprintReadWrite, DisplayName = "Knockback Force" )

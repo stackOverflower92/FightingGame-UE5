@@ -1,7 +1,7 @@
 ﻿#include "HitData.h"
 
 HitData::HitData( bool InForceOpponentFacing, float InDamagePercent, float InDamageHP, float InRadius, const FVector& InProcessedKnockback,
-                  bool InIgnoreKnockbackMultiplier,
+                  float InKnockbackAngleDeg, bool InIgnoreKnockbackMultiplier,
                   float InHitStopDuration, float InOpponentHitStopDuration, bool InShake, UWorld* InWorld, AActor* InOwner, USkeletalMeshComponent* InSkeletalMesh,
                   const FName& InSocketToFollow, FVector InLocation, uint32 InId, int32 InGroupId,
                   int32 InPriority, bool InIsCounter, bool InIgnoreBlock, const TArray<TObjectPtr<AActor>>& InAdditionalActorsToIgnore,
@@ -11,6 +11,7 @@ HitData::HitData( bool InForceOpponentFacing, float InDamagePercent, float InDam
       m_DamageHP( InDamageHP ),
       m_Radius( InRadius ),
       m_ProcessedKnockback( InProcessedKnockback ),
+      m_KnockbackAngleDeg( InKnockbackAngleDeg ),
       m_IgnoreKnockbackMultiplier( InIgnoreKnockbackMultiplier ),
       m_HitStopDuration( InHitStopDuration ),
       m_OpponentHitStopDuration( InOpponentHitStopDuration ),

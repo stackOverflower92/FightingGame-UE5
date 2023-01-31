@@ -362,8 +362,9 @@ void AFightingCharacter::OnHitReceived( const HitData& HitData )
         bool ignoreKnockbackMultiplier = m_DamageIncreasesCharactersPercent ? HitData.m_IgnoreKnockbackMultiplier : true;
         UCombatStatics::ApplyKnockbackTo( HitData.m_ProcessedKnockback, HitData.m_ProcessedKnockback.Length(), this, ignoreKnockbackMultiplier );
 
-        float DotAbs = FMath::Abs( FVector::DotProduct( GetActorForwardVector(), HitData.m_ProcessedKnockback.GetSafeNormal() ) );
-        if( DotAbs < .9f && HitData.m_ProcessedKnockback.Length() >= 500.f )
+#pragma region REACTION_HANDLING
+
+        if( (HitData.m_KnockbackAngleDeg > 45.f && HitData.m_ProcessedKnockback.Length() >= 500.f) || IsAirborne() )
         {
             m_StateMachine->SetState( m_GroundToAirReactionStateName );
         }
@@ -372,6 +373,8 @@ void AFightingCharacter::OnHitReceived( const HitData& HitData )
             m_StateMachine->SetState( m_GroundedReactionStateName );
         }
     }
+
+#pragma endregion
 
     if( HitData.m_HitSound )
     {

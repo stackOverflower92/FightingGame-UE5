@@ -131,6 +131,7 @@ HitData UCombatStatics::GenerateHitDataFromHitboxDescription( TObjectPtr<AActor>
                     HitboxDesc.m_DamageHP,
                     HitboxDesc.m_Radius,
                     processedKnockback,
+                    HitboxDesc.m_KnockbackOrientation,
                     HitboxDesc.m_IgnoreKnockbackMultiplier,
                     hitStopDuration,
                     opponentHitStopDuration,
